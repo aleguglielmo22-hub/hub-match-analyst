@@ -1,0 +1,32 @@
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import type { Database } from "@/lib/types/database";
+
+/**
+ * Client Supabase per Server Components, Route Handlers e Server Actions.
+ * Legge/scrive i cookie di sessione gestiti da @supabase/ssr.
+ */
+export async function createClient() {
+  const cookieStore = await cookies();
+
+  return createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
+            );
+          } catch {
+            // Chiamato da un Server Component: il refresh sessione lo fa il middleware.
+          }
+        },
+      },
+    },
+  );
+}
