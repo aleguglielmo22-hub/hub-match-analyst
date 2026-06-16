@@ -27,16 +27,17 @@ type NavItem = {
 
 /**
  * Navigazione globale. L'IA primaria è:
- *   Dashboard → Scouting → Set Pieces → Situazionali → Archivio → Impostazioni
- * Archivio resta in nav come sezione storica/repository ma sotto le 3 verticali
- * tattiche. Solo l'OWNER vede Impostazioni.
+ *   Dashboard → Scouting DB → Set Pieces DB → Training → Cloud → Impostazioni
+ * Cloud resta in nav come repository file ma sotto le verticali operative.
+ * Solo l'OWNER vede Impostazioni.
+ * NB: le label sono solo testo; gli slug URL restano invariati.
  */
 const NAV: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/scouting", label: "Scouting", icon: Users },
-  { href: "/set-pieces", label: "Set Pieces", icon: Target },
-  { href: "/situational", label: "Situazionali", icon: Brain },
-  { href: "/archivio", label: "Archivio", icon: Archive },
+  { href: "/scouting", label: "Scouting DB", icon: Users },
+  { href: "/set-pieces", label: "Set Pieces DB", icon: Target },
+  { href: "/situational", label: "Training", icon: Brain },
+  { href: "/archivio", label: "Cloud", icon: Archive },
   {
     href: "/impostazioni/collaboratori",
     label: "Impostazioni",

@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Archive } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { SectionHeader } from "@/components/app/section-header";
 import { ArchiveList } from "@/components/archivio/archive-list";
 import { FiltersSidebar } from "@/components/archivio/filters-sidebar";
 import { FiltersMobileTrigger } from "@/components/archivio/filters-mobile-trigger";
@@ -15,7 +16,7 @@ import {
 } from "@/lib/schemas/filters";
 
 export const metadata = {
-  title: "Archivio · Hub Match Analyst",
+  title: "Cloud · Football Hub",
 };
 
 export const dynamic = "force-dynamic";
@@ -44,33 +45,27 @@ export default async function ArchivioPage({
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-10">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-primary font-semibold">
-            Sezione
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Archivio
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/archivio/cestino"
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            Cestino
-          </Link>
-          <Link
-            href="/archivio/nuovo"
-            className={buttonVariants({ size: "lg" })}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Nuova voce
-          </Link>
-        </div>
-      </div>
+      <SectionHeader
+        icon={Archive}
+        title="Cloud"
+        subtitle="Archivio video e documenti del workspace"
+        actions={
+          <>
+            <Link
+              href="/archivio/cestino"
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              Cestino
+            </Link>
+            <Link href="/archivio/nuovo" className={buttonVariants({ size: "lg" })}>
+              <Plus className="mr-2 h-4 w-4" />
+              Nuova voce
+            </Link>
+          </>
+        }
+      />
 
-      <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
+      <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <FiltersSidebar
           filters={filters}
           lookups={lookups}

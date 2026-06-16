@@ -97,7 +97,7 @@ export default async function DettaglioGiocatorePage({
         className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Torna allo scouting
+        Torna allo Scouting DB
       </Link>
 
       <header className="flex flex-wrap items-start justify-between gap-4">

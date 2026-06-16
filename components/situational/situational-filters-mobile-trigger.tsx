@@ -35,7 +35,7 @@ export function SituationalFiltersMobileTrigger({
         )}
       </SheetTrigger>
       <SheetContent side="left" className="w-80 overflow-y-auto p-5">
-        <SheetTitle className="sr-only">Filtri Situazionali</SheetTitle>
+        <SheetTitle className="sr-only">Filtri Training</SheetTitle>
         <SituationalFiltersSidebar
           filters={filters}
           availableFocusTags={availableFocusTags}

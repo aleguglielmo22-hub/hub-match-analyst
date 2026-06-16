@@ -13,12 +13,12 @@ export function SidebarBrand() {
       <span className="relative grid h-8 w-8 place-items-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
         <span className="absolute inset-1 rounded-md bg-gradient-to-br from-primary/80 to-primary/40" />
         <span className="relative text-[11px] font-bold tracking-tight text-primary-foreground">
-          HMA
+          FH
         </span>
       </span>
       <div className="flex flex-col leading-tight">
         <span className="text-sm font-semibold tracking-tight text-sidebar-foreground">
-          Hub Match Analyst
+          Football Hub
         </span>
         <span className="text-[10px] uppercase tracking-[0.2em] text-sidebar-foreground/50">
           Performance · Scouting

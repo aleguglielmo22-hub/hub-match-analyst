@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { LoginForm } from "./login-form";
 
 export const metadata = {
-  title: "Accedi · Hub Match Analyst",
+  title: "Accedi · Football Hub",
 };
 
 export default function LoginPage() {

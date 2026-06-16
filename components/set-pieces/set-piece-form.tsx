@@ -225,7 +225,7 @@ export function SetPieceForm() {
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Torna ai Set Pieces
+            Torna ai Set Pieces DB
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
             Aggiungi schema

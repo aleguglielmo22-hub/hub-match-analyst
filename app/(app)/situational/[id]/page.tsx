@@ -46,7 +46,7 @@ export default async function DettaglioSituazionalePage({
         className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Torna al catalogo
+        Torna al Training
       </Link>
 
       <header className="space-y-3">

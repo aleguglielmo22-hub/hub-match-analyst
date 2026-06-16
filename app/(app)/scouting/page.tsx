@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { SectionHeader } from "@/components/app/section-header";
 import { PlayersList } from "@/components/scouting/players-list";
 import { ScoutingFiltersSidebar } from "@/components/scouting/scouting-filters-sidebar";
 import { ScoutingFiltersMobileTrigger } from "@/components/scouting/scouting-filters-mobile-trigger";
@@ -13,7 +14,7 @@ import {
 } from "@/lib/schemas/scouting-filters";
 
 export const metadata = {
-  title: "Scouting · Hub Match Analyst",
+  title: "Scouting DB · Football Hub",
 };
 
 export const dynamic = "force-dynamic";
@@ -40,23 +41,17 @@ export default async function ScoutingPage({
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-10">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-primary font-semibold">
-            Sezione
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Scouting
-          </h1>
-        </div>
-        <Link
-          href="/scouting/nuovo"
-          className={buttonVariants({ size: "lg" })}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Aggiungi giocatore
-        </Link>
-      </div>
+      <SectionHeader
+        icon={Users}
+        title="Scouting DB"
+        subtitle="Database giocatori osservati e valutazioni"
+        actions={
+          <Link href="/scouting/nuovo" className={buttonVariants({ size: "lg" })}>
+            <Plus className="mr-2 h-4 w-4" />
+            Aggiungi giocatore
+          </Link>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <ScoutingFiltersSidebar

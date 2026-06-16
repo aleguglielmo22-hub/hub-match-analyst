@@ -4,7 +4,7 @@ import { getPlayerForEdit } from "@/app/(app)/scouting/actions";
 import { PlayerForm } from "@/components/scouting/player-form";
 
 export const metadata = {
-  title: "Modifica giocatore · Scouting",
+  title: "Modifica giocatore · Scouting DB",
 };
 
 export const dynamic = "force-dynamic";

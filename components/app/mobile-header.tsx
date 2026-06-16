@@ -43,7 +43,7 @@ export function MobileHeader({
         <SheetContent side="left" className="w-72 p-0">
           <SheetTitle className="sr-only">Menu di navigazione</SheetTitle>
           <SheetDescription className="sr-only">
-            Sezioni dell&apos;Hub Match Analyst
+            Sezioni del Football Hub
           </SheetDescription>
           <AppSidebar
             email={email}
@@ -57,11 +57,11 @@ export function MobileHeader({
       <div className="flex items-center gap-2">
         <span className="grid h-7 w-7 place-items-center rounded-md bg-primary/15 ring-1 ring-primary/30">
           <span className="text-[9px] font-bold tracking-tight text-primary">
-            HMA
+            FH
           </span>
         </span>
         <span className="text-sm font-semibold tracking-tight">
-          Hub Match Analyst
+          Football Hub
         </span>
       </div>
     </header>

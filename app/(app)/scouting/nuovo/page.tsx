@@ -3,7 +3,7 @@ import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { PlayerForm } from "@/components/scouting/player-form";
 
 export const metadata = {
-  title: "Aggiungi giocatore · Scouting",
+  title: "Aggiungi giocatore · Scouting DB",
 };
 
 export default async function NuovoGiocatorePage() {

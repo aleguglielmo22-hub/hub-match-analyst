@@ -3,7 +3,7 @@ import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { SituationalForm } from "@/components/situational/situational-form";
 
 export const metadata = {
-  title: "Nuova situazione · Situazionali",
+  title: "Nuovo · Training",
 };
 
 export default async function NuovaSituazionePage() {

@@ -33,7 +33,7 @@ export function SetPiecesFiltersMobileTrigger({
         )}
       </SheetTrigger>
       <SheetContent side="left" className="w-80 overflow-y-auto p-5">
-        <SheetTitle className="sr-only">Filtri Set Pieces</SheetTitle>
+        <SheetTitle className="sr-only">Filtri Set Pieces DB</SheetTitle>
         <SetPiecesFiltersSidebar filters={filters} />
       </SheetContent>
     </Sheet>

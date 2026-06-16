@@ -6,7 +6,7 @@ import { loadArchivePage } from "@/app/(app)/archivio/actions";
 import { EMPTY_FILTERS } from "@/lib/schemas/filters";
 
 export const metadata = {
-  title: "Cestino · Archivio",
+  title: "Cestino · Cloud",
 };
 
 export const dynamic = "force-dynamic";
@@ -36,7 +36,7 @@ export default async function CestinoPage({
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Torna all&apos;archivio
+          Torna al Cloud
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Cestino

@@ -287,7 +287,7 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            {isEdit ? "Torna al dettaglio" : "Torna all'archivio"}
+            {isEdit ? "Torna al dettaglio" : "Torna al Cloud"}
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
             {headerLabel}

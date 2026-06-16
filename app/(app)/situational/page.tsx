@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Brain } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { SectionHeader } from "@/components/app/section-header";
 import { SituationalList } from "@/components/situational/situational-list";
 import { SituationalFiltersSidebar } from "@/components/situational/situational-filters-sidebar";
 import { SituationalFiltersMobileTrigger } from "@/components/situational/situational-filters-mobile-trigger";
@@ -12,7 +13,7 @@ import {
 } from "@/lib/schemas/situational-filters";
 
 export const metadata = {
-  title: "Situazionali · Hub Match Analyst",
+  title: "Training · Football Hub",
 };
 
 export const dynamic = "force-dynamic";
@@ -36,26 +37,17 @@ export default async function SituationalPage({
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-10">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-primary font-semibold">
-            Sezione
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Situazionali
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Catalogo tattico ed esercitazioni
-          </p>
-        </div>
-        <Link
-          href="/situational/nuovo"
-          className={buttonVariants({ size: "lg" })}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Nuova situazione
-        </Link>
-      </div>
+      <SectionHeader
+        icon={Brain}
+        title="Training"
+        subtitle="Catalogo esercitazioni e situazioni di gioco"
+        actions={
+          <Link href="/situational/nuovo" className={buttonVariants({ size: "lg" })}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nuova situazione
+          </Link>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <SituationalFiltersSidebar

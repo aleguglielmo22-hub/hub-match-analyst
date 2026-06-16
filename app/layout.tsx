@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Hub Match Analyst",
-  description: "Archivio, scouting e analisi per Match Analyst",
+  title: "Football Hub",
+  description: "Scouting, palle inattive, training e cloud per il match analyst",
 };
 
 export default function RootLayout({

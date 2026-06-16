@@ -34,7 +34,7 @@ export function ScoutingFiltersMobileTrigger({
         )}
       </SheetTrigger>
       <SheetContent side="left" className="w-80 overflow-y-auto p-5">
-        <SheetTitle className="sr-only">Filtri Scouting</SheetTitle>
+        <SheetTitle className="sr-only">Filtri Scouting DB</SheetTitle>
         <ScoutingFiltersSidebar filters={filters} />
       </SheetContent>
     </Sheet>

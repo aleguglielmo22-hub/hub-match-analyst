@@ -4,7 +4,7 @@ import { getLookupOptions } from "@/app/(app)/archivio/actions";
 import { ArchiveForm } from "@/components/archivio/archive-form";
 
 export const metadata = {
-  title: "Nuova voce · Archivio",
+  title: "Nuova voce · Cloud",
 };
 
 export default async function NuovaVocePage() {

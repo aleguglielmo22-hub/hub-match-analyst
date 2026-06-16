@@ -14,9 +14,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
-  title: "Hub Match Analyst — Scouting & Analisi per Match Analyst",
+  title: "Football Hub — Scouting & Analisi per Match Analyst",
   description:
-    "Scouting, palle inattive, situazionali e archivio video in un unico hub di lavoro per match analyst.",
+    "Database scouting e palle inattive, training e cloud video in un unico hub per il match analyst.",
 };
 
 // La home è pubblica: la rendiamo dinamica perché controlliamo la sessione.
@@ -26,23 +26,23 @@ export const dynamic = "force-dynamic";
 const FEATURES = [
   {
     icon: Users,
-    title: "Scouting",
+    title: "Scouting DB",
     desc: "Database di giocatori osservati con schede complete e valutazioni dettagliate. Filtri avanzati per ruolo, scadenza e potenziale.",
   },
   {
     icon: Target,
-    title: "Set Pieces",
-    desc: "Analisi delle palle inattive: angoli, punizioni e rimesse. Schemi, esecutori ed efficacia misurata nel tempo.",
+    title: "Set Pieces DB",
+    desc: "Database delle palle inattive: angoli, punizioni e rimesse. Schemi, esecutori ed efficacia misurata nel tempo.",
   },
   {
     icon: Brain,
-    title: "Situazionali",
-    desc: "Studio delle situazioni di gioco ricorrenti. Pattern offensivi e difensivi catalogati per fase e contesto.",
+    title: "Training",
+    desc: "Catalogo di esercitazioni e situazioni di gioco. Pattern offensivi e difensivi organizzati per fase e obiettivo.",
   },
   {
     icon: Archive,
-    title: "Archivio",
-    desc: "Tutti i lavori video e i documenti in un unico posto. Tag, stagioni e ricerca per ritrovare ogni file in pochi secondi.",
+    title: "Cloud",
+    desc: "Archivio cloud per video e documenti. Tag, stagioni e ricerca per ritrovare ogni file in pochi secondi.",
   },
 ];
 
@@ -54,9 +54,9 @@ const FEATURES = [
  */
 const SHOTS = [
   { caption: "Dashboard — centro di controllo" },
-  { caption: "Scheda giocatore — Scouting" },
-  { caption: "Analisi palle inattive — Set Pieces" },
-  { caption: "Archivio video & documenti" },
+  { caption: "Scheda giocatore — Scouting DB" },
+  { caption: "Analisi palle inattive — Set Pieces DB" },
+  { caption: "Cloud — video & documenti" },
 ];
 
 export default async function LandingPage() {
@@ -77,11 +77,11 @@ export default async function LandingPage() {
             <span className="relative grid h-8 w-8 place-items-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
               <span className="absolute inset-1 rounded-md bg-gradient-to-br from-primary/80 to-primary/40" />
               <span className="relative text-[11px] font-bold tracking-tight text-primary-foreground">
-                HMA
+                FH
               </span>
             </span>
             <span className="text-sm font-semibold tracking-tight">
-              Hub Match Analyst
+              Football Hub
             </span>
           </div>
           <Link href="/login" className={buttonVariants({ size: "default" })}>
@@ -108,11 +108,11 @@ export default async function LandingPage() {
               Performance · Scouting
             </p>
             <h1 className="mx-auto max-w-4xl text-4xl font-semibold tracking-tight sm:text-6xl">
-              Hub Match Analyst
+              Football Hub
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Scouting, palle inattive, situazionali e archivio video in
-              un&apos;unica piattaforma di lavoro per il match analyst.
+              Database scouting e palle inattive, catalogo training e cloud
+              video: tutto in un&apos;unica piattaforma per il match analyst.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
@@ -209,7 +209,7 @@ export default async function LandingPage() {
       <footer className="border-t border-border/60 bg-card/20">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-4 py-8 text-sm sm:flex-row sm:items-center sm:px-8">
           <div className="space-y-1">
-            <p className="font-semibold tracking-tight">Hub Match Analyst</p>
+            <p className="font-semibold tracking-tight">Football Hub</p>
             <p className="text-xs text-muted-foreground">
               © {new Date().getFullYear()} · Tutti i diritti riservati
             </p>

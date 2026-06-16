@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Target } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { SectionHeader } from "@/components/app/section-header";
 import { SetPiecesList } from "@/components/set-pieces/set-pieces-list";
 import { SetPiecesFiltersSidebar } from "@/components/set-pieces/set-pieces-filters-sidebar";
 import { SetPiecesFiltersMobileTrigger } from "@/components/set-pieces/set-pieces-filters-mobile-trigger";
@@ -12,7 +13,7 @@ import {
 } from "@/lib/schemas/set-pieces-filters";
 
 export const metadata = {
-  title: "Set Pieces · Hub Match Analyst",
+  title: "Set Pieces DB · Football Hub",
 };
 
 export const dynamic = "force-dynamic";
@@ -37,23 +38,17 @@ export default async function SetPiecesPage({
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-10">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-primary font-semibold">
-            Sezione
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Set Pieces
-          </h1>
-        </div>
-        <Link
-          href="/set-pieces/nuovo"
-          className={buttonVariants({ size: "lg" })}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Aggiungi schema
-        </Link>
-      </div>
+      <SectionHeader
+        icon={Target}
+        title="Set Pieces DB"
+        subtitle="Database calci piazzati: schemi ed efficacia"
+        actions={
+          <Link href="/set-pieces/nuovo" className={buttonVariants({ size: "lg" })}>
+            <Plus className="mr-2 h-4 w-4" />
+            Aggiungi schema
+          </Link>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <SetPiecesFiltersSidebar

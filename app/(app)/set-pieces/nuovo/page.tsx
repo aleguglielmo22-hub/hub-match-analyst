@@ -3,7 +3,7 @@ import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { SetPieceForm } from "@/components/set-pieces/set-piece-form";
 
 export const metadata = {
-  title: "Aggiungi schema · Set Pieces",
+  title: "Aggiungi schema · Set Pieces DB",
 };
 
 export default async function NuovoSetPiecePage() {

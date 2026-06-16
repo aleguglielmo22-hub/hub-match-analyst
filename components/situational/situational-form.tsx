@@ -215,7 +215,7 @@ export function SituationalForm() {
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Torna al catalogo
+            Torna al Training
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
             Nuova situazione / esercizio
