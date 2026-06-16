@@ -215,16 +215,15 @@ export default async function LandingPage() {
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:items-end">
-            {/* Sostituisci con i contatti definitivi */}
             <a
-              href="mailto:brancatimaria.mb@gmail.com"
+              href="mailto:aleguglielmo22@gmail.com"
               className="inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary"
             >
               <Mail className="h-4 w-4" />
-              brancatimaria.mb@gmail.com
+              aleguglielmo22@gmail.com
             </a>
             <p className="text-xs text-muted-foreground/70">
-              Maria Brancati · Match Analyst
+              Alessandro Guglielmo · Match Analyst
             </p>
           </div>
         </div>
