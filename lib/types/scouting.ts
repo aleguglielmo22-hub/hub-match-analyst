@@ -468,6 +468,7 @@ export function ratingsAverage(
 export type PlayerListItem = Pick<
   PlayerRow,
   | "id"
+  | "created_by"
   | "nome"
   | "cognome"
   | "foto_url"

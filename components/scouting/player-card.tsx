@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   PIEDE_LABEL,
@@ -57,7 +57,13 @@ function PhotoAvatar({
   );
 }
 
-export function PlayerCard({ player }: { player: PlayerListItem }) {
+export function PlayerCard({
+  player,
+  canEdit = false,
+}: {
+  player: PlayerListItem;
+  canEdit?: boolean;
+}) {
   const eta = calcolaEta(player.data_nascita);
   const initials = `${(player.nome ?? "").charAt(0)}${(player.cognome ?? "").charAt(0)}`;
   const status = STATUS_TINT[player.status_osservazione];
@@ -70,10 +76,21 @@ export function PlayerCard({ player }: { player: PlayerListItem }) {
     : null;
 
   return (
-    <Link
-      href={`/scouting/${player.id}`}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/50 transition-all hover:border-primary/40 hover:bg-card/80 hover:shadow-lg hover:shadow-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-    >
+    <div className="relative">
+      {canEdit && (
+        <Link
+          href={`/scouting/${player.id}/modifica`}
+          aria-label={`Modifica ${player.nome} ${player.cognome}`}
+          title="Modifica rapida"
+          className="absolute bottom-2.5 right-2.5 z-10 grid h-8 w-8 place-items-center rounded-lg border border-border/60 bg-background/80 text-muted-foreground opacity-70 backdrop-blur transition-all hover:border-primary/50 hover:bg-background hover:text-primary hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </Link>
+      )}
+      <Link
+        href={`/scouting/${player.id}`}
+        className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/50 transition-all hover:border-primary/40 hover:bg-card/80 hover:shadow-lg hover:shadow-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
       <div className="flex items-start gap-3 p-4">
         <PhotoAvatar src={player.foto_url} initials={initials || "??"} />
         <div className="flex min-w-0 flex-1 flex-col">
@@ -158,6 +175,7 @@ export function PlayerCard({ player }: { player: PlayerListItem }) {
           {STATUS_OSSERVAZIONE_LABEL[player.status_osservazione]}
         </p>
       </div>
-    </Link>
+      </Link>
+    </div>
   );
 }

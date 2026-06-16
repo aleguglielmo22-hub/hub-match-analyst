@@ -2,10 +2,11 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import {
   FASCIA_INGAGGIO_LABEL,
   GESTI_MOTORI_LABEL,
@@ -52,6 +53,9 @@ export default async function DettaglioGiocatorePage({
 
   if (error || !player) notFound();
   const p = player as PlayerRow;
+
+  // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
+  const canEdit = workspace.isOwner || p.created_by === workspace.userId;
 
   const eta = calcolaEta(p.data_nascita);
   const dataNascitaFmt = p.data_nascita
@@ -129,20 +133,31 @@ export default async function DettaglioGiocatorePage({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
-          <Badge variant="secondary" className="text-[10px]">
-            {STATUS_OSSERVAZIONE_LABEL[p.status_osservazione]}
-          </Badge>
-          {p.voto_potenziale && (
-            <Badge variant="outline" className="text-[10px]">
-              {VOTO_POTENZIALE_LABEL[p.voto_potenziale]}
-            </Badge>
+        <div className="flex flex-col items-end gap-3">
+          {canEdit && (
+            <Link
+              href={`/scouting/${p.id}/modifica`}
+              className={buttonVariants({ variant: "outline", size: "default" })}
+            >
+              <Pencil className="mr-2 h-4 w-4" />
+              Modifica
+            </Link>
           )}
-          {p.ruolo_principale && (
-            <Badge variant="outline" className="font-mono text-[10px]">
-              {p.ruolo_principale}
+          <div className="flex flex-wrap justify-end gap-1.5">
+            <Badge variant="secondary" className="text-[10px]">
+              {STATUS_OSSERVAZIONE_LABEL[p.status_osservazione]}
             </Badge>
-          )}
+            {p.voto_potenziale && (
+              <Badge variant="outline" className="text-[10px]">
+                {VOTO_POTENZIALE_LABEL[p.voto_potenziale]}
+              </Badge>
+            )}
+            {p.ruolo_principale && (
+              <Badge variant="outline" className="font-mono text-[10px]">
+                {p.ruolo_principale}
+              </Badge>
+            )}
+          </div>
         </div>
       </header>
 

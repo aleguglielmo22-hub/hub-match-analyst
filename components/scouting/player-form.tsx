@@ -53,7 +53,7 @@ import {
   type RatingMacroGroup,
   type RuoloEnum,
 } from "@/lib/types/scouting";
-import { createPlayer } from "@/app/(app)/scouting/actions";
+import { createPlayer, updatePlayer } from "@/app/(app)/scouting/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -318,13 +318,19 @@ function RatingNumberInput({
  * app/(app)/scouting/actions.ts per popolare automaticamente squadra,
  * valore, scadenza e nazionalità.
  */
-export function PlayerForm() {
+export function PlayerForm({
+  existing,
+}: {
+  existing?: { id: string; values: PlayerFormValues };
+}) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const isEdit = !!existing;
+  const cancelHref = existing ? `/scouting/${existing.id}` : "/scouting";
 
   const form = useForm<PlayerFormValues>({
     resolver: zodResolver(playerFormSchema),
-    defaultValues: emptyPlayerForm(),
+    defaultValues: existing?.values ?? emptyPlayerForm(),
   });
 
   const ruoloPrimario = form.watch("ruolo_principale");
@@ -345,9 +351,15 @@ export function PlayerForm() {
   async function onSubmit(values: PlayerFormValues) {
     setSubmitting(true);
     try {
-      const { id } = await createPlayer(values);
-      toast.success("Giocatore aggiunto");
-      router.push(`/scouting/${id}`);
+      if (existing) {
+        const { id } = await updatePlayer(existing.id, values);
+        toast.success("Modifiche salvate");
+        router.push(`/scouting/${id}`);
+      } else {
+        const { id } = await createPlayer(values);
+        toast.success("Giocatore aggiunto");
+        router.push(`/scouting/${id}`);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore sconosciuto";
       toast.error("Salvataggio fallito", { description: message });
@@ -360,14 +372,14 @@ export function PlayerForm() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <Link
-            href="/scouting"
+            href={cancelHref}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Torna allo scouting
+            {isEdit ? "Torna al dettaglio" : "Torna allo scouting"}
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Aggiungi giocatore
+            {isEdit ? "Modifica giocatore" : "Aggiungi giocatore"}
           </h1>
         </div>
         <div className="flex items-center gap-2">
@@ -375,7 +387,7 @@ export function PlayerForm() {
             type="button"
             variant="ghost"
             disabled={submitting}
-            onClick={() => router.push("/scouting")}
+            onClick={() => router.push(cancelHref)}
           >
             <X className="mr-2 h-4 w-4" />
             Annulla
@@ -389,7 +401,7 @@ export function PlayerForm() {
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Salva giocatore
+                {isEdit ? "Salva modifiche" : "Salva giocatore"}
               </>
             )}
           </Button>
@@ -1119,7 +1131,7 @@ export function PlayerForm() {
           type="button"
           variant="ghost"
           disabled={submitting}
-          onClick={() => router.push("/scouting")}
+          onClick={() => router.push(cancelHref)}
         >
           Annulla
         </Button>
@@ -1132,7 +1144,7 @@ export function PlayerForm() {
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />
-              Salva giocatore
+              {isEdit ? "Salva modifiche" : "Salva giocatore"}
             </>
           )}
         </Button>

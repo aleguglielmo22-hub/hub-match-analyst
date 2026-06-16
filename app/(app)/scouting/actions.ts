@@ -10,6 +10,7 @@ import {
   INFLUENZE_NEG,
   RATING_KEYS,
   type PlayerListItem,
+  type PlayerRow,
   type RatingKey,
 } from "@/lib/types/scouting";
 
@@ -88,7 +89,7 @@ export async function loadPlayersPage(
     .from("players")
     .select(
       `
-        id, nome, cognome, foto_url, data_nascita, nazionalita, piede,
+        id, created_by, nome, cognome, foto_url, data_nascita, nazionalita, piede,
         ruolo_principale, ruoli_secondari, squadra_attuale, campionato,
         scadenza_contratto, valore_mercato_eur, status_osservazione, voto_potenziale
       `,
@@ -240,6 +241,180 @@ export async function createPlayer(
   if (error || !data) throw new Error(error?.message ?? "Errore creazione giocatore");
 
   revalidatePath("/scouting");
+  return { id: data.id };
+}
+
+/* ============================================================
+ * Modifica giocatore
+ * ============================================================ */
+
+/** Converte una riga DB nei valori attesi dal form. */
+function playerRowToFormValues(p: PlayerRow): PlayerFormValues {
+  const base: Record<string, unknown> = {
+    nome: p.nome,
+    cognome: p.cognome,
+    foto_url: p.foto_url,
+    data_nascita: p.data_nascita,
+    nazionalita: p.nazionalita,
+    passaporto: p.passaporto,
+    piede: p.piede,
+
+    ruolo_principale: p.ruolo_principale,
+    ruoli_secondari: p.ruoli_secondari ?? [],
+    stili_gioco: p.stili_gioco ?? [],
+
+    transfermarkt_url: p.transfermarkt_url,
+    squadra_attuale: p.squadra_attuale,
+    campionato: p.campionato,
+    scadenza_contratto: p.scadenza_contratto,
+    agenzia: p.agenzia,
+    valore_mercato_eur: p.valore_mercato_eur,
+    fascia_ingaggio: p.fascia_ingaggio,
+
+    altezza_cm: p.altezza_cm,
+    peso_kg: p.peso_kg,
+    struttura_corporea: p.struttura_corporea,
+    gesti_motori: p.gesti_motori,
+    muscolatura: p.muscolatura,
+    capacita_condizionali: p.capacita_condizionali,
+
+    behav_delega_altri: p.behav_delega_altri,
+    behav_assume_responsabilita: p.behav_assume_responsabilita,
+
+    status_osservazione: p.status_osservazione,
+    voto_potenziale: p.voto_potenziale,
+    data_ultimo_aggiornamento: p.data_ultimo_aggiornamento,
+    scout_assegnato: p.scout_assegnato,
+
+    scouting_report_url: p.scouting_report_url,
+    note_rapide: p.note_rapide,
+    clip_video_urls: p.clip_video_urls ?? [],
+  };
+  const row = p as unknown as Record<string, unknown>;
+  for (const i of INFLUENZE_NEG) base[i.key] = !!row[i.key];
+  for (const k of RATING_KEYS) {
+    const v = row[k];
+    base[k] = typeof v === "number" ? v : null;
+  }
+  return base as PlayerFormValues;
+}
+
+/**
+ * Carica un giocatore per la pagina di modifica.
+ * Ritorna i valori già pronti per il form e il flag `can_edit`
+ * (creatore o owner del workspace — coerente con le RLS).
+ */
+export async function getPlayerForEdit(playerId: string): Promise<{
+  id: string;
+  values: PlayerFormValues;
+  can_edit: boolean;
+} | null> {
+  z.string().uuid().parse(playerId);
+
+  const workspace = await getCurrentWorkspace();
+  if (!workspace) return null;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("players")
+    .select("*")
+    .eq("id", playerId)
+    .eq("workspace_id", workspace.id)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  const p = data as PlayerRow;
+
+  return {
+    id: p.id,
+    values: playerRowToFormValues(p),
+    can_edit: workspace.isOwner || p.created_by === workspace.userId,
+  };
+}
+
+/**
+ * Aggiorna un giocatore esistente.
+ * La RLS `players_update_owner_or_creator` garantisce che solo il creatore
+ * o l'owner del workspace possano scrivere. Imposta sempre
+ * `data_ultimo_aggiornamento` a oggi.
+ */
+export async function updatePlayer(
+  playerId: string,
+  raw: PlayerFormValues,
+): Promise<{ id: string }> {
+  z.string().uuid().parse(playerId);
+  const v = playerFormSchema.parse(raw);
+
+  const workspace = await getCurrentWorkspace();
+  if (!workspace) throw new Error("Workspace non trovato");
+
+  const supabase = await createClient();
+
+  const ratings = Object.fromEntries(
+    RATING_KEYS.map((k) => [k, v[k as RatingKey]]),
+  );
+  const influenze = Object.fromEntries(
+    INFLUENZE_NEG.map((i) => [i.key, v[i.key]]),
+  );
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { data, error } = await supabase
+    .from("players")
+    .update({
+      nome: v.nome,
+      cognome: v.cognome,
+      foto_url: v.foto_url,
+      data_nascita: v.data_nascita,
+      nazionalita: v.nazionalita,
+      passaporto: v.passaporto ?? null,
+      piede: v.piede ?? null,
+
+      ruolo_principale: v.ruolo_principale ?? null,
+      ruoli_secondari: v.ruoli_secondari,
+      stili_gioco: v.stili_gioco,
+
+      transfermarkt_url: v.transfermarkt_url,
+      squadra_attuale: v.squadra_attuale,
+      campionato: v.campionato,
+      scadenza_contratto: v.scadenza_contratto,
+      agenzia: v.agenzia,
+      valore_mercato_eur: v.valore_mercato_eur,
+      fascia_ingaggio: v.fascia_ingaggio ?? null,
+
+      altezza_cm: v.altezza_cm,
+      peso_kg: v.peso_kg,
+      struttura_corporea: v.struttura_corporea ?? null,
+      gesti_motori: v.gesti_motori ?? null,
+      muscolatura: v.muscolatura ?? null,
+      capacita_condizionali: v.capacita_condizionali,
+
+      behav_delega_altri: v.behav_delega_altri ?? null,
+      behav_assume_responsabilita: v.behav_assume_responsabilita ?? null,
+      ...influenze,
+      ...ratings,
+
+      status_osservazione: v.status_osservazione,
+      voto_potenziale: v.voto_potenziale ?? null,
+      data_ultimo_aggiornamento: today,
+      scout_assegnato: v.scout_assegnato,
+
+      scouting_report_url: v.scouting_report_url,
+      note_rapide: v.note_rapide,
+      clip_video_urls: v.clip_video_urls,
+    })
+    .eq("id", playerId)
+    .eq("workspace_id", workspace.id)
+    .select("id")
+    .single();
+
+  if (error || !data) {
+    throw new Error(error?.message ?? "Errore aggiornamento giocatore");
+  }
+
+  revalidatePath("/scouting");
+  revalidatePath(`/scouting/${playerId}`);
   return { id: data.id };
 }
 

@@ -34,11 +34,15 @@ export function PlayersList({
   initialHasMore,
   filters,
   hasActiveSearchOrFilters,
+  currentUserId,
+  isOwner,
 }: {
   initialItems: PlayerListItem[];
   initialHasMore: boolean;
   filters: ScoutingFilters;
   hasActiveSearchOrFilters?: boolean;
+  currentUserId: string | null;
+  isOwner: boolean;
 }) {
   const [items, setItems] = useState<PlayerListItem[]>(initialItems);
   const [page, setPage] = useState(0);
@@ -150,7 +154,11 @@ export function PlayersList({
         <>
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
             {items.map((p) => (
-              <PlayerCard key={p.id} player={p} />
+              <PlayerCard
+                key={p.id}
+                player={p}
+                canEdit={isOwner || p.created_by === currentUserId}
+              />
             ))}
             {isPending &&
               Array.from({ length: 6 }).map((_, i) => (

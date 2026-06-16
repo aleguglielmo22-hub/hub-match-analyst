@@ -5,6 +5,7 @@ import { PlayersList } from "@/components/scouting/players-list";
 import { ScoutingFiltersSidebar } from "@/components/scouting/scouting-filters-sidebar";
 import { ScoutingFiltersMobileTrigger } from "@/components/scouting/scouting-filters-mobile-trigger";
 import { SearchInput } from "@/components/archivio/search-input";
+import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { loadPlayersPage } from "./actions";
 import {
   countActiveScoutingFilters,
@@ -24,6 +25,8 @@ export default async function ScoutingPage({
 }) {
   const sp = await searchParams;
   const filters = parseScoutingFiltersFromSearchParams(sp);
+
+  const workspace = await getCurrentWorkspace();
 
   const initialPage = await loadPlayersPage({
     sort: "recent",
@@ -77,6 +80,8 @@ export default async function ScoutingPage({
             initialHasMore={initialPage.hasMore}
             filters={filters}
             hasActiveSearchOrFilters={hasActiveSearchOrFilters}
+            currentUserId={workspace?.userId ?? null}
+            isOwner={workspace?.isOwner ?? false}
           />
         </div>
       </div>
