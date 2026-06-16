@@ -7,7 +7,7 @@ import Link from "next/link";
 export function SidebarBrand() {
   return (
     <Link
-      href="/"
+      href="/dashboard"
       className="flex items-center gap-2.5 px-4 py-4 transition-opacity hover:opacity-90"
     >
       <span className="relative grid h-8 w-8 place-items-center rounded-lg bg-primary/15 ring-1 ring-primary/30">

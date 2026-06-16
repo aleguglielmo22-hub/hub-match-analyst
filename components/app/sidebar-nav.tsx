@@ -32,7 +32,7 @@ type NavItem = {
  * tattiche. Solo l'OWNER vede Impostazioni.
  */
 const NAV: NavItem[] = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/scouting", label: "Scouting", icon: Users },
   { href: "/set-pieces", label: "Set Pieces", icon: Target },
   { href: "/situational", label: "Situazionali", icon: Brain },
@@ -60,7 +60,7 @@ export function SidebarNav({
     <nav className="flex flex-col gap-1 px-2 py-2">
       {items.map((item) => {
         const Icon = item.icon;
-        // "/" → match esatto (altrimenti matcherebbe sempre).
+        // exact → match esatto (es. /dashboard, altrimenti matcherebbe i figli).
         // Altri → startsWith su matchPrefix o href.
         const isActive = item.exact
           ? pathname === item.href

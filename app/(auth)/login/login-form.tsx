@@ -21,7 +21,7 @@ type Mode = "signin" | "signup";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/";
+  const nextPath = searchParams.get("next") ?? "/dashboard";
 
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
@@ -62,8 +62,8 @@ export function LoginForm() {
       }
 
       // Successo: router.refresh per propagare la nuova sessione + push alla
-      // pagina richiesta (di default "/").
-      router.replace(nextPath.startsWith("/") ? nextPath : "/");
+      // pagina richiesta (di default "/dashboard").
+      router.replace(nextPath.startsWith("/") ? nextPath : "/dashboard");
       router.refresh();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore sconosciuto";
