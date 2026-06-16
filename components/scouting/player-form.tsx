@@ -54,6 +54,11 @@ import {
   type RuoloEnum,
 } from "@/lib/types/scouting";
 import { createPlayer, updatePlayer } from "@/app/(app)/scouting/actions";
+import {
+  AttachmentsField,
+  type PendingAttachment,
+} from "@/components/attachments/attachments-field";
+import { uploadPendingAttachments } from "@/components/attachments/upload";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -325,6 +330,9 @@ export function PlayerForm({
 }) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [pendingAttachments, setPendingAttachments] = useState<
+    PendingAttachment[]
+  >([]);
   const isEdit = !!existing;
   const cancelHref = existing ? `/scouting/${existing.id}` : "/scouting";
 
@@ -351,15 +359,18 @@ export function PlayerForm({
   async function onSubmit(values: PlayerFormValues) {
     setSubmitting(true);
     try {
-      if (existing) {
-        const { id } = await updatePlayer(existing.id, values);
-        toast.success("Modifiche salvate");
-        router.push(`/scouting/${id}`);
-      } else {
-        const { id } = await createPlayer(values);
-        toast.success("Giocatore aggiunto");
-        router.push(`/scouting/${id}`);
+      const id = existing
+        ? (await updatePlayer(existing.id, values)).id
+        : (await createPlayer(values)).id;
+      if (pendingAttachments.length > 0) {
+        await uploadPendingAttachments(
+          "player",
+          id,
+          pendingAttachments.map((p) => p.file),
+        );
       }
+      toast.success(existing ? "Modifiche salvate" : "Giocatore aggiunto");
+      router.push(`/scouting/${id}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore sconosciuto";
       toast.error("Salvataggio fallito", { description: message });
@@ -1024,6 +1035,19 @@ export function PlayerForm({
             )}
           />
         </div>
+      </FormSection>
+
+      {/* Allegati (file reali su storage privato) */}
+      <FormSection
+        title="Allegati"
+        description="Carica file reali (video, PDF, slide, immagini…) oltre ai link qui sopra."
+      >
+        <AttachmentsField
+          entityType="player"
+          entityId={existing?.id ?? null}
+          pending={pendingAttachments}
+          onPendingChange={setPendingAttachments}
+        />
       </FormSection>
 
       <div className="flex items-center justify-end gap-2 pb-8">

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import {
   FASCIA_INGAGGIO_LABEL,
   GESTI_MOTORI_LABEL,
@@ -428,6 +429,8 @@ export default async function DettaglioGiocatorePage({
           )}
         </section>
       )}
+
+      <AttachmentsViewer entityType="player" entityId={p.id} />
     </div>
   );
 }

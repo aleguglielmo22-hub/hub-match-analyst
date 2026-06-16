@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, ExternalLink, FileText, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import { cn } from "@/lib/utils";
 import {
   MACRO_FASE_BADGE,
@@ -235,6 +236,8 @@ export default async function DettaglioSituazionalePage({
           </div>
         </section>
       )}
+
+      <AttachmentsViewer entityType="situational" entityId={s.id} />
     </div>
   );
 }

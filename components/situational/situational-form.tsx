@@ -25,6 +25,11 @@ import {
   type SottoFaseEnum,
 } from "@/lib/types/situational";
 import { createSituational } from "@/app/(app)/situational/actions";
+import {
+  AttachmentsField,
+  type PendingAttachment,
+} from "@/components/attachments/attachments-field";
+import { uploadPendingAttachments } from "@/components/attachments/upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -168,6 +173,9 @@ function FreeChipInput({
 export function SituationalForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [pendingAttachments, setPendingAttachments] = useState<
+    PendingAttachment[]
+  >([]);
 
   const form = useForm<SituationalFormValues>({
     resolver: zodResolver(situationalFormSchema),
@@ -197,6 +205,13 @@ export function SituationalForm() {
     setSubmitting(true);
     try {
       const { id } = await createSituational(values);
+      if (pendingAttachments.length > 0) {
+        await uploadPendingAttachments(
+          "situational",
+          id,
+          pendingAttachments.map((p) => p.file),
+        );
+      }
       toast.success("Situazione salvata");
       router.push(`/situational/${id}`);
     } catch (err) {
@@ -483,6 +498,19 @@ export function SituationalForm() {
           />
           <FieldError message={form.formState.errors.pdf_url?.message} />
         </div>
+      </FormSection>
+
+      {/* Allegati (file reali su storage privato) */}
+      <FormSection
+        title="Allegati"
+        description="Carica file reali (video, PDF, slide, immagini…) oltre ai link."
+      >
+        <AttachmentsField
+          entityType="situational"
+          entityId={null}
+          pending={pendingAttachments}
+          onPendingChange={setPendingAttachments}
+        />
       </FormSection>
 
       <div className="flex items-center justify-end gap-2 pb-8">

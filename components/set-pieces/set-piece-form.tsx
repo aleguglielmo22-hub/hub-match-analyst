@@ -48,6 +48,11 @@ import {
   type SetPieceFormValues,
 } from "@/lib/schemas/set-pieces";
 import { createSetPiece } from "@/app/(app)/set-pieces/actions";
+import {
+  AttachmentsField,
+  type PendingAttachment,
+} from "@/components/attachments/attachments-field";
+import { uploadPendingAttachments } from "@/components/attachments/upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -158,6 +163,9 @@ function PresetTagToggle({
 export function SetPieceForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [pendingAttachments, setPendingAttachments] = useState<
+    PendingAttachment[]
+  >([]);
 
   const form = useForm<SetPieceFormValues>({
     resolver: zodResolver(setPieceFormSchema),
@@ -207,6 +215,13 @@ export function SetPieceForm() {
     setSubmitting(true);
     try {
       const { id } = await createSetPiece(values);
+      if (pendingAttachments.length > 0) {
+        await uploadPendingAttachments(
+          "set_piece",
+          id,
+          pendingAttachments.map((p) => p.file),
+        );
+      }
       toast.success("Schema salvato");
       router.push(`/set-pieces/${id}`);
     } catch (err) {
@@ -805,6 +820,19 @@ export function SetPieceForm() {
           />
           <FieldError message={form.formState.errors.pdf_url?.message} />
         </div>
+      </FormSection>
+
+      {/* Allegati (file reali su storage privato) */}
+      <FormSection
+        title="Allegati"
+        description="Carica file reali (video, PDF, slide, immagini…) oltre ai link."
+      >
+        <AttachmentsField
+          entityType="set_piece"
+          entityId={null}
+          pending={pendingAttachments}
+          onPendingChange={setPendingAttachments}
+        />
       </FormSection>
 
       <div className="flex items-center justify-end gap-2 pb-8">

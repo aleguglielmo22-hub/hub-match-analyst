@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import { Badge } from "@/components/ui/badge";
 import {
   ALTEZZA_LINEA_LABEL,
@@ -301,6 +302,8 @@ export default async function DettaglioSetPiecePage({
           </a>
         </section>
       )}
+
+      <AttachmentsViewer entityType="set_piece" entityId={sp.id} />
     </div>
   );
 }
