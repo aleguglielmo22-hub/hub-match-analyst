@@ -264,50 +264,16 @@ export type Database = {
         Row: {
           agenzia: string | null
           altezza_cm: number | null
-          atl_abilita_acrobatica: number | null
-          atl_accelerazione: number | null
-          atl_agilita: number | null
-          atl_cambi_direzione: number | null
-          atl_cambio_passo: number | null
-          atl_elevazione: number | null
-          atl_flessibilita: number | null
-          atl_forza: number | null
-          atl_potenza_contrasti: number | null
-          atl_rapidita: number | null
-          atl_resistenza_fatica: number | null
-          atl_velocita_senza_palla: number | null
-          behav_aggressivita: number | null
           behav_assume_responsabilita:
             | Database["public"]["Enums"]["si_no_avolte_enum"]
             | null
-          behav_atteggiamento_fuori_campo: number | null
-          behav_atteggiamento_in_campo: number | null
-          behav_autocritica: number | null
-          behav_autostima: number | null
-          behav_carisma: number | null
-          behav_concentrazione: number | null
           behav_delega_altri:
             | Database["public"]["Enums"]["si_no_avolte_enum"]
             | null
-          behav_generosita: number | null
-          behav_personalita: number | null
-          behav_spirito_collaborativo: number | null
-          behav_spirito_comprensione: number | null
-          behav_spirito_sacrificio: number | null
-          behav_temperamento: number | null
-          behav_tenacia: number | null
           campionato: string | null
           capacita_condizionali: string | null
           clip_video_urls: string[]
           cognome: string
-          coord_accoppiamento_motorio: number | null
-          coord_adattamento: number | null
-          coord_anticipazione: number | null
-          coord_differenziazione: number | null
-          coord_equilibrio: number | null
-          coord_orientamento: number | null
-          coord_reazione: number | null
-          coord_ritmizzazione: number | null
           created_at: string
           created_by: string
           data_nascita: string | null
@@ -316,14 +282,47 @@ export type Database = {
           fascia_ingaggio:
             | Database["public"]["Enums"]["fascia_ingaggio_enum"]
             | null
+          fis_accelerazione: number | null
+          fis_agilita: number | null
+          fis_elevazione: number | null
+          fis_equilibrio: number | null
+          fis_forza: number | null
+          fis_integrita: number | null
+          fis_resistenza: number | null
+          fis_velocita: number | null
           foto_url: string | null
           gesti_motori: Database["public"]["Enums"]["gesti_motori_enum"] | null
+          gk_comando_area: number | null
+          gk_comunicazione: number | null
+          gk_eccentricita: number | null
+          gk_gioco_aereo: number | null
+          gk_lancio: number | null
+          gk_presa: number | null
+          gk_riflessi: number | null
+          gk_rinvio: number | null
+          gk_tendenza_pugni: number | null
+          gk_tendenza_uscire: number | null
+          gk_uno_vs_uno: number | null
           id: string
           influenza_neg_allenatore: boolean
           influenza_neg_arbitro: boolean
           influenza_neg_errore_compagno: boolean
           influenza_neg_propri_errori: boolean
           influenza_neg_risultato: boolean
+          men_aggressivita: number | null
+          men_carisma: number | null
+          men_concentrazione: number | null
+          men_coraggio: number | null
+          men_decisioni: number | null
+          men_determinazione: number | null
+          men_fantasia: number | null
+          men_freddezza: number | null
+          men_gioco_squadra: number | null
+          men_impegno: number | null
+          men_intuito: number | null
+          men_posizione: number | null
+          men_senza_palla: number | null
+          men_visione: number | null
           muscolatura: Database["public"]["Enums"]["muscolatura_enum"] | null
           nazionalita: string | null
           nome: string
@@ -342,43 +341,20 @@ export type Database = {
           struttura_corporea:
             | Database["public"]["Enums"]["struttura_corporea_enum"]
             | null
-          tappl_nposs_anticipazione_gioco: number | null
-          tappl_nposs_partecipazione_difensiva: number | null
-          tappl_nposs_pressing: number | null
-          tappl_nposs_scalare: number | null
-          tappl_poss_fantasia_gioco: number | null
-          tappl_poss_lettura_veloce: number | null
-          tappl_poss_velocita_esecuzione: number | null
-          tappl_ruolo_comportamento: number | null
-          tatti_nposs_anticipo: number | null
-          tatti_nposs_contrasto_diretto: number | null
-          tatti_nposs_difesa_zona: number | null
-          tatti_nposs_intercettamento: number | null
-          tatti_nposs_marcamento: number | null
-          tatti_nposs_pressione: number | null
-          tatti_nposs_ripresa_dopo_perdita: number | null
-          tatti_nposs_ripresa_fine_azione: number | null
-          tatti_poss_agisce_stile: number | null
-          tatti_poss_controllo_difesa_palla: number | null
-          tatti_poss_dribbling: number | null
-          tatti_poss_falli_laterali: number | null
-          tatti_poss_fantasia_estro: number | null
-          tatti_poss_finta: number | null
-          tatti_poss_occupazione_spazio: number | null
-          tatti_poss_smarcamento: number | null
-          tatti_poss_sovrapposizione: number | null
-          tatti_poss_taglio: number | null
-          tatti_poss_triangolazione: number | null
-          tatti_poss_vedere_porta: number | null
-          tatti_poss_visione_periferica: number | null
-          tec_gioco_testa: number | null
-          tec_lato_dominante: number | null
-          tec_piede_dx: number | null
-          tec_piede_sx: number | null
-          tec_ricezione_petto: number | null
-          tec_ricezione_piede: number | null
-          tec_trasmissione_piede: number | null
-          tec_trasmissione_testa: number | null
+          tec_calci_angolo: number | null
+          tec_colpi_testa: number | null
+          tec_contrasti: number | null
+          tec_controllo_palla: number | null
+          tec_cross: number | null
+          tec_dribbling: number | null
+          tec_finalizzazione: number | null
+          tec_marcatura: number | null
+          tec_passaggi: number | null
+          tec_punizioni: number | null
+          tec_rigori: number | null
+          tec_rimesse_lunghe: number | null
+          tec_tecnica: number | null
+          tec_tiri_lontano: number | null
           transfermarkt_url: string | null
           updated_at: string
           valore_mercato_eur: number | null
@@ -390,50 +366,16 @@ export type Database = {
         Insert: {
           agenzia?: string | null
           altezza_cm?: number | null
-          atl_abilita_acrobatica?: number | null
-          atl_accelerazione?: number | null
-          atl_agilita?: number | null
-          atl_cambi_direzione?: number | null
-          atl_cambio_passo?: number | null
-          atl_elevazione?: number | null
-          atl_flessibilita?: number | null
-          atl_forza?: number | null
-          atl_potenza_contrasti?: number | null
-          atl_rapidita?: number | null
-          atl_resistenza_fatica?: number | null
-          atl_velocita_senza_palla?: number | null
-          behav_aggressivita?: number | null
           behav_assume_responsabilita?:
             | Database["public"]["Enums"]["si_no_avolte_enum"]
             | null
-          behav_atteggiamento_fuori_campo?: number | null
-          behav_atteggiamento_in_campo?: number | null
-          behav_autocritica?: number | null
-          behav_autostima?: number | null
-          behav_carisma?: number | null
-          behav_concentrazione?: number | null
           behav_delega_altri?:
             | Database["public"]["Enums"]["si_no_avolte_enum"]
             | null
-          behav_generosita?: number | null
-          behav_personalita?: number | null
-          behav_spirito_collaborativo?: number | null
-          behav_spirito_comprensione?: number | null
-          behav_spirito_sacrificio?: number | null
-          behav_temperamento?: number | null
-          behav_tenacia?: number | null
           campionato?: string | null
           capacita_condizionali?: string | null
           clip_video_urls?: string[]
           cognome: string
-          coord_accoppiamento_motorio?: number | null
-          coord_adattamento?: number | null
-          coord_anticipazione?: number | null
-          coord_differenziazione?: number | null
-          coord_equilibrio?: number | null
-          coord_orientamento?: number | null
-          coord_reazione?: number | null
-          coord_ritmizzazione?: number | null
           created_at?: string
           created_by: string
           data_nascita?: string | null
@@ -442,14 +384,47 @@ export type Database = {
           fascia_ingaggio?:
             | Database["public"]["Enums"]["fascia_ingaggio_enum"]
             | null
+          fis_accelerazione?: number | null
+          fis_agilita?: number | null
+          fis_elevazione?: number | null
+          fis_equilibrio?: number | null
+          fis_forza?: number | null
+          fis_integrita?: number | null
+          fis_resistenza?: number | null
+          fis_velocita?: number | null
           foto_url?: string | null
           gesti_motori?: Database["public"]["Enums"]["gesti_motori_enum"] | null
+          gk_comando_area?: number | null
+          gk_comunicazione?: number | null
+          gk_eccentricita?: number | null
+          gk_gioco_aereo?: number | null
+          gk_lancio?: number | null
+          gk_presa?: number | null
+          gk_riflessi?: number | null
+          gk_rinvio?: number | null
+          gk_tendenza_pugni?: number | null
+          gk_tendenza_uscire?: number | null
+          gk_uno_vs_uno?: number | null
           id?: string
           influenza_neg_allenatore?: boolean
           influenza_neg_arbitro?: boolean
           influenza_neg_errore_compagno?: boolean
           influenza_neg_propri_errori?: boolean
           influenza_neg_risultato?: boolean
+          men_aggressivita?: number | null
+          men_carisma?: number | null
+          men_concentrazione?: number | null
+          men_coraggio?: number | null
+          men_decisioni?: number | null
+          men_determinazione?: number | null
+          men_fantasia?: number | null
+          men_freddezza?: number | null
+          men_gioco_squadra?: number | null
+          men_impegno?: number | null
+          men_intuito?: number | null
+          men_posizione?: number | null
+          men_senza_palla?: number | null
+          men_visione?: number | null
           muscolatura?: Database["public"]["Enums"]["muscolatura_enum"] | null
           nazionalita?: string | null
           nome: string
@@ -468,43 +443,20 @@ export type Database = {
           struttura_corporea?:
             | Database["public"]["Enums"]["struttura_corporea_enum"]
             | null
-          tappl_nposs_anticipazione_gioco?: number | null
-          tappl_nposs_partecipazione_difensiva?: number | null
-          tappl_nposs_pressing?: number | null
-          tappl_nposs_scalare?: number | null
-          tappl_poss_fantasia_gioco?: number | null
-          tappl_poss_lettura_veloce?: number | null
-          tappl_poss_velocita_esecuzione?: number | null
-          tappl_ruolo_comportamento?: number | null
-          tatti_nposs_anticipo?: number | null
-          tatti_nposs_contrasto_diretto?: number | null
-          tatti_nposs_difesa_zona?: number | null
-          tatti_nposs_intercettamento?: number | null
-          tatti_nposs_marcamento?: number | null
-          tatti_nposs_pressione?: number | null
-          tatti_nposs_ripresa_dopo_perdita?: number | null
-          tatti_nposs_ripresa_fine_azione?: number | null
-          tatti_poss_agisce_stile?: number | null
-          tatti_poss_controllo_difesa_palla?: number | null
-          tatti_poss_dribbling?: number | null
-          tatti_poss_falli_laterali?: number | null
-          tatti_poss_fantasia_estro?: number | null
-          tatti_poss_finta?: number | null
-          tatti_poss_occupazione_spazio?: number | null
-          tatti_poss_smarcamento?: number | null
-          tatti_poss_sovrapposizione?: number | null
-          tatti_poss_taglio?: number | null
-          tatti_poss_triangolazione?: number | null
-          tatti_poss_vedere_porta?: number | null
-          tatti_poss_visione_periferica?: number | null
-          tec_gioco_testa?: number | null
-          tec_lato_dominante?: number | null
-          tec_piede_dx?: number | null
-          tec_piede_sx?: number | null
-          tec_ricezione_petto?: number | null
-          tec_ricezione_piede?: number | null
-          tec_trasmissione_piede?: number | null
-          tec_trasmissione_testa?: number | null
+          tec_calci_angolo?: number | null
+          tec_colpi_testa?: number | null
+          tec_contrasti?: number | null
+          tec_controllo_palla?: number | null
+          tec_cross?: number | null
+          tec_dribbling?: number | null
+          tec_finalizzazione?: number | null
+          tec_marcatura?: number | null
+          tec_passaggi?: number | null
+          tec_punizioni?: number | null
+          tec_rigori?: number | null
+          tec_rimesse_lunghe?: number | null
+          tec_tecnica?: number | null
+          tec_tiri_lontano?: number | null
           transfermarkt_url?: string | null
           updated_at?: string
           valore_mercato_eur?: number | null
@@ -516,50 +468,16 @@ export type Database = {
         Update: {
           agenzia?: string | null
           altezza_cm?: number | null
-          atl_abilita_acrobatica?: number | null
-          atl_accelerazione?: number | null
-          atl_agilita?: number | null
-          atl_cambi_direzione?: number | null
-          atl_cambio_passo?: number | null
-          atl_elevazione?: number | null
-          atl_flessibilita?: number | null
-          atl_forza?: number | null
-          atl_potenza_contrasti?: number | null
-          atl_rapidita?: number | null
-          atl_resistenza_fatica?: number | null
-          atl_velocita_senza_palla?: number | null
-          behav_aggressivita?: number | null
           behav_assume_responsabilita?:
             | Database["public"]["Enums"]["si_no_avolte_enum"]
             | null
-          behav_atteggiamento_fuori_campo?: number | null
-          behav_atteggiamento_in_campo?: number | null
-          behav_autocritica?: number | null
-          behav_autostima?: number | null
-          behav_carisma?: number | null
-          behav_concentrazione?: number | null
           behav_delega_altri?:
             | Database["public"]["Enums"]["si_no_avolte_enum"]
             | null
-          behav_generosita?: number | null
-          behav_personalita?: number | null
-          behav_spirito_collaborativo?: number | null
-          behav_spirito_comprensione?: number | null
-          behav_spirito_sacrificio?: number | null
-          behav_temperamento?: number | null
-          behav_tenacia?: number | null
           campionato?: string | null
           capacita_condizionali?: string | null
           clip_video_urls?: string[]
           cognome?: string
-          coord_accoppiamento_motorio?: number | null
-          coord_adattamento?: number | null
-          coord_anticipazione?: number | null
-          coord_differenziazione?: number | null
-          coord_equilibrio?: number | null
-          coord_orientamento?: number | null
-          coord_reazione?: number | null
-          coord_ritmizzazione?: number | null
           created_at?: string
           created_by?: string
           data_nascita?: string | null
@@ -568,14 +486,47 @@ export type Database = {
           fascia_ingaggio?:
             | Database["public"]["Enums"]["fascia_ingaggio_enum"]
             | null
+          fis_accelerazione?: number | null
+          fis_agilita?: number | null
+          fis_elevazione?: number | null
+          fis_equilibrio?: number | null
+          fis_forza?: number | null
+          fis_integrita?: number | null
+          fis_resistenza?: number | null
+          fis_velocita?: number | null
           foto_url?: string | null
           gesti_motori?: Database["public"]["Enums"]["gesti_motori_enum"] | null
+          gk_comando_area?: number | null
+          gk_comunicazione?: number | null
+          gk_eccentricita?: number | null
+          gk_gioco_aereo?: number | null
+          gk_lancio?: number | null
+          gk_presa?: number | null
+          gk_riflessi?: number | null
+          gk_rinvio?: number | null
+          gk_tendenza_pugni?: number | null
+          gk_tendenza_uscire?: number | null
+          gk_uno_vs_uno?: number | null
           id?: string
           influenza_neg_allenatore?: boolean
           influenza_neg_arbitro?: boolean
           influenza_neg_errore_compagno?: boolean
           influenza_neg_propri_errori?: boolean
           influenza_neg_risultato?: boolean
+          men_aggressivita?: number | null
+          men_carisma?: number | null
+          men_concentrazione?: number | null
+          men_coraggio?: number | null
+          men_decisioni?: number | null
+          men_determinazione?: number | null
+          men_fantasia?: number | null
+          men_freddezza?: number | null
+          men_gioco_squadra?: number | null
+          men_impegno?: number | null
+          men_intuito?: number | null
+          men_posizione?: number | null
+          men_senza_palla?: number | null
+          men_visione?: number | null
           muscolatura?: Database["public"]["Enums"]["muscolatura_enum"] | null
           nazionalita?: string | null
           nome?: string
@@ -594,43 +545,20 @@ export type Database = {
           struttura_corporea?:
             | Database["public"]["Enums"]["struttura_corporea_enum"]
             | null
-          tappl_nposs_anticipazione_gioco?: number | null
-          tappl_nposs_partecipazione_difensiva?: number | null
-          tappl_nposs_pressing?: number | null
-          tappl_nposs_scalare?: number | null
-          tappl_poss_fantasia_gioco?: number | null
-          tappl_poss_lettura_veloce?: number | null
-          tappl_poss_velocita_esecuzione?: number | null
-          tappl_ruolo_comportamento?: number | null
-          tatti_nposs_anticipo?: number | null
-          tatti_nposs_contrasto_diretto?: number | null
-          tatti_nposs_difesa_zona?: number | null
-          tatti_nposs_intercettamento?: number | null
-          tatti_nposs_marcamento?: number | null
-          tatti_nposs_pressione?: number | null
-          tatti_nposs_ripresa_dopo_perdita?: number | null
-          tatti_nposs_ripresa_fine_azione?: number | null
-          tatti_poss_agisce_stile?: number | null
-          tatti_poss_controllo_difesa_palla?: number | null
-          tatti_poss_dribbling?: number | null
-          tatti_poss_falli_laterali?: number | null
-          tatti_poss_fantasia_estro?: number | null
-          tatti_poss_finta?: number | null
-          tatti_poss_occupazione_spazio?: number | null
-          tatti_poss_smarcamento?: number | null
-          tatti_poss_sovrapposizione?: number | null
-          tatti_poss_taglio?: number | null
-          tatti_poss_triangolazione?: number | null
-          tatti_poss_vedere_porta?: number | null
-          tatti_poss_visione_periferica?: number | null
-          tec_gioco_testa?: number | null
-          tec_lato_dominante?: number | null
-          tec_piede_dx?: number | null
-          tec_piede_sx?: number | null
-          tec_ricezione_petto?: number | null
-          tec_ricezione_piede?: number | null
-          tec_trasmissione_piede?: number | null
-          tec_trasmissione_testa?: number | null
+          tec_calci_angolo?: number | null
+          tec_colpi_testa?: number | null
+          tec_contrasti?: number | null
+          tec_controllo_palla?: number | null
+          tec_cross?: number | null
+          tec_dribbling?: number | null
+          tec_finalizzazione?: number | null
+          tec_marcatura?: number | null
+          tec_passaggi?: number | null
+          tec_punizioni?: number | null
+          tec_rigori?: number | null
+          tec_rimesse_lunghe?: number | null
+          tec_tecnica?: number | null
+          tec_tiri_lontano?: number | null
           transfermarkt_url?: string | null
           updated_at?: string
           valore_mercato_eur?: number | null

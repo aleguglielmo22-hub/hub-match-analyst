@@ -83,11 +83,10 @@ export default async function DettaglioGiocatorePage({
     m.get(r.area)!.push(r);
   }
   const MACRO_ORDER: RatingMacroGroup[] = [
-    "COMPORTAMENTALI",
-    "ATLETICHE",
-    "TECNICA_COORD",
-    "TATTICA_IND",
-    "TATTICA_APPL",
+    "TECNICA",
+    "PSICOLOGIA",
+    "FISICO",
+    "PORTIERE",
   ];
 
   return (

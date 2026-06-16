@@ -176,222 +176,143 @@ export const FASCIA_INGAGGIO_LABEL: Record<FasciaIngaggioEnum, string> = {
 // Allineate alla scheda ufficiale, raggruppate per area logica.
 // ============================================================
 
-export type RatingArea =
-  | "COMPORTAMENTALI"
-  | "ATLETICHE"
-  | "TECNICA"
-  | "COORDINATIVE"
-  | "TATT_IND_POSSESSO"
-  | "TATT_IND_NON_POSSESSO"
-  | "TATT_APPL_POSSESSO"
-  | "TATT_APPL_NON_POSSESSO"
-  | "TATT_APPL_RUOLO";
+/**
+ * Aree valutazione in stile Football Manager.
+ * Le valutazioni 1-10 dei calciatori osservati seguono questo set.
+ */
+export type RatingArea = "TECNICA" | "PSICOLOGIA" | "FISICO" | "PORTIERE";
 
 export const RATING_AREA_LABEL: Record<RatingArea, string> = {
-  COMPORTAMENTALI: "Comportamentali",
-  ATLETICHE: "Atletiche",
   TECNICA: "Tecnica",
-  COORDINATIVE: "Coordinative",
-  TATT_IND_POSSESSO: "Tattica individuale · Possesso",
-  TATT_IND_NON_POSSESSO: "Tattica individuale · Non possesso",
-  TATT_APPL_POSSESSO: "Tattica applicata · Possesso",
-  TATT_APPL_NON_POSSESSO: "Tattica applicata · Non possesso",
-  TATT_APPL_RUOLO: "Tattica applicata · Ruolo",
+  PSICOLOGIA: "Psicologia",
+  FISICO: "Fisico",
+  PORTIERE: "Portiere",
 };
 
-/** Macro-gruppi (per Accordion in sidebar e form). */
-export type RatingMacroGroup =
-  | "COMPORTAMENTALI"
-  | "ATLETICHE"
-  | "TECNICA_COORD"
-  | "TATTICA_IND"
-  | "TATTICA_APPL";
+/** In stile FM i macro-gruppi coincidono con le aree. */
+export type RatingMacroGroup = RatingArea;
 
 export const RATING_MACRO_LABEL: Record<RatingMacroGroup, string> = {
-  COMPORTAMENTALI: "Comportamentali",
-  ATLETICHE: "Atletiche",
-  TECNICA_COORD: "Tecnica & Coordinative",
-  TATTICA_IND: "Tattica individuale",
-  TATTICA_APPL: "Tattica applicata",
+  TECNICA: "Tecnica",
+  PSICOLOGIA: "Psicologia",
+  FISICO: "Fisico",
+  PORTIERE: "Portiere",
 };
 
 export const RATING_AREA_MACRO: Record<RatingArea, RatingMacroGroup> = {
-  COMPORTAMENTALI: "COMPORTAMENTALI",
-  ATLETICHE: "ATLETICHE",
-  TECNICA: "TECNICA_COORD",
-  COORDINATIVE: "TECNICA_COORD",
-  TATT_IND_POSSESSO: "TATTICA_IND",
-  TATT_IND_NON_POSSESSO: "TATTICA_IND",
-  TATT_APPL_POSSESSO: "TATTICA_APPL",
-  TATT_APPL_NON_POSSESSO: "TATTICA_APPL",
-  TATT_APPL_RUOLO: "TATTICA_APPL",
+  TECNICA: "TECNICA",
+  PSICOLOGIA: "PSICOLOGIA",
+  FISICO: "FISICO",
+  PORTIERE: "PORTIERE",
 };
 
 export type RatingKey =
-  // A. Comportamentali
-  | "behav_carisma"
-  | "behav_autostima"
-  | "behav_personalita"
-  | "behav_spirito_sacrificio"
-  | "behav_spirito_comprensione"
-  | "behav_generosita"
-  | "behav_aggressivita"
-  | "behav_autocritica"
-  | "behav_spirito_collaborativo"
-  | "behav_atteggiamento_in_campo"
-  | "behav_atteggiamento_fuori_campo"
-  | "behav_concentrazione"
-  | "behav_temperamento"
-  | "behav_tenacia"
-  // C. Atletiche
-  | "atl_velocita_senza_palla"
-  | "atl_accelerazione"
-  | "atl_cambi_direzione"
-  | "atl_elevazione"
-  | "atl_resistenza_fatica"
-  | "atl_flessibilita"
-  | "atl_rapidita"
-  | "atl_agilita"
-  | "atl_cambio_passo"
-  | "atl_forza"
-  | "atl_potenza_contrasti"
-  | "atl_abilita_acrobatica"
-  // D. Tecnica
-  | "tec_lato_dominante"
-  | "tec_piede_dx"
-  | "tec_piede_sx"
-  | "tec_gioco_testa"
-  | "tec_ricezione_piede"
-  | "tec_ricezione_petto"
-  | "tec_trasmissione_piede"
-  | "tec_trasmissione_testa"
-  // D. Coordinative
-  | "coord_equilibrio"
-  | "coord_differenziazione"
-  | "coord_ritmizzazione"
-  | "coord_orientamento"
-  | "coord_reazione"
-  | "coord_accoppiamento_motorio"
-  | "coord_adattamento"
-  | "coord_anticipazione"
-  // E. Tattica individuale — Possesso
-  | "tatti_poss_visione_periferica"
-  | "tatti_poss_smarcamento"
-  | "tatti_poss_controllo_difesa_palla"
-  | "tatti_poss_dribbling"
-  | "tatti_poss_occupazione_spazio"
-  | "tatti_poss_taglio"
-  | "tatti_poss_sovrapposizione"
-  | "tatti_poss_triangolazione"
-  | "tatti_poss_finta"
-  | "tatti_poss_falli_laterali"
-  | "tatti_poss_fantasia_estro"
-  | "tatti_poss_vedere_porta"
-  | "tatti_poss_agisce_stile"
-  // E. Tattica individuale — Non possesso
-  | "tatti_nposs_marcamento"
-  | "tatti_nposs_pressione"
-  | "tatti_nposs_anticipo"
-  | "tatti_nposs_intercettamento"
-  | "tatti_nposs_contrasto_diretto"
-  | "tatti_nposs_difesa_zona"
-  | "tatti_nposs_ripresa_fine_azione"
-  | "tatti_nposs_ripresa_dopo_perdita"
-  // F. Tattica applicata — Possesso
-  | "tappl_poss_lettura_veloce"
-  | "tappl_poss_fantasia_gioco"
-  | "tappl_poss_velocita_esecuzione"
-  // F. Tattica applicata — Non possesso
-  | "tappl_nposs_scalare"
-  | "tappl_nposs_pressing"
-  | "tappl_nposs_partecipazione_difensiva"
-  | "tappl_nposs_anticipazione_gioco"
-  // F. Tattica applicata — Ruolo
-  | "tappl_ruolo_comportamento";
+  // Tecnica (14)
+  | "tec_colpi_testa"
+  | "tec_contrasti"
+  | "tec_controllo_palla"
+  | "tec_cross"
+  | "tec_dribbling"
+  | "tec_finalizzazione"
+  | "tec_marcatura"
+  | "tec_passaggi"
+  | "tec_tecnica"
+  | "tec_tiri_lontano"
+  | "tec_calci_angolo"
+  | "tec_punizioni"
+  | "tec_rigori"
+  | "tec_rimesse_lunghe"
+  // Psicologia (14)
+  | "men_aggressivita"
+  | "men_carisma"
+  | "men_concentrazione"
+  | "men_coraggio"
+  | "men_decisioni"
+  | "men_determinazione"
+  | "men_fantasia"
+  | "men_freddezza"
+  | "men_gioco_squadra"
+  | "men_impegno"
+  | "men_intuito"
+  | "men_posizione"
+  | "men_senza_palla"
+  | "men_visione"
+  // Fisico (8)
+  | "fis_accelerazione"
+  | "fis_agilita"
+  | "fis_equilibrio"
+  | "fis_forza"
+  | "fis_integrita"
+  | "fis_elevazione"
+  | "fis_resistenza"
+  | "fis_velocita"
+  // Portiere (11)
+  | "gk_gioco_aereo"
+  | "gk_comando_area"
+  | "gk_comunicazione"
+  | "gk_eccentricita"
+  | "gk_presa"
+  | "gk_rinvio"
+  | "gk_uno_vs_uno"
+  | "gk_riflessi"
+  | "gk_tendenza_uscire"
+  | "gk_tendenza_pugni"
+  | "gk_lancio";
 
 export type RatingDef = { key: RatingKey; label: string; area: RatingArea };
 
 export const RATINGS: RatingDef[] = [
-  // A. Comportamentali
-  { key: "behav_carisma",                  label: "Carisma",                       area: "COMPORTAMENTALI" },
-  { key: "behav_autostima",                label: "Autostima",                     area: "COMPORTAMENTALI" },
-  { key: "behav_personalita",              label: "Personalità",                   area: "COMPORTAMENTALI" },
-  { key: "behav_spirito_sacrificio",       label: "Spirito di sacrificio",         area: "COMPORTAMENTALI" },
-  { key: "behav_spirito_comprensione",     label: "Spirito di comprensione",       area: "COMPORTAMENTALI" },
-  { key: "behav_generosita",               label: "Generosità",                    area: "COMPORTAMENTALI" },
-  { key: "behav_aggressivita",             label: "Aggressività",                  area: "COMPORTAMENTALI" },
-  { key: "behav_autocritica",              label: "Autocritica",                   area: "COMPORTAMENTALI" },
-  { key: "behav_spirito_collaborativo",    label: "Spirito collaborativo",         area: "COMPORTAMENTALI" },
-  { key: "behav_atteggiamento_in_campo",   label: "Atteggiamento in campo",        area: "COMPORTAMENTALI" },
-  { key: "behav_atteggiamento_fuori_campo",label: "Atteggiamento fuori campo",     area: "COMPORTAMENTALI" },
-  { key: "behav_concentrazione",           label: "Concentrazione",                area: "COMPORTAMENTALI" },
-  { key: "behav_temperamento",             label: "Temperamento",                  area: "COMPORTAMENTALI" },
-  { key: "behav_tenacia",                  label: "Tenacia",                       area: "COMPORTAMENTALI" },
-  // C. Atletiche
-  { key: "atl_velocita_senza_palla", label: "Velocità senza palla",       area: "ATLETICHE" },
-  { key: "atl_accelerazione",        label: "Capacità di accelerazione",  area: "ATLETICHE" },
-  { key: "atl_cambi_direzione",      label: "Cambi di direzione",         area: "ATLETICHE" },
-  { key: "atl_elevazione",           label: "Elevazione",                 area: "ATLETICHE" },
-  { key: "atl_resistenza_fatica",    label: "Resistenza alla fatica",     area: "ATLETICHE" },
-  { key: "atl_flessibilita",         label: "Flessibilità",               area: "ATLETICHE" },
-  { key: "atl_rapidita",             label: "Rapidità",                   area: "ATLETICHE" },
-  { key: "atl_agilita",              label: "Agilità",                    area: "ATLETICHE" },
-  { key: "atl_cambio_passo",         label: "Cambio di passo",            area: "ATLETICHE" },
-  { key: "atl_forza",                label: "Forza",                      area: "ATLETICHE" },
-  { key: "atl_potenza_contrasti",    label: "Potenza nei contrasti",      area: "ATLETICHE" },
-  { key: "atl_abilita_acrobatica",   label: "Abilità acrobatica",         area: "ATLETICHE" },
-  // D. Tecnica
-  { key: "tec_lato_dominante",       label: "Lato dominante",             area: "TECNICA" },
-  { key: "tec_piede_dx",             label: "Piede destro",               area: "TECNICA" },
-  { key: "tec_piede_sx",             label: "Piede sinistro",             area: "TECNICA" },
-  { key: "tec_gioco_testa",          label: "Gioco di testa",             area: "TECNICA" },
-  { key: "tec_ricezione_piede",      label: "Ricezione palla (piede)",    area: "TECNICA" },
-  { key: "tec_ricezione_petto",      label: "Ricezione palla (petto)",    area: "TECNICA" },
-  { key: "tec_trasmissione_piede",   label: "Trasmissione palla (piede)", area: "TECNICA" },
-  { key: "tec_trasmissione_testa",   label: "Trasmissione palla (testa)", area: "TECNICA" },
-  // D. Coordinative
-  { key: "coord_equilibrio",            label: "Equilibrio",                       area: "COORDINATIVE" },
-  { key: "coord_differenziazione",      label: "Differenziazione / Cinestesi",     area: "COORDINATIVE" },
-  { key: "coord_ritmizzazione",         label: "Ritmizzazione",                    area: "COORDINATIVE" },
-  { key: "coord_orientamento",          label: "Orientamento (spazio-tempo)",      area: "COORDINATIVE" },
-  { key: "coord_reazione",              label: "Reazione (atteso / inatteso)",     area: "COORDINATIVE" },
-  { key: "coord_accoppiamento_motorio", label: "Accoppiamento motorio",            area: "COORDINATIVE" },
-  { key: "coord_adattamento",           label: "Adattamento e trasformazione",     area: "COORDINATIVE" },
-  { key: "coord_anticipazione",         label: "Anticipazione",                    area: "COORDINATIVE" },
-  // E. Tattica individuale — Possesso
-  { key: "tatti_poss_visione_periferica",     label: "Visione periferica",          area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_smarcamento",            label: "Smarcamento",                  area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_controllo_difesa_palla", label: "Controllo e difesa palla",     area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_dribbling",              label: "Dribbling",                    area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_occupazione_spazio",     label: "Occupazione spazio",           area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_taglio",                 label: "Taglio",                       area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_sovrapposizione",        label: "Sovrapposizione",              area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_triangolazione",         label: "Triangolazione 1-2",           area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_finta",                  label: "Finta",                        area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_falli_laterali",         label: "Falli laterali",               area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_fantasia_estro",         label: "Fantasia ed estro",            area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_vedere_porta",           label: "Capacità di vedere la porta",  area: "TATT_IND_POSSESSO" },
-  { key: "tatti_poss_agisce_stile",           label: "Agisce con stile",             area: "TATT_IND_POSSESSO" },
-  // E. Tattica individuale — Non possesso
-  { key: "tatti_nposs_marcamento",            label: "Marcamento",                   area: "TATT_IND_NON_POSSESSO" },
-  { key: "tatti_nposs_pressione",             label: "Pressione",                    area: "TATT_IND_NON_POSSESSO" },
-  { key: "tatti_nposs_anticipo",              label: "Anticipo",                     area: "TATT_IND_NON_POSSESSO" },
-  { key: "tatti_nposs_intercettamento",       label: "Intercettamento",              area: "TATT_IND_NON_POSSESSO" },
-  { key: "tatti_nposs_contrasto_diretto",     label: "Contrasto diretto",            area: "TATT_IND_NON_POSSESSO" },
-  { key: "tatti_nposs_difesa_zona",           label: "Difesa a zona",                area: "TATT_IND_NON_POSSESSO" },
-  { key: "tatti_nposs_ripresa_fine_azione",   label: "Ripresa posizione a fine azione",  area: "TATT_IND_NON_POSSESSO" },
-  { key: "tatti_nposs_ripresa_dopo_perdita",  label: "Ripresa posizione dopo perdita",   area: "TATT_IND_NON_POSSESSO" },
-  // F. Tattica applicata — Possesso
-  { key: "tappl_poss_lettura_veloce",      label: "Lettura veloce situazione",    area: "TATT_APPL_POSSESSO" },
-  { key: "tappl_poss_fantasia_gioco",      label: "Fantasia di gioco",            area: "TATT_APPL_POSSESSO" },
-  { key: "tappl_poss_velocita_esecuzione", label: "Velocità di esecuzione",       area: "TATT_APPL_POSSESSO" },
-  // F. Tattica applicata — Non possesso
-  { key: "tappl_nposs_scalare",                  label: "Scalare",                          area: "TATT_APPL_NON_POSSESSO" },
-  { key: "tappl_nposs_pressing",                 label: "Pressing",                         area: "TATT_APPL_NON_POSSESSO" },
-  { key: "tappl_nposs_partecipazione_difensiva", label: "Partecipazione fase difensiva",    area: "TATT_APPL_NON_POSSESSO" },
-  { key: "tappl_nposs_anticipazione_gioco",      label: "Anticipazione gioco avversario",   area: "TATT_APPL_NON_POSSESSO" },
-  // F. Tattica applicata — Ruolo
-  { key: "tappl_ruolo_comportamento", label: "Comportamento tecnico-tattico nel ruolo", area: "TATT_APPL_RUOLO" },
+  // Tecnica (14)
+  { key: "tec_colpi_testa",     label: "Colpi di testa",     area: "TECNICA" },
+  { key: "tec_contrasti",       label: "Contrasti",          area: "TECNICA" },
+  { key: "tec_controllo_palla", label: "Controllo di palla", area: "TECNICA" },
+  { key: "tec_cross",           label: "Cross",              area: "TECNICA" },
+  { key: "tec_dribbling",       label: "Dribbling",          area: "TECNICA" },
+  { key: "tec_finalizzazione",  label: "Finalizzazione",     area: "TECNICA" },
+  { key: "tec_marcatura",       label: "Marcatura",          area: "TECNICA" },
+  { key: "tec_passaggi",        label: "Passaggi",           area: "TECNICA" },
+  { key: "tec_tecnica",         label: "Tecnica",            area: "TECNICA" },
+  { key: "tec_tiri_lontano",    label: "Tiri da lontano",    area: "TECNICA" },
+  { key: "tec_calci_angolo",    label: "Calci d'angolo",     area: "TECNICA" },
+  { key: "tec_punizioni",       label: "Calci piazzati",     area: "TECNICA" },
+  { key: "tec_rigori",          label: "Rigori",             area: "TECNICA" },
+  { key: "tec_rimesse_lunghe",  label: "Rimesse lunghe",     area: "TECNICA" },
+  // Psicologia (14)
+  { key: "men_aggressivita",    label: "Aggressività",       area: "PSICOLOGIA" },
+  { key: "men_carisma",         label: "Carisma",            area: "PSICOLOGIA" },
+  { key: "men_concentrazione",  label: "Concentrazione",     area: "PSICOLOGIA" },
+  { key: "men_coraggio",        label: "Coraggio",           area: "PSICOLOGIA" },
+  { key: "men_decisioni",       label: "Decisioni",          area: "PSICOLOGIA" },
+  { key: "men_determinazione",  label: "Determinazione",     area: "PSICOLOGIA" },
+  { key: "men_fantasia",        label: "Fantasia",           area: "PSICOLOGIA" },
+  { key: "men_freddezza",       label: "Freddezza",          area: "PSICOLOGIA" },
+  { key: "men_gioco_squadra",   label: "Gioco di squadra",   area: "PSICOLOGIA" },
+  { key: "men_impegno",         label: "Impegno",            area: "PSICOLOGIA" },
+  { key: "men_intuito",         label: "Intuito",            area: "PSICOLOGIA" },
+  { key: "men_posizione",       label: "Posizione",          area: "PSICOLOGIA" },
+  { key: "men_senza_palla",     label: "Senza palla",        area: "PSICOLOGIA" },
+  { key: "men_visione",         label: "Visione di gioco",   area: "PSICOLOGIA" },
+  // Fisico (8)
+  { key: "fis_accelerazione",   label: "Accelerazione",      area: "FISICO" },
+  { key: "fis_agilita",         label: "Agilità",            area: "FISICO" },
+  { key: "fis_equilibrio",      label: "Equilibrio",         area: "FISICO" },
+  { key: "fis_forza",           label: "Forza",              area: "FISICO" },
+  { key: "fis_integrita",       label: "Integrità fisica",   area: "FISICO" },
+  { key: "fis_elevazione",      label: "Massima elevazione", area: "FISICO" },
+  { key: "fis_resistenza",      label: "Resistenza",         area: "FISICO" },
+  { key: "fis_velocita",        label: "Velocità",           area: "FISICO" },
+  // Portiere (11)
+  { key: "gk_gioco_aereo",      label: "Gioco aereo",        area: "PORTIERE" },
+  { key: "gk_comando_area",     label: "Comando dell'area",  area: "PORTIERE" },
+  { key: "gk_comunicazione",    label: "Comunicazione",      area: "PORTIERE" },
+  { key: "gk_eccentricita",     label: "Eccentricità",       area: "PORTIERE" },
+  { key: "gk_presa",            label: "Presa",              area: "PORTIERE" },
+  { key: "gk_rinvio",           label: "Rinvio",             area: "PORTIERE" },
+  { key: "gk_uno_vs_uno",       label: "Uno contro uno",     area: "PORTIERE" },
+  { key: "gk_riflessi",         label: "Riflessi",           area: "PORTIERE" },
+  { key: "gk_tendenza_uscire",  label: "Tendenza a uscire",  area: "PORTIERE" },
+  { key: "gk_tendenza_pugni",   label: "Tendenza ai pugni",  area: "PORTIERE" },
+  { key: "gk_lancio",           label: "Lancio",             area: "PORTIERE" },
 ];
 
 /** Tutte le chiavi rating, utile per loop type-safe. */

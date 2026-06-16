@@ -1,66 +1,56 @@
 /**
  * Filtri della lista Scouting. Stato in URL search params.
- * Allineato al refactor della scheda valutazione ufficiale.
+ * Set essenziale ad alto segnale: età (range), ruolo, piede, passaporto,
+ * status osservazione, voto potenziale, scadenza e fascia ingaggio.
  */
 import {
   FASCIA_INGAGGIO_VALUES,
-  GESTI_MOTORI_VALUES,
-  MUSCOLATURA_VALUES,
   PASSAPORTO_VALUES,
   PIEDE_VALUES,
   RATING_KEYS,
   RUOLO_VALUES,
   STATUS_OSSERVAZIONE_VALUES,
-  STRUTTURA_CORPOREA_VALUES,
   VOTO_POTENZIALE_VALUES,
-  type FasciaEta,
   type FasciaIngaggioEnum,
-  type GestiMotoriEnum,
-  type MuscolaturaEnum,
   type PassaportoEnum,
   type PiedeEnum,
   type RatingKey,
   type RuoloEnum,
   type ScadenzaQuick,
   type StatusOsservazioneEnum,
-  type StrutturaCorporeaEnum,
   type VotoPotenzialeEnum,
 } from "@/lib/types/scouting";
 
+/** Limiti ragionevoli per l'età di un calciatore. */
+export const ETA_MIN = 14;
+export const ETA_MAX = 50;
+
 export type ScoutingFilters = {
   q?: string;
-  fascia_eta: FasciaEta[];
+  /** Range età "Da … a … anni" (estremi inclusi). */
+  eta_min?: number;
+  eta_max?: number;
   passaporto: PassaportoEnum[];
   piede: PiedeEnum[];
-  struttura_corporea: StrutturaCorporeaEnum[];
-  gesti_motori: GestiMotoriEnum[];
-  muscolatura: MuscolaturaEnum[];
   ruolo_principale: RuoloEnum[];
-  ruoli_secondari: RuoloEnum[];
   fascia_ingaggio: FasciaIngaggioEnum[];
   status_osservazione: StatusOsservazioneEnum[];
   voto_potenziale: VotoPotenzialeEnum[];
   scadenza_quick?: ScadenzaQuick;
-  /** Soglia minima per ogni rating (assente = nessun filtro). */
+  /** Soglia minima per ogni attributo FM (assente = nessun filtro). */
   ratings_min: Partial<Record<RatingKey, number>>;
 };
 
 export const EMPTY_SCOUTING_FILTERS: ScoutingFilters = {
-  fascia_eta: [],
   passaporto: [],
   piede: [],
-  struttura_corporea: [],
-  gesti_motori: [],
-  muscolatura: [],
   ruolo_principale: [],
-  ruoli_secondari: [],
   fascia_ingaggio: [],
   status_osservazione: [],
   voto_potenziale: [],
   ratings_min: {},
 };
 
-const FASCIA_ETA_ALLOWED: readonly FasciaEta[] = ["U21", "TRA_22_26", "OVER_27"];
 const SCADENZA_ALLOWED: readonly ScadenzaQuick[] = [
   "ENTRO_6_MESI",
   "ENTRO_12_MESI",
@@ -84,6 +74,13 @@ function getParam(
   const v = (params as Record<string, string | string[] | undefined>)[key];
   if (Array.isArray(v)) return v[0] ?? null;
   return v ?? null;
+}
+
+function parseAge(value: string | null): number | undefined {
+  if (!value) return undefined;
+  const n = parseInt(value, 10);
+  if (Number.isInteger(n) && n >= ETA_MIN && n <= ETA_MAX) return n;
+  return undefined;
 }
 
 /** Chiave URL per soglia rating: prefisso "min_" + nome colonna. */
@@ -113,17 +110,11 @@ export function parseScoutingFiltersFromSearchParams(
 
   return {
     q,
-    fascia_eta: parseList(getParam(params, "eta"), FASCIA_ETA_ALLOWED),
+    eta_min: parseAge(getParam(params, "eta_min")),
+    eta_max: parseAge(getParam(params, "eta_max")),
     passaporto: parseList(getParam(params, "pass"), PASSAPORTO_VALUES),
     piede: parseList(getParam(params, "piede"), PIEDE_VALUES),
-    struttura_corporea: parseList(
-      getParam(params, "struttura"),
-      STRUTTURA_CORPOREA_VALUES,
-    ),
-    gesti_motori: parseList(getParam(params, "gesti"), GESTI_MOTORI_VALUES),
-    muscolatura: parseList(getParam(params, "musc"), MUSCOLATURA_VALUES),
     ruolo_principale: parseList(getParam(params, "ruolo"), RUOLO_VALUES),
-    ruoli_secondari: parseList(getParam(params, "ruolo_sec"), RUOLO_VALUES),
     fascia_ingaggio: parseList(
       getParam(params, "ingaggio"),
       FASCIA_INGAGGIO_VALUES,
@@ -145,14 +136,11 @@ export function scoutingFiltersToSearchParams(
   const sp = new URLSearchParams(base);
   const KEYS_TO_RESET = [
     "q",
-    "eta",
+    "eta_min",
+    "eta_max",
     "pass",
     "piede",
-    "struttura",
-    "gesti",
-    "musc",
     "ruolo",
-    "ruolo_sec",
     "ingaggio",
     "status",
     "voto",
@@ -162,19 +150,12 @@ export function scoutingFiltersToSearchParams(
   for (const k of KEYS_TO_RESET) sp.delete(k);
 
   if (filters.q) sp.set("q", filters.q);
-  if (filters.fascia_eta.length) sp.set("eta", filters.fascia_eta.join(","));
+  if (typeof filters.eta_min === "number") sp.set("eta_min", String(filters.eta_min));
+  if (typeof filters.eta_max === "number") sp.set("eta_max", String(filters.eta_max));
   if (filters.passaporto.length) sp.set("pass", filters.passaporto.join(","));
   if (filters.piede.length) sp.set("piede", filters.piede.join(","));
-  if (filters.struttura_corporea.length)
-    sp.set("struttura", filters.struttura_corporea.join(","));
-  if (filters.gesti_motori.length)
-    sp.set("gesti", filters.gesti_motori.join(","));
-  if (filters.muscolatura.length)
-    sp.set("musc", filters.muscolatura.join(","));
   if (filters.ruolo_principale.length)
     sp.set("ruolo", filters.ruolo_principale.join(","));
-  if (filters.ruoli_secondari.length)
-    sp.set("ruolo_sec", filters.ruoli_secondari.join(","));
   if (filters.fascia_ingaggio.length)
     sp.set("ingaggio", filters.fascia_ingaggio.join(","));
   if (filters.status_osservazione.length)
@@ -193,14 +174,10 @@ export function scoutingFiltersToSearchParams(
 export function countActiveScoutingFilters(f: ScoutingFilters): number {
   let n = 0;
   if (f.q) n++;
-  if (f.fascia_eta.length) n++;
+  if (typeof f.eta_min === "number" || typeof f.eta_max === "number") n++;
   if (f.passaporto.length) n++;
   if (f.piede.length) n++;
-  if (f.struttura_corporea.length) n++;
-  if (f.gesti_motori.length) n++;
-  if (f.muscolatura.length) n++;
   if (f.ruolo_principale.length) n++;
-  if (f.ruoli_secondari.length) n++;
   if (f.fascia_ingaggio.length) n++;
   if (f.status_osservazione.length) n++;
   if (f.voto_potenziale.length) n++;

@@ -783,24 +783,11 @@ export function PlayerForm({
         </div>
       </FormSection>
 
-      {/* §A Comportamentali */}
+      {/* Comportamento & Influenze (non-rating) */}
       <FormSection
-        title="Comportamentali"
-        description="Voti 1-10 sulla scheda ufficiale, più domande binarie e indicatori di influenza negativa."
+        title="Comportamento & Influenze"
+        description="Domande comportamentali e fattori di influenza negativa."
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {RATINGS.filter((r) => r.area === "COMPORTAMENTALI").map((r) => (
-            <RatingNumberInput
-              key={r.key}
-              id={r.key}
-              label={r.label}
-              registerProps={form.register(r.key as RatingKey, {
-                setValueAs: (v) => (v === "" || v == null ? null : Number(v)),
-              })}
-            />
-          ))}
-        </div>
-
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Delega gli altri?</Label>
@@ -881,38 +868,21 @@ export function PlayerForm({
         </div>
       </FormSection>
 
-      {/* §C Atletiche */}
-      <FormSection
-        title="Caratteristiche atletiche"
-        description="Voti 1-10 (lasciare vuoto = non valutato)."
-      >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {RATINGS.filter((r) => r.area === "ATLETICHE").map((r) => (
-            <RatingNumberInput
-              key={r.key}
-              id={r.key}
-              label={r.label}
-              registerProps={form.register(r.key as RatingKey, {
-                setValueAs: (v) => (v === "" || v == null ? null : Number(v)),
-              })}
-            />
-          ))}
-        </div>
-      </FormSection>
-
-      {/* §D Tecnica & Coordinative */}
-      <FormSection
-        title="Tecnica & Coordinative"
-        description="Capacità tecniche di base e capacità coordinative motorie."
-      >
-        {(["TECNICA", "COORDINATIVE"] as RatingArea[]).map((area) => {
+      {/* Valutazioni — set Football Manager: Tecnica · Psicologia · Fisico · Portiere */}
+      {(["TECNICA", "PSICOLOGIA", "FISICO", "PORTIERE"] as RatingArea[]).map(
+        (area) => {
           const items = RATINGS.filter((r) => r.area === area);
           if (!items.length) return null;
           return (
-            <div key={area} className="space-y-3">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                {RATING_AREA_LABEL[area]}
-              </p>
+            <FormSection
+              key={area}
+              title={RATING_AREA_LABEL[area]}
+              description={
+                area === "PORTIERE"
+                  ? "Da compilare solo per i portieri. Voti 1-10 (vuoto = non valutato)."
+                  : "Voti 1-10 (lasciare vuoto = non valutato)."
+              }
+            >
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((r) => (
                   <RatingNumberInput
@@ -926,80 +896,10 @@ export function PlayerForm({
                   />
                 ))}
               </div>
-            </div>
+            </FormSection>
           );
-        })}
-      </FormSection>
-
-      {/* §E Tattica individuale */}
-      <FormSection
-        title="Tattica individuale"
-        description="Comportamento del giocatore in fase di possesso e non possesso."
-      >
-        {(
-          ["TATT_IND_POSSESSO", "TATT_IND_NON_POSSESSO"] as RatingArea[]
-        ).map((area) => {
-          const items = RATINGS.filter((r) => r.area === area);
-          if (!items.length) return null;
-          return (
-            <div key={area} className="space-y-3">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                {RATING_AREA_LABEL[area]}
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((r) => (
-                  <RatingNumberInput
-                    key={r.key}
-                    id={r.key}
-                    label={r.label}
-                    registerProps={form.register(r.key as RatingKey, {
-                      setValueAs: (v) =>
-                        v === "" || v == null ? null : Number(v),
-                    })}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </FormSection>
-
-      {/* §F Tattica applicata */}
-      <FormSection
-        title="Tattica applicata"
-        description="Lettura del gioco, contributo alla fase difensiva e comportamento nel ruolo."
-      >
-        {(
-          [
-            "TATT_APPL_POSSESSO",
-            "TATT_APPL_NON_POSSESSO",
-            "TATT_APPL_RUOLO",
-          ] as RatingArea[]
-        ).map((area) => {
-          const items = RATINGS.filter((r) => r.area === area);
-          if (!items.length) return null;
-          return (
-            <div key={area} className="space-y-3">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                {RATING_AREA_LABEL[area]}
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((r) => (
-                  <RatingNumberInput
-                    key={r.key}
-                    id={r.key}
-                    label={r.label}
-                    registerProps={form.register(r.key as RatingKey, {
-                      setValueAs: (v) =>
-                        v === "" || v == null ? null : Number(v),
-                    })}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </FormSection>
+        },
+      )}
 
       {/* Workflow + Media */}
       <FormSection

@@ -12,19 +12,12 @@ import {
 import { ToggleChipGroup } from "@/components/archivio/multi-select-popover";
 import { RatingSlider } from "@/components/scouting/rating-slider";
 import {
-  FASCIA_ETA_LABEL,
   FASCIA_INGAGGIO_LABEL,
   FASCIA_INGAGGIO_VALUES,
-  GESTI_MOTORI_LABEL,
-  GESTI_MOTORI_VALUES,
-  MUSCOLATURA_LABEL,
-  MUSCOLATURA_VALUES,
   PASSAPORTO_LABEL,
   PASSAPORTO_VALUES,
   PIEDE_LABEL,
   PIEDE_VALUES,
-  RATING_AREA_LABEL,
-  RATING_AREA_MACRO,
   RATING_MACRO_LABEL,
   RATINGS,
   RUOLO_GRUPPI,
@@ -32,52 +25,93 @@ import {
   SCADENZA_QUICK_LABEL,
   STATUS_OSSERVAZIONE_LABEL,
   STATUS_OSSERVAZIONE_VALUES,
-  STRUTTURA_CORPOREA_LABEL,
-  STRUTTURA_CORPOREA_VALUES,
   VOTO_POTENZIALE_SHORT,
   VOTO_POTENZIALE_VALUES,
-  type FasciaEta,
   type FasciaIngaggioEnum,
-  type GestiMotoriEnum,
-  type MuscolaturaEnum,
   type PassaportoEnum,
   type PiedeEnum,
-  type RatingArea,
   type RatingKey,
   type RatingMacroGroup,
   type ScadenzaQuick,
   type StatusOsservazioneEnum,
-  type StrutturaCorporeaEnum,
   type VotoPotenzialeEnum,
 } from "@/lib/types/scouting";
 import {
   EMPTY_SCOUTING_FILTERS,
+  ETA_MAX,
+  ETA_MIN,
   countActiveScoutingFilters,
   scoutingFiltersToSearchParams,
   type ScoutingFilters,
 } from "@/lib/schemas/scouting-filters";
 
-const FASCE_ETA: FasciaEta[] = ["U21", "TRA_22_26", "OVER_27"];
 const SCADENZE: ScadenzaQuick[] = ["ENTRO_6_MESI", "ENTRO_12_MESI"];
 
 const RATING_MACRO_ORDER: RatingMacroGroup[] = [
-  "COMPORTAMENTALI",
-  "ATLETICHE",
-  "TECNICA_COORD",
-  "TATTICA_IND",
-  "TATTICA_APPL",
+  "TECNICA",
+  "PSICOLOGIA",
+  "FISICO",
+  "PORTIERE",
 ];
 
-const RATING_MACRO_COLOR: Record<
-  RatingMacroGroup,
-  "emerald" | "rose" | "sky"
-> = {
-  COMPORTAMENTALI: "sky",
-  ATLETICHE: "emerald",
-  TECNICA_COORD: "emerald",
-  TATTICA_IND: "rose",
-  TATTICA_APPL: "rose",
+const RATING_MACRO_COLOR: Record<RatingMacroGroup, "emerald" | "rose" | "sky"> = {
+  TECNICA: "emerald",
+  PSICOLOGIA: "sky",
+  FISICO: "emerald",
+  PORTIERE: "rose",
 };
+
+function AgeRange({
+  min,
+  max,
+  onChange,
+}: {
+  min: number | undefined;
+  max: number | undefined;
+  onChange: (next: { eta_min?: number; eta_max?: number }) => void;
+}) {
+  const toAge = (raw: string): number | undefined => {
+    if (raw === "") return undefined;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : undefined;
+  };
+  const inputClass =
+    "w-14 rounded-md border border-input bg-transparent px-2 py-1 text-center text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40";
+  return (
+    <div className="space-y-1.5">
+      <span className="text-xs font-medium text-sidebar-foreground/80">
+        Fascia d&apos;età
+      </span>
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span>Da</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={ETA_MIN}
+          max={ETA_MAX}
+          placeholder="—"
+          value={min ?? ""}
+          onChange={(e) => onChange({ eta_min: toAge(e.target.value), eta_max: max })}
+          className={inputClass}
+          aria-label="Età minima"
+        />
+        <span>a</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={ETA_MIN}
+          max={ETA_MAX}
+          placeholder="—"
+          value={max ?? ""}
+          onChange={(e) => onChange({ eta_min: min, eta_max: toAge(e.target.value) })}
+          className={inputClass}
+          aria-label="Età massima"
+        />
+        <span>anni</span>
+      </div>
+    </div>
+  );
+}
 
 function ScadenzaQuickPicker({
   value,
@@ -172,11 +206,6 @@ export function ScoutingFiltersSidebar({
     router.replace(`/scouting?${sp.toString()}`, { scroll: false });
   }, [local.q, router, searchParams]);
 
-  // Opzioni precomputate (chip labels)
-  const fasceEtaOpts = useMemo(
-    () => FASCE_ETA.map((v) => ({ value: v, label: FASCIA_ETA_LABEL[v] })),
-    [],
-  );
   const passaportoOpts = useMemo(
     () =>
       PASSAPORTO_VALUES.map((v) => ({ value: v, label: PASSAPORTO_LABEL[v] })),
@@ -184,30 +213,6 @@ export function ScoutingFiltersSidebar({
   );
   const piedeOpts = useMemo(
     () => PIEDE_VALUES.map((v) => ({ value: v, label: PIEDE_LABEL[v] })),
-    [],
-  );
-  const strutturaOpts = useMemo(
-    () =>
-      STRUTTURA_CORPOREA_VALUES.map((v) => ({
-        value: v,
-        label: STRUTTURA_CORPOREA_LABEL[v],
-      })),
-    [],
-  );
-  const gestiOpts = useMemo(
-    () =>
-      GESTI_MOTORI_VALUES.map((v) => ({
-        value: v,
-        label: GESTI_MOTORI_LABEL[v],
-      })),
-    [],
-  );
-  const muscolaturaOpts = useMemo(
-    () =>
-      MUSCOLATURA_VALUES.map((v) => ({
-        value: v,
-        label: MUSCOLATURA_LABEL[v],
-      })),
     [],
   );
   const fasciaIngaggioOpts = useMemo(
@@ -234,31 +239,6 @@ export function ScoutingFiltersSidebar({
       })),
     [],
   );
-
-  // Rating raggruppati per macro-area, poi per RatingArea interna.
-  const ratingsByMacro = useMemo(() => {
-    const groups: Record<
-      RatingMacroGroup,
-      { area: RatingArea; items: typeof RATINGS }[]
-    > = {
-      COMPORTAMENTALI: [],
-      ATLETICHE: [],
-      TECNICA_COORD: [],
-      TATTICA_IND: [],
-      TATTICA_APPL: [],
-    };
-    const seenArea = new Map<string, (typeof RATINGS)[number][]>();
-    for (const r of RATINGS) {
-      const arr = seenArea.get(r.area) ?? [];
-      arr.push(r);
-      seenArea.set(r.area, arr);
-    }
-    for (const [area, items] of seenArea.entries()) {
-      const macro = RATING_AREA_MACRO[area as RatingArea];
-      groups[macro].push({ area: area as RatingArea, items });
-    }
-    return groups;
-  }, []);
 
   return (
     <aside className={className}>
@@ -289,23 +269,22 @@ export function ScoutingFiltersSidebar({
         <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/50">
           Anagrafica
         </h3>
-        <ToggleChipGroup<FasciaEta>
-          label="Fascia d'età"
-          options={fasceEtaOpts}
-          value={local.fascia_eta}
-          onChange={(v) => update({ fascia_eta: v })}
-        />
-        <ToggleChipGroup<PassaportoEnum>
-          label="Passaporto"
-          options={passaportoOpts}
-          value={local.passaporto}
-          onChange={(v) => update({ passaporto: v })}
+        <AgeRange
+          min={local.eta_min}
+          max={local.eta_max}
+          onChange={(next) => update(next)}
         />
         <ToggleChipGroup<PiedeEnum>
           label="Piede preferito"
           options={piedeOpts}
           value={local.piede}
           onChange={(v) => update({ piede: v })}
+        />
+        <ToggleChipGroup<PassaportoEnum>
+          label="Passaporto"
+          options={passaportoOpts}
+          value={local.passaporto}
+          onChange={(v) => update({ passaporto: v })}
         />
       </section>
 
@@ -367,35 +346,6 @@ export function ScoutingFiltersSidebar({
           </AccordionContent>
         </AccordionItem>
 
-        {/* Fisico */}
-        <AccordionItem value="fisico">
-          <AccordionTrigger className="text-xs font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/70">
-            Fisico
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-3">
-              <ToggleChipGroup<StrutturaCorporeaEnum>
-                label="Struttura corporea"
-                options={strutturaOpts}
-                value={local.struttura_corporea}
-                onChange={(v) => update({ struttura_corporea: v })}
-              />
-              <ToggleChipGroup<GestiMotoriEnum>
-                label="Gesti motori"
-                options={gestiOpts}
-                value={local.gesti_motori}
-                onChange={(v) => update({ gesti_motori: v })}
-              />
-              <ToggleChipGroup<MuscolaturaEnum>
-                label="Muscolatura"
-                options={muscolaturaOpts}
-                value={local.muscolatura}
-                onChange={(v) => update({ muscolatura: v })}
-              />
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
         {/* Workflow */}
         <AccordionItem value="workflow">
           <AccordionTrigger className="text-xs font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/70">
@@ -440,18 +390,13 @@ export function ScoutingFiltersSidebar({
           </AccordionContent>
         </AccordionItem>
 
-        {/* Valutazioni — 5 macro-aree, ciascuna come AccordionItem */}
+        {/* Valutazioni — soglia minima per attributo (set FM) */}
         {RATING_MACRO_ORDER.map((macro) => {
-          const areas = ratingsByMacro[macro];
-          if (!areas.length) return null;
-          // Conta quanti rating di questa macro hanno una soglia attiva
-          let activeInGroup = 0;
-          for (const a of areas) {
-            for (const r of a.items) {
-              if (typeof local.ratings_min[r.key] === "number")
-                activeInGroup++;
-            }
-          }
+          const items = RATINGS.filter((r) => r.area === macro);
+          if (!items.length) return null;
+          const activeInGroup = items.filter(
+            (r) => typeof local.ratings_min[r.key] === "number",
+          ).length;
           return (
             <AccordionItem key={macro} value={`val-${macro.toLowerCase()}`}>
               <AccordionTrigger className="text-xs font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/70">
@@ -465,26 +410,15 @@ export function ScoutingFiltersSidebar({
                 </span>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="space-y-4">
-                  {areas.map(({ area, items }) => (
-                    <div key={area} className="space-y-3">
-                      {/* Se la macro raggruppa più aree (Tecnica+Coord, Tattica Ind, Tattica Appl)
-                          mostra il sub-label dell'area. */}
-                      {areas.length > 1 && (
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                          {RATING_AREA_LABEL[area]}
-                        </p>
-                      )}
-                      {items.map((r) => (
-                        <RatingSlider
-                          key={r.key}
-                          label={r.label}
-                          value={local.ratings_min[r.key] ?? 0}
-                          groupColor={RATING_MACRO_COLOR[macro]}
-                          onChange={(v) => updateRating(r.key, v)}
-                        />
-                      ))}
-                    </div>
+                <div className="space-y-3">
+                  {items.map((r) => (
+                    <RatingSlider
+                      key={r.key}
+                      label={r.label}
+                      value={local.ratings_min[r.key] ?? 0}
+                      groupColor={RATING_MACRO_COLOR[macro]}
+                      onChange={(v) => updateRating(r.key, v)}
+                    />
                   ))}
                 </div>
               </AccordionContent>

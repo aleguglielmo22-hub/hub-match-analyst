@@ -42,22 +42,6 @@ function ageRangeToDates(ages: { min?: number; max?: number }): {
   return out;
 }
 
-function fasceEtaToDateRanges(fasce: ScoutingFilters["fascia_eta"]) {
-  if (fasce.length === 0) return null;
-  const ranges = fasce.map((f) => {
-    if (f === "U21") return ageRangeToDates({ max: 20 });
-    if (f === "TRA_22_26") return ageRangeToDates({ min: 22, max: 26 });
-    return ageRangeToDates({ min: 27 });
-  });
-  let from = ranges[0].from;
-  let to = ranges[0].to;
-  for (const r of ranges) {
-    if (r.from && (!from || r.from < from)) from = r.from;
-    if (r.to && (!to || r.to > to)) to = r.to;
-  }
-  return { from, to };
-}
-
 function scadenzaCutoff(quick: ScoutingFilters["scadenza_quick"]): string | null {
   if (!quick) return null;
   const d = new Date();
@@ -104,24 +88,22 @@ export async function loadPlayersPage(
     );
   }
 
-  if (filters?.fascia_eta.length) {
-    const range = fasceEtaToDateRanges(filters.fascia_eta);
-    if (range?.from) q = q.gte("data_nascita", range.from);
-    if (range?.to) q = q.lte("data_nascita", range.to);
+  if (
+    typeof filters?.eta_min === "number" ||
+    typeof filters?.eta_max === "number"
+  ) {
+    const range = ageRangeToDates({
+      min: filters?.eta_min,
+      max: filters?.eta_max,
+    });
+    if (range.from) q = q.gte("data_nascita", range.from);
+    if (range.to) q = q.lte("data_nascita", range.to);
   }
 
   if (filters?.passaporto.length) q = q.in("passaporto", filters.passaporto);
   if (filters?.piede.length) q = q.in("piede", filters.piede);
-  if (filters?.struttura_corporea.length)
-    q = q.in("struttura_corporea", filters.struttura_corporea);
-  if (filters?.gesti_motori.length)
-    q = q.in("gesti_motori", filters.gesti_motori);
-  if (filters?.muscolatura.length)
-    q = q.in("muscolatura", filters.muscolatura);
   if (filters?.ruolo_principale.length)
     q = q.in("ruolo_principale", filters.ruolo_principale);
-  if (filters?.ruoli_secondari.length)
-    q = q.overlaps("ruoli_secondari", filters.ruoli_secondari);
   if (filters?.fascia_ingaggio.length)
     q = q.in("fascia_ingaggio", filters.fascia_ingaggio);
   if (filters?.status_osservazione.length)
