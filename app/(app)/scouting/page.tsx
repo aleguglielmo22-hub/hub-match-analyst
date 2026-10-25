@@ -15,7 +15,7 @@ import {
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 export const metadata = {
-  title: "Scouting DB · Football Hub",
+  title: "Scouting DB · AG Workspace",
 };
 
 export const dynamic = "force-dynamic";

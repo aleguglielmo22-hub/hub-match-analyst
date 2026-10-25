@@ -34,12 +34,12 @@ export function SidebarNav({
                 : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
             )}
           >
-            <LinkPendingIcon className="h-4 w-4 shrink-0 text-primary">
+            <LinkPendingIcon className="h-4 w-4 shrink-0 text-sidebar-primary">
               <Icon
                 className={cn(
                   "h-4 w-4 shrink-0 transition-colors",
                   isActive
-                    ? "text-primary"
+                    ? "text-sidebar-primary"
                     : "text-sidebar-foreground/50 group-hover:text-sidebar-foreground/80",
                 )}
               />

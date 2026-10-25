@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/app/service-worker-register";
-import { THEME_BACKGROUND_HEX } from "@/lib/theme";
+import { THEME_BAR_HEX } from "@/lib/theme";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -11,12 +11,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Football Hub",
+  title: "AG Workspace",
   description: "Scouting, palle inattive, training e cloud per il match analyst",
   // App installata su iPhone: a schermo intero, titolo breve, barra di stato scura.
   appleWebApp: {
     capable: true,
-    title: "FH Hub",
+    title: "AG",
     statusBarStyle: "black",
   },
   // Next genera solo "mobile-web-app-capable": questo serve agli iOS meno recenti.
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: THEME_BACKGROUND_HEX,
+  themeColor: THEME_BAR_HEX,
   // Necessario per leggere le aree sicure dell'iPhone (safe-area-inset-*).
   viewportFit: "cover",
 };

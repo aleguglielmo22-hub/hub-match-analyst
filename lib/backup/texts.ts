@@ -15,6 +15,8 @@ export type ManifestSkippedFile = {
 };
 
 export type BackupManifest = {
+  // Identificativo tecnico del formato: invariato dopo il cambio di nome,
+  // così un futuro ripristino riconosce anche i backup già fatti.
   formato: "football-hub-backup";
   versione_formato: 1;
   creato_il: string;
@@ -32,7 +34,7 @@ export function buildReadme(m: BackupManifest): string {
   });
   const tableErrors = Object.entries(m.tabelle).filter(([, t]) => t.errore);
   const lines = [
-    "FOOTBALL HUB — BACKUP DEI DATI",
+    "AG WORKSPACE — BACKUP DEI DATI",
     "==============================",
     "",
     `Creato il: ${createdAt} (ora italiana)`,

@@ -13,9 +13,10 @@ import { createClient } from "@/lib/supabase/server";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/brand/logo";
 
 export const metadata = {
-  title: "Football Hub — Scouting & Analisi per Match Analyst",
+  title: "AG Workspace — Scouting & Analisi per Match Analyst",
   description:
     "Database scouting e palle inattive, training e cloud video in un unico hub per il match analyst.",
 };
@@ -74,17 +75,7 @@ export default async function LandingPage() {
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-8">
-          <div className="flex items-center gap-2.5">
-            <span className="relative grid h-8 w-8 place-items-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
-              <span className="absolute inset-1 rounded-md bg-gradient-to-br from-primary/80 to-primary/40" />
-              <span className="relative text-[11px] font-bold tracking-tight text-primary-foreground">
-                FH
-              </span>
-            </span>
-            <span className="text-sm font-semibold tracking-tight">
-              Football Hub
-            </span>
-          </div>
+          <Logo />
           <Link href="/login" className={buttonVariants({ size: "default" })}>
             Accedi
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -109,7 +100,7 @@ export default async function LandingPage() {
               Performance · Scouting
             </p>
             <h1 className="mx-auto max-w-4xl text-4xl font-semibold tracking-tight sm:text-6xl">
-              Football Hub
+              AG Workspace
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
               Database scouting e palle inattive, catalogo training e cloud
@@ -210,7 +201,7 @@ export default async function LandingPage() {
       <footer className="border-t border-border/60 bg-card/20">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-4 py-8 text-sm sm:flex-row sm:items-center sm:px-8">
           <div className="space-y-1">
-            <p className="font-semibold tracking-tight">Football Hub</p>
+            <p className="font-semibold tracking-tight">AG Workspace</p>
             <p className="text-xs text-muted-foreground">
               © {new Date().getFullYear()} · Tutti i diritti riservati
             </p>

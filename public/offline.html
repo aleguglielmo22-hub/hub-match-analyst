@@ -3,36 +3,45 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#001207" />
-    <title>Offline · Football Hub</title>
+    <meta name="theme-color" content="#121C2E" />
+    <title>Offline · AG Workspace</title>
     <style>
       /* Pagina statica (servita dal service worker senza rete): i colori
-         replicano il tema scuro attuale di globals.css. */
+         replicano la palette C "Notte blu" di globals.css. */
       :root { color-scheme: dark; }
       html, body { height: 100%; margin: 0; }
       body {
         display: flex; align-items: center; justify-content: center;
         padding: 24px; box-sizing: border-box;
-        background: #001207; color: #f0f7f3;
+        background: #0b1220; color: #e8eef8;
         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       }
       main { max-width: 360px; text-align: center; }
-      .logo {
-        width: 56px; height: 56px; margin: 0 auto 20px; border-radius: 14px;
-        display: grid; place-items: center; font-weight: 700; font-size: 20px;
-        background: #1d4ed8; color: #fff;
-      }
+      svg { display: block; width: 64px; height: 64px; margin: 0 auto 20px; }
       h1 { font-size: 20px; margin: 0 0 8px; }
-      p { margin: 0 0 24px; color: #94aba0; line-height: 1.5; }
+      p { margin: 0 0 24px; color: #93a3bc; line-height: 1.5; }
       button {
         min-height: 44px; padding: 0 24px; border: 0; border-radius: 10px;
-        font: inherit; font-weight: 600; background: #ff761c; color: #001207;
+        font: inherit; font-weight: 600; background: #4c8dff; color: #0b1220;
       }
     </style>
   </head>
   <body>
     <main>
-      <div class="logo">FH</div>
+      <!-- Logo AG Workspace (stessa geometria di components/brand/logo-geometry.ts) -->
+      <svg viewBox="0 0 100 100" aria-label="AG Workspace" role="img">
+        <rect width="100" height="100" rx="22" fill="#0B2149" />
+        <g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 73 L30 27 L46 73" />
+          <path d="M83.08 38.61 A18.5 18.5 0 1 0 85.4 57.52 L85.4 51 L71 51" />
+        </g>
+        <circle cx="24.5" cy="62" r="1.9" fill="#7FB0FF" />
+        <circle cx="30" cy="62" r="1.9" fill="#7FB0FF" />
+        <circle cx="35.5" cy="62" r="1.9" fill="#7FB0FF" />
+        <circle cx="30" cy="27" r="5" fill="#4C8DFF" />
+        <circle cx="14" cy="73" r="5" fill="#4C8DFF" />
+        <circle cx="46" cy="73" r="5" fill="#4C8DFF" />
+      </svg>
       <h1>Sei offline</h1>
       <p>Riprova quando torna la connessione.</p>
       <button type="button" onclick="location.reload()">Riprova</button>

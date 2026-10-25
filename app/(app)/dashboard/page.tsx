@@ -14,7 +14,7 @@ import { BackupReminder } from "@/components/dashboard/backup-reminder";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 
 export const metadata = {
-  title: "Dashboard · Football Hub",
+  title: "Dashboard · AG Workspace",
 };
 
 export const dynamic = "force-dynamic";

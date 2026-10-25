@@ -34,6 +34,21 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-fase-possesso: var(--fase-possesso);
+  --color-fase-transizione-difensiva: var(--fase-transizione-difensiva);
+  --color-fase-non-possesso: var(--fase-non-possesso);
+  --color-fase-transizione-offensiva: var(--fase-transizione-offensiva);
+  --color-voto-1: var(--voto-1);
+  --color-voto-2: var(--voto-2);
+  --color-voto-3: var(--voto-3);
+  --color-voto-4: var(--voto-4);
+  --color-voto-5: var(--voto-5);
+  --color-voto-6: var(--voto-6);
+  --color-voto-7: var(--voto-7);
+  --color-voto-8: var(--voto-8);
+  --color-voto-9: var(--voto-9);
+  --color-voto-10: var(--voto-10);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -47,75 +62,102 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Light scheme — non usato in questa fase (default è dark), ma mantenuto per future toggle. */
+/*
+ * Palette AG Workspace.
+ * Tema chiaro B "Navy club" (:root) — non ancora attivo: si attiverà nella Modifica 8.
+ * Tema scuro C "Notte blu" (.dark) — attivo (classe "dark" forzata in app/layout.tsx).
+ * I valori non indicati nella palette sono ricavati con color-mix dai colori dati.
+ * Contrasto WCAG AA verificato sulle coppie testo/sfondo principali.
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.72 0.19 47);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #f4f6fa;
+  --foreground: #13203a;
+  --card: #ffffff;
+  --card-foreground: #13203a;
+  --popover: #ffffff;
+  --popover-foreground: #13203a;
+  --primary: #0b5fd9;
+  --primary-foreground: #ffffff;
+  --primary-soft: #e3edfc; /* primario tenue */
+  --secondary: var(--primary-soft);
+  --secondary-foreground: #13203a;
+  --muted: color-mix(in oklab, #dde3ec 50%, #f4f6fa);
+  --muted-foreground: #5e6c84;
+  --accent: var(--primary-soft);
+  --accent-foreground: #13203a;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.72 0.19 47);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --border: #dde3ec;
+  --input: #dde3ec;
+  --ring: #0b5fd9;
+  --chart-1: var(--primary);
+  --chart-2: #7fb0ff;
+  --chart-3: #1098ad;
+  --chart-4: #2f9e44;
+  --chart-5: #7048e8;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.696 0.17 162.5);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.696 0.17 162.5);
+  /* Barre di navigazione (sidebar, barra superiore e inferiore) */
+  --sidebar: #0b2149;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #7fb0ff; /* voce attiva */
+  --sidebar-primary-foreground: #0b2149;
+  --sidebar-accent: color-mix(in oklab, #ffffff 10%, #0b2149);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: color-mix(in oklab, #ffffff 14%, #0b2149);
+  --sidebar-ring: #7fb0ff;
+
+  /* Non ancora applicate (Modifica 8): colori delle fasi di gioco */
+  --fase-possesso: #2f9e44;
+  --fase-transizione-difensiva: #e8590c;
+  --fase-non-possesso: #1098ad;
+  --fase-transizione-offensiva: #7048e8;
+  /* Non ancora applicate (Modifica 8): scala dei voti 1 → 10 */
+  --voto-1: #b54708;
+  --voto-2: #d9631e;
+  --voto-3: #e98a4a;
+  --voto-4: #f2b48a;
+  --voto-5: #a9b1bf;
+  --voto-6: #9db8f0;
+  --voto-7: #6e97ec;
+  --voto-8: #4277e6;
+  --voto-9: #1f5bd8;
+  --voto-10: #123fa8;
 }
 
-/* Dark scheme — default in questa fase. Palette sport: base verde scura + accent arancio. */
 .dark {
-  --background: oklch(0.16 0.04 160); /* verde scuro profondo */
-  --foreground: oklch(0.97 0.01 160); /* bianco caldo */
-  --card: oklch(0.22 0.042 160); /* verde scuro chiaro */
-  --card-foreground: oklch(0.97 0.01 160);
-  --popover: oklch(0.22 0.042 160);
-  --popover-foreground: oklch(0.97 0.01 160);
-  --primary: oklch(0.72 0.19 47); /* arancio sport */
-  --primary-foreground: oklch(0.16 0.04 160);
-  --secondary: oklch(0.30 0.045 160); /* verde acciaio */
-  --secondary-foreground: oklch(0.97 0.01 160);
-  --muted: oklch(0.30 0.045 160);
-  --muted-foreground: oklch(0.72 0.03 165); /* verde-grigio */
-  --accent: oklch(0.30 0.045 160);
-  --accent-foreground: oklch(0.97 0.01 160);
+  --background: #0b1220;
+  --foreground: #e8eef8;
+  --card: #121c2e;
+  --card-foreground: #e8eef8;
+  --popover: #121c2e;
+  --popover-foreground: #e8eef8;
+  --primary: #4c8dff;
+  /* Testo scuro sul primario: il bianco su #4C8DFF non raggiunge AA (3,2:1). */
+  --primary-foreground: #0b1220;
+  --primary-soft: #1a2c4d; /* primario tenue */
+  --secondary: var(--primary-soft);
+  --secondary-foreground: #e8eef8;
+  --muted: var(--primary-soft);
+  --muted-foreground: #93a3bc;
+  --accent: var(--primary-soft);
+  --accent-foreground: #e8eef8;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.30 0.045 160 / 80%); /* verde acciaio */
-  --input: oklch(0.30 0.045 160);
-  --ring: oklch(0.72 0.19 47); /* arancio */
-  --chart-1: oklch(0.72 0.19 47); /* arancio */
-  --chart-2: oklch(0.70 0.16 158); /* verde */
-  --chart-3: oklch(0.80 0.13 160); /* verde chiaro */
-  --chart-4: oklch(0.80 0.14 70); /* ambra */
-  --chart-5: oklch(0.50 0.12 158); /* verde profondo */
-  --sidebar: oklch(0.19 0.045 160); /* verde scuro leggermente più scuro */
-  --sidebar-foreground: oklch(0.97 0.01 160);
-  --sidebar-primary: oklch(0.72 0.19 47); /* arancio */
-  --sidebar-primary-foreground: oklch(0.16 0.04 160);
-  --sidebar-accent: oklch(0.30 0.045 160);
-  --sidebar-accent-foreground: oklch(0.97 0.01 160);
-  --sidebar-border: oklch(0.30 0.045 160);
-  --sidebar-ring: oklch(0.72 0.19 47); /* arancio */
+  --border: #22314a;
+  --input: #22314a;
+  --ring: #4c8dff;
+  --chart-1: var(--primary);
+  --chart-2: #7fb0ff;
+  --chart-3: #1098ad;
+  --chart-4: #2f9e44;
+  --chart-5: #7048e8;
+  /* Barre di navigazione */
+  --sidebar: #121c2e;
+  --sidebar-foreground: #e8eef8;
+  --sidebar-primary: #4c8dff; /* voce attiva */
+  --sidebar-primary-foreground: #0b1220;
+  --sidebar-accent: var(--primary-soft);
+  --sidebar-accent-foreground: #e8eef8;
+  --sidebar-border: #22314a;
+  --sidebar-ring: #4c8dff;
 }
 
 @layer base {

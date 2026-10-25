@@ -208,7 +208,7 @@ function pad(n: number): string {
 }
 
 export function backupFilename(d: Date): string {
-  return `football-hub-backup-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.zip`;
+  return `ag-workspace-backup-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.zip`;
 }
 
 /** Esegue il backup e restituisce lo ZIP pronto da scaricare. */

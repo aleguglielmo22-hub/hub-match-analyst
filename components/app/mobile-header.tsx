@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { AppSidebar } from "./app-sidebar";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/brand/logo";
 
 /**
  * Barra in alto visibile solo su mobile (<md). Apre la sidebar in un drawer laterale.
@@ -29,21 +30,21 @@ export function MobileHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur",
+        "sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-sidebar-border bg-sidebar px-4 text-sidebar-foreground",
         className,
       )}
     >
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger
           aria-label="Apri menu"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
         >
           <Menu className="h-5 w-5" />
         </SheetTrigger>
         <SheetContent side="left" className="w-72 p-0">
           <SheetTitle className="sr-only">Menu di navigazione</SheetTitle>
           <SheetDescription className="sr-only">
-            Sezioni del Football Hub
+            Sezioni di AG Workspace
           </SheetDescription>
           <AppSidebar
             email={email}
@@ -54,16 +55,7 @@ export function MobileHeader({
         </SheetContent>
       </Sheet>
 
-      <div className="flex items-center gap-2">
-        <span className="grid h-7 w-7 place-items-center rounded-md bg-primary/15 ring-1 ring-primary/30">
-          <span className="text-[9px] font-bold tracking-tight text-primary">
-            FH
-          </span>
-        </span>
-        <span className="text-sm font-semibold tracking-tight">
-          Football Hub
-        </span>
-      </div>
+      <Logo size={28} />
     </header>
   );
 }

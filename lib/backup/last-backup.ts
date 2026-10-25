@@ -2,6 +2,7 @@
  * Data dell'ultimo backup riuscito, salvata nel browser (solo promemoria:
  * può sparire con la pulizia dei dati del browser o in navigazione privata).
  */
+// Chiave invariata dopo il cambio di nome: il promemoria non si azzera.
 const KEY = "football-hub:last-backup";
 
 export const BACKUP_REMINDER_DAYS = 7;

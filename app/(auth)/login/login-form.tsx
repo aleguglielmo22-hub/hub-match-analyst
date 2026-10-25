@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Loader2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { LogoMark } from "@/components/brand/logo";
 import {
   getSupabaseConfig,
   MISSING_SUPABASE_CONFIG_MESSAGE,
@@ -81,8 +82,9 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md border-border/60 bg-card/60 backdrop-blur-sm shadow-2xl shadow-black/40">
       <CardHeader className="space-y-2 text-center">
+        <LogoMark size={44} className="mx-auto" />
         <p className="text-[10px] uppercase tracking-[0.25em] text-primary font-semibold">
-          Football Hub
+          AG Workspace
         </p>
         <CardTitle className="text-2xl font-semibold tracking-tight">
           Accedi
