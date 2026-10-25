@@ -50,7 +50,7 @@ export function TipoMediaChips({
             onClick={() => toggle(tipo)}
             aria-pressed={active}
             className={cn(
-              "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
+              "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all max-md:min-h-11",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
               active
                 ? "border-primary/60 bg-primary/15 text-primary"

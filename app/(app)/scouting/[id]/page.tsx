@@ -109,7 +109,7 @@ export default async function DettaglioGiocatorePage({
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-8 sm:py-10">
       <Link
         href="/scouting"
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Torna allo Scouting DB

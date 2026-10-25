@@ -76,7 +76,7 @@ function AgeRange({
     return Number.isFinite(n) ? n : undefined;
   };
   const inputClass =
-    "w-14 rounded-md border border-input bg-transparent px-2 py-1 text-center text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40";
+    "w-14 rounded-md border border-input bg-transparent px-2 py-1 text-center text-base text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/40 md:text-sm max-md:min-h-11";
   return (
     <div className="space-y-1.5">
       <span className="text-xs font-medium text-sidebar-foreground/80">
@@ -135,7 +135,7 @@ function ScadenzaQuickPicker({
               onClick={() => onChange(active ? undefined : v)}
               aria-pressed={active}
               className={
-                "rounded-md border px-2 py-1 text-[11px] font-medium transition-colors " +
+                "rounded-md border px-2 py-1 text-[11px] font-medium transition-colors max-md:min-h-11 " +
                 (active
                   ? "border-primary/60 bg-primary/15 text-primary"
                   : "border-border bg-transparent text-muted-foreground hover:border-border/80 hover:text-foreground")
@@ -256,7 +256,7 @@ export function ScoutingFiltersSidebar({
           <button
             type="button"
             onClick={clearAll}
-            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground max-md:min-h-11 max-md:px-2"
           >
             <Eraser className="h-3 w-3" />
             Pulisci tutto
@@ -337,7 +337,7 @@ export function ScoutingFiltersSidebar({
                 <button
                   type="button"
                   onClick={() => update({ ruolo_principale: [] })}
-                  className="text-[10px] text-muted-foreground hover:text-foreground"
+                  className="text-[10px] text-muted-foreground hover:text-foreground max-md:min-h-11 max-md:px-2"
                 >
                   Pulisci ruoli
                 </button>

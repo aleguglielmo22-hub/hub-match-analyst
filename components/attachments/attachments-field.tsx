@@ -123,7 +123,7 @@ export function AttachmentsField({
                       href={f.signed_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      className="relative rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground max-md:after:absolute max-md:after:-inset-2"
                       aria-label={`Apri ${f.file_name}`}
                     >
                       <ExternalLink className="h-4 w-4" />
@@ -134,7 +134,7 @@ export function AttachmentsField({
                       type="button"
                       onClick={() => handleDelete(f.id)}
                       aria-label={`Elimina ${f.file_name}`}
-                      className="rounded-md p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                      className="relative rounded-md p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive max-md:after:absolute max-md:after:-inset-2"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -221,7 +221,7 @@ export function AttachmentsField({
                   onPendingChange(pending.filter((p) => p.uid !== pf.uid))
                 }
                 aria-label={`Rimuovi ${pf.file.name}`}
-                className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                className="relative rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground max-md:after:absolute max-md:after:-inset-2"
               >
                 <X className="h-4 w-4" />
               </button>

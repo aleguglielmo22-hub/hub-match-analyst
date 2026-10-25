@@ -59,7 +59,7 @@ export function MultiSelectPopover({
           <button
             type="button"
             onClick={() => onChange([])}
-            className="text-[10px] text-muted-foreground hover:text-foreground"
+            className="text-[10px] text-muted-foreground hover:text-foreground max-md:min-h-11 max-md:px-2"
           >
             Pulisci
           </button>
@@ -131,7 +131,7 @@ export function MultiSelectPopover({
                 type="button"
                 onClick={() => toggle(s.id)}
                 aria-label={`Rimuovi ${s.label}`}
-                className="rounded-sm hover:bg-primary/20"
+                className="relative rounded-sm hover:bg-primary/20 max-md:after:absolute max-md:after:-inset-4.5"
               >
                 <X className="h-2.5 w-2.5" />
               </button>
@@ -171,7 +171,7 @@ export function ToggleChipGroup<T extends string>({
           <button
             type="button"
             onClick={() => onChange([])}
-            className="text-[10px] text-muted-foreground hover:text-foreground"
+            className="text-[10px] text-muted-foreground hover:text-foreground max-md:min-h-11 max-md:px-2"
           >
             Pulisci
           </button>
@@ -187,7 +187,7 @@ export function ToggleChipGroup<T extends string>({
               onClick={() => toggle(opt.value)}
               aria-pressed={active}
               className={cn(
-                "rounded-md border px-2 py-1 text-[11px] font-medium transition-colors",
+                "rounded-md border px-2 py-1 text-[11px] font-medium transition-colors max-md:min-h-11",
                 active
                   ? "border-primary/60 bg-primary/15 text-primary"
                   : "border-border bg-transparent text-muted-foreground hover:border-border/80 hover:text-foreground",

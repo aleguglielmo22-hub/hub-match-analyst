@@ -157,7 +157,7 @@ export function SituationalFiltersSidebar({
           <button
             type="button"
             onClick={clearAll}
-            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground max-md:min-h-11 max-md:px-2"
           >
             <Eraser className="h-3 w-3" />
             Pulisci tutto
@@ -181,7 +181,7 @@ export function SituationalFiltersSidebar({
                 onClick={() => toggleMacro(m)}
                 aria-pressed={active}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-medium transition-colors",
+                  "inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-medium transition-colors max-md:min-h-11",
                   active
                     ? cn(c.bg, c.text, c.ring, "ring-1 border-transparent")
                     : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground",
@@ -248,7 +248,7 @@ export function SituationalFiltersSidebar({
                               aria-pressed={active}
                               title={SOTTO_FASE_LABEL[s]}
                               className={cn(
-                                "rounded-md border px-2 py-1 text-[11px] transition-colors",
+                                "rounded-md border px-2 py-1 text-[11px] transition-colors max-md:min-h-11",
                                 active
                                   ? "border-primary/60 bg-primary/15 text-primary"
                                   : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground",
@@ -290,7 +290,7 @@ export function SituationalFiltersSidebar({
                     onClick={() => toggleFocusTag(tag)}
                     aria-pressed={active}
                     className={cn(
-                      "rounded-md border px-2 py-1 text-[11px] transition-colors",
+                      "rounded-md border px-2 py-1 text-[11px] transition-colors max-md:min-h-11",
                       active
                         ? "border-primary/60 bg-primary/15 text-primary"
                         : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground",

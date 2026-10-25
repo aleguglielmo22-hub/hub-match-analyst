@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { MobileHeader } from "@/components/app/mobile-header";
+import { MobileBottomNav } from "@/components/app/mobile-bottom-nav";
 import { MissingConfigNotice } from "@/components/app/missing-config-notice";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { ACCESS_DENIED_PARAM, isEmailAllowed } from "@/lib/auth/allowlist";
@@ -51,8 +52,12 @@ export default async function AppLayout({
           isOwner={isOwner}
           className="md:hidden"
         />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        {/* Su mobile spazio in fondo per la barra di navigazione (o la barra Salva). */}
+        <main className="flex-1 overflow-y-auto max-md:pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
+          {children}
+        </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 }

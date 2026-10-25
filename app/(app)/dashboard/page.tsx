@@ -43,6 +43,11 @@ export default async function DashboardPage() {
       {/* Promemoria backup (solo owner: la pagina Backup è riservata a lui) */}
       {workspace?.isOwner && <BackupReminder />}
 
+      {/* Su mobile le azioni rapide vengono prima dei contatori. */}
+      <div className="md:hidden">
+        <QuickActions />
+      </div>
+
       {/* A. KPI cards (4 colonne su lg) */}
       <Suspense fallback={<KpiCardsSkeleton />}>
         <KpiCards />
@@ -53,7 +58,9 @@ export default async function DashboardPage() {
         <Suspense fallback={<RecentActivitySkeleton />}>
           <RecentActivity />
         </Suspense>
-        <QuickActions />
+        <div className="hidden md:block">
+          <QuickActions />
+        </div>
       </div>
 
       {/* C. Widget efficacia piazzati */}

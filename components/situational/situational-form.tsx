@@ -42,6 +42,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { MobileSaveBar } from "@/components/app/mobile-save-bar";
+import { focusNextFieldOnEnter } from "@/lib/forms/enter-key";
 
 function FormSection({
   title,
@@ -106,7 +108,7 @@ function FreeChipInput({
               type="button"
               onClick={() => onChange(value.filter((x) => x !== t))}
               aria-label={`Rimuovi ${t}`}
-              className="rounded-sm hover:bg-primary/20"
+              className="relative rounded-sm hover:bg-primary/20 max-md:after:absolute max-md:after:-inset-4"
             >
               <X className="h-3 w-3" />
             </button>
@@ -125,7 +127,8 @@ function FreeChipInput({
             }
           }}
           onBlur={() => commit(draft)}
-          className="flex-1 min-w-[8rem] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+          enterKeyHint="done"
+          className="flex-1 min-w-[8rem] bg-transparent text-base outline-none placeholder:text-muted-foreground md:text-sm max-md:min-h-9"
         />
       </div>
       {suggestions && (
@@ -138,7 +141,7 @@ function FreeChipInput({
                 key={s}
                 type="button"
                 onClick={() => commit(s)}
-                className="rounded-md border border-dashed border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary/40 hover:text-primary"
+                className="rounded-md border border-dashed border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary/40 hover:text-primary max-md:min-h-11 max-md:px-3 max-md:text-xs"
               >
                 + {s}
               </button>
@@ -222,12 +225,16 @@ export function SituationalForm() {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      onKeyDown={focusNextFieldOnEnter}
+      className="space-y-5"
+    >
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <Link
             href="/situational"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Torna al Training
@@ -347,7 +354,7 @@ export function SituationalForm() {
                         onClick={() => field.onChange(m)}
                         aria-pressed={active}
                         className={cn(
-                          "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors",
+                          "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors max-md:min-h-11",
                           active
                             ? cn(c.bg, c.text, c.ring, "ring-1 border-transparent")
                             : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground",
@@ -513,7 +520,13 @@ export function SituationalForm() {
         />
       </FormSection>
 
-      <div className="flex items-center justify-end gap-2 pb-8">
+      <MobileSaveBar
+        label={"Salva"}
+        submitting={submitting}
+        onCancel={() => router.push("/situational")}
+      />
+
+      <div className="flex items-center justify-end gap-2 pb-8 max-md:hidden">
         <Button
           type="button"
           variant="ghost"

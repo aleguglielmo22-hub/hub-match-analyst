@@ -50,14 +50,15 @@ export function SearchInput({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Cerca per titolo o descrizione…"
-        className="h-9 pl-8 pr-8 text-sm"
+        // 16px su mobile: evita lo zoom automatico di iPhone sul campo.
+        className="h-9 pl-8 pr-8 text-base md:text-sm"
       />
       {value && (
         <button
           type="button"
           onClick={clear}
           aria-label="Pulisci ricerca"
-          className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 max-md:after:absolute max-md:after:-inset-3 text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <X className="h-3.5 w-3.5" />
         </button>

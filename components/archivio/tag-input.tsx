@@ -101,7 +101,7 @@ export function TagInput({
               type="button"
               onClick={() => removeTag(tag.id)}
               aria-label={`Rimuovi tag ${tag.label}`}
-              className="rounded-sm hover:bg-primary/20"
+              className="relative rounded-sm hover:bg-primary/20 max-md:after:absolute max-md:after:-inset-4"
             >
               <X className="h-3 w-3" />
             </button>
@@ -118,7 +118,8 @@ export function TagInput({
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           onKeyDown={handleKeyDown}
           placeholder={value.length === 0 ? "Aggiungi tag…" : ""}
-          className="flex-1 min-w-[8rem] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+          enterKeyHint="done"
+          className="flex-1 min-w-[8rem] bg-transparent text-base outline-none placeholder:text-muted-foreground md:text-sm max-md:min-h-9"
         />
       </div>
 
@@ -131,7 +132,7 @@ export function TagInput({
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => addTag(opt.id)}
-                  className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted"
+                  className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted max-md:min-h-11"
                 >
                   <span className="truncate">#{opt.label}</span>
                 </button>
@@ -144,7 +145,7 @@ export function TagInput({
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={handleCreate}
                   disabled={isPending}
-                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-primary hover:bg-primary/10 disabled:opacity-60"
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-primary hover:bg-primary/10 disabled:opacity-60 max-md:min-h-11"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Crea tag <strong>“{trimmed}”</strong>

@@ -10,6 +10,7 @@ import {
   MISSING_SUPABASE_CONFIG_MESSAGE,
 } from "@/lib/supabase/config";
 import { loginErrorMessage } from "@/lib/auth/login-errors";
+import { focusNextFieldOnEnter } from "@/lib/forms/enter-key";
 import {
   ACCESS_DENIED_MESSAGE,
   ACCESS_DENIED_PARAM,
@@ -108,7 +109,11 @@ export function LoginForm() {
             {MISSING_SUPABASE_CONFIG_MESSAGE}
           </p>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          onKeyDown={focusNextFieldOnEnter}
+          className="space-y-4"
+        >
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
@@ -119,6 +124,7 @@ export function LoginForm() {
                 required
                 autoFocus
                 autoComplete="email"
+                inputMode="email"
                 placeholder="nome@esempio.it"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -138,6 +144,7 @@ export function LoginForm() {
                 required
                 minLength={6}
                 autoComplete="current-password"
+                enterKeyHint="go"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

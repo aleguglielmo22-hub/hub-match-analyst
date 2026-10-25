@@ -34,6 +34,8 @@ import {
 import type { ArchiveExistingFile } from "@/app/(app)/archivio/types";
 
 import { Button } from "@/components/ui/button";
+import { MobileSaveBar } from "@/components/app/mobile-save-bar";
+import { focusNextFieldOnEnter } from "@/lib/forms/enter-key";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -279,12 +281,16 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
   const submitLabel = isEdit ? "Salva modifiche" : "Salva voce";
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      onKeyDown={focusNextFieldOnEnter}
+      className="space-y-5"
+    >
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <Link
             href={cancelHref}
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {isEdit ? "Torna al dettaglio" : "Torna al Cloud"}
@@ -622,7 +628,13 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
         />
       </FormSection>
 
-      <div className="flex items-center justify-end gap-2 pb-8">
+      <MobileSaveBar
+        label={submitLabel}
+        submitting={submitting}
+        onCancel={() => router.push(cancelHref)}
+      />
+
+      <div className="flex items-center justify-end gap-2 pb-8 max-md:hidden">
         <Button
           type="button"
           variant="ghost"

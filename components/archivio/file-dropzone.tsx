@@ -204,7 +204,7 @@ export function FileDropzone({
                   type="button"
                   onClick={() => remove(pf.uid)}
                   aria-label={`Rimuovi ${pf.file.name}`}
-                  className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  className="relative rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground max-md:after:absolute max-md:after:-inset-2"
                 >
                   <X className="h-4 w-4" />
                 </button>

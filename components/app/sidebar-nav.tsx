@@ -2,50 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Archive,
-  Brain,
-  LayoutDashboard,
-  Settings,
-  Target,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
-
-type NavItem = {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-  /** Prefisso usato per il match attivo (es. /impostazioni → /impostazioni/*). */
-  matchPrefix?: string;
-  /** Se true, l'attivo richiede match esatto su href invece di startsWith. */
-  exact?: boolean;
-  /** Se true, mostrato solo se isOwner è true. */
-  ownerOnly?: boolean;
-};
-
-/**
- * Navigazione globale. L'IA primaria è:
- *   Dashboard → Scouting DB → Set Pieces DB → Training → Cloud → Impostazioni
- * Cloud resta in nav come repository file ma sotto le verticali operative.
- * Solo l'OWNER vede Impostazioni.
- * NB: le label sono solo testo; gli slug URL restano invariati.
- */
-const NAV: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/scouting", label: "Scouting DB", icon: Users },
-  { href: "/set-pieces", label: "Set Pieces DB", icon: Target },
-  { href: "/situational", label: "Training", icon: Brain },
-  { href: "/archivio", label: "Cloud", icon: Archive },
-  {
-    href: "/impostazioni/collaboratori",
-    label: "Impostazioni",
-    icon: Settings,
-    matchPrefix: "/impostazioni",
-    ownerOnly: true,
-  },
-];
+import { NAV, isNavItemActive } from "./nav-items";
 
 export function SidebarNav({
   isOwner,
@@ -61,11 +19,7 @@ export function SidebarNav({
     <nav className="flex flex-col gap-1 px-2 py-2">
       {items.map((item) => {
         const Icon = item.icon;
-        // exact → match esatto (es. /dashboard, altrimenti matcherebbe i figli).
-        // Altri → startsWith su matchPrefix o href.
-        const isActive = item.exact
-          ? pathname === item.href
-          : pathname.startsWith(item.matchPrefix ?? item.href);
+        const isActive = isNavItemActive(item, pathname);
         return (
           <Link
             key={item.href}
@@ -73,7 +27,7 @@ export function SidebarNav({
             onClick={onNavigate}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors max-md:min-h-11",
               isActive
                 ? "bg-sidebar-accent text-sidebar-accent-foreground"
                 : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",

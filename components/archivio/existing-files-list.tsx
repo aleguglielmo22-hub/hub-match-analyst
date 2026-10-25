@@ -132,7 +132,7 @@ export function ExistingFilesList({
                 onClick={() => patch(f.id, { removed: !f.removed })}
                 aria-label={f.removed ? "Annulla rimozione" : "Rimuovi file"}
                 className={cn(
-                  "rounded-md p-1.5 transition-colors",
+                  "relative rounded-md p-1.5 transition-colors max-md:after:absolute max-md:after:-inset-2",
                   f.removed
                     ? "text-muted-foreground hover:bg-muted hover:text-foreground"
                     : "text-muted-foreground hover:bg-destructive/10 hover:text-destructive",

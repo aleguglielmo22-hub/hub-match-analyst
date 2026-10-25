@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#001207" />
+    <title>Offline · Football Hub</title>
+    <style>
+      /* Pagina statica (servita dal service worker senza rete): i colori
+         replicano il tema scuro attuale di globals.css. */
+      :root { color-scheme: dark; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex; align-items: center; justify-content: center;
+        padding: 24px; box-sizing: border-box;
+        background: #001207; color: #f0f7f3;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      main { max-width: 360px; text-align: center; }
+      .logo {
+        width: 56px; height: 56px; margin: 0 auto 20px; border-radius: 14px;
+        display: grid; place-items: center; font-weight: 700; font-size: 20px;
+        background: #1d4ed8; color: #fff;
+      }
+      h1 { font-size: 20px; margin: 0 0 8px; }
+      p { margin: 0 0 24px; color: #94aba0; line-height: 1.5; }
+      button {
+        min-height: 44px; padding: 0 24px; border: 0; border-radius: 10px;
+        font: inherit; font-weight: 600; background: #ff761c; color: #001207;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="logo">FH</div>
+      <h1>Sei offline</h1>
+      <p>Riprova quando torna la connessione.</p>
+      <button type="button" onclick="location.reload()">Riprova</button>
+    </main>
+  </body>
+</html>

@@ -27,7 +27,7 @@ export function SidebarUser({ email }: { email: string }) {
           <button
             type="submit"
             aria-label="Esci"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md max-md:h-11 max-md:w-11 text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
           >
             <LogOut className="h-4 w-4" />
           </button>

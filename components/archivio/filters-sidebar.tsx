@@ -139,7 +139,7 @@ export function FiltersSidebar({ filters, lookups, className }: Props) {
           <button
             type="button"
             onClick={clearAll}
-            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground max-md:min-h-11 max-md:px-2"
           >
             <Eraser className="h-3 w-3" />
             Pulisci tutto

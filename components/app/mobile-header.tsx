@@ -36,7 +36,7 @@ export function MobileHeader({
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger
           aria-label="Apri menu"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
         >
           <Menu className="h-5 w-5" />
         </SheetTrigger>

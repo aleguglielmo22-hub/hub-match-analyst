@@ -65,6 +65,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { MobileSaveBar } from "@/components/app/mobile-save-bar";
+import { focusNextFieldOnEnter } from "@/lib/forms/enter-key";
 
 function FormSection({
   title,
@@ -130,7 +132,7 @@ function PresetTagToggle({
             onClick={() => toggle(opt)}
             aria-pressed={active}
             className={cn(
-              "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+              "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors max-md:min-h-11",
               active
                 ? "border-primary/60 bg-primary/15 text-primary"
                 : "border-border bg-card/30 text-muted-foreground hover:border-border/80 hover:text-foreground",
@@ -232,12 +234,16 @@ export function SetPieceForm() {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      onKeyDown={focusNextFieldOnEnter}
+      className="space-y-5"
+    >
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <Link
             href="/set-pieces"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Torna ai Set Pieces DB
@@ -328,6 +334,7 @@ export function SetPieceForm() {
             <Input
               id="minuto"
               type="number"
+              inputMode="numeric"
               min={0}
               max={130}
               placeholder="0–130"
@@ -564,6 +571,7 @@ export function SetPieceForm() {
               <Input
                 id="giocatori_in_area"
                 type="number"
+                inputMode="numeric"
                 min={0}
                 max={11}
                 placeholder="0–11"
@@ -655,6 +663,7 @@ export function SetPieceForm() {
               <Input
                 id="uomini_in_barriera"
                 type="number"
+                inputMode="numeric"
                 min={0}
                 max={9}
                 placeholder="0–9"
@@ -724,6 +733,7 @@ export function SetPieceForm() {
               <Input
                 id="giocatori_in_transizione"
                 type="number"
+                inputMode="numeric"
                 min={0}
                 max={11}
                 placeholder="0–11"
@@ -835,7 +845,13 @@ export function SetPieceForm() {
         />
       </FormSection>
 
-      <div className="flex items-center justify-end gap-2 pb-8">
+      <MobileSaveBar
+        label={"Salva schema"}
+        submitting={submitting}
+        onCancel={() => router.push("/set-pieces")}
+      />
+
+      <div className="flex items-center justify-end gap-2 pb-8 max-md:hidden">
         <Button
           type="button"
           variant="ghost"
