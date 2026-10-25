@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# note locali (mai su git)
+/AUDIT.md
+
+# stato locale della Supabase CLI
+supabase/.temp/
