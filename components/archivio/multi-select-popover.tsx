@@ -124,7 +124,7 @@ export function MultiSelectPopover({
           {selected.map((s) => (
             <span
               key={s.id}
-              className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium text-primary"
+              className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary"
             >
               {s.label}
               <button
@@ -189,7 +189,7 @@ export function ToggleChipGroup<T extends string>({
               className={cn(
                 "rounded-md border px-2 py-1 text-[11px] font-medium transition-colors max-md:min-h-11",
                 active
-                  ? "border-primary/60 bg-primary/15 text-primary"
+                  ? "border-primary/60 bg-primary/10 text-primary"
                   : "border-border bg-transparent text-muted-foreground hover:border-border/80 hover:text-foreground",
               )}
             >

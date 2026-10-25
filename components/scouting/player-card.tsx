@@ -3,6 +3,7 @@ import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { Calendar, MapPin, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { STATUS_OSSERVAZIONE_TONE, TONE, potentialTone } from "@/lib/tones";
 import {
   PIEDE_LABEL,
   RUOLO_LABEL,
@@ -10,27 +11,7 @@ import {
   VOTO_POTENZIALE_LABEL,
   calcolaEta,
   type PlayerListItem,
-  type VotoPotenzialeEnum,
 } from "@/lib/types/scouting";
-
-const VOTO_TINT: Record<VotoPotenzialeEnum, string> = {
-  A1: "from-amber-400/30 via-amber-500/15 to-amber-500/5 text-amber-200 ring-amber-400/40",
-  A2: "from-emerald-400/25 via-emerald-500/15 to-emerald-500/5 text-emerald-200 ring-emerald-400/30",
-  B1: "from-sky-400/25 via-sky-500/15 to-sky-500/5 text-sky-200 ring-sky-400/30",
-  B2: "from-violet-400/25 via-violet-500/15 to-violet-500/5 text-violet-200 ring-violet-400/30",
-  C: "from-slate-400/20 via-slate-500/15 to-slate-500/5 text-slate-300 ring-slate-400/20",
-  D: "from-rose-400/20 via-rose-500/15 to-rose-500/5 text-rose-200 ring-rose-400/30",
-};
-
-const STATUS_TINT: Record<
-  NonNullable<PlayerListItem["status_osservazione"]>,
-  { dot: string; text: string }
-> = {
-  DA_VISIONARE: { dot: "bg-slate-400", text: "text-slate-300" },
-  IN_OSSERVAZIONE: { dot: "bg-amber-400", text: "text-amber-200" },
-  APPROVATO: { dot: "bg-emerald-400", text: "text-emerald-200" },
-  RIFIUTATO: { dot: "bg-rose-400", text: "text-rose-300" },
-};
 
 function PhotoAvatar({
   src,
@@ -66,10 +47,11 @@ export function PlayerCard({
 }) {
   const eta = calcolaEta(player.data_nascita);
   const initials = `${(player.nome ?? "").charAt(0)}${(player.cognome ?? "").charAt(0)}`;
-  const status = STATUS_TINT[player.status_osservazione];
+  // Stato di osservazione e voto potenziale: colori con significato (lib/tones.ts).
+  const status = TONE[STATUS_OSSERVAZIONE_TONE[player.status_osservazione]];
   const votoCls = player.voto_potenziale
-    ? VOTO_TINT[player.voto_potenziale]
-    : "from-slate-700/40 to-slate-700/10 text-slate-300 ring-slate-500/20";
+    ? TONE[potentialTone(player.voto_potenziale)].badge
+    : TONE.neutral.badge;
 
   const scadenzaFmt = player.scadenza_contratto
     ? format(parseISO(player.scadenza_contratto), "MMM yyyy", { locale: it })
@@ -89,7 +71,7 @@ export function PlayerCard({
       )}
       <Link
         href={`/scouting/${player.id}`}
-        className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/50 transition-all hover:border-primary/40 hover:bg-card/80 hover:shadow-lg hover:shadow-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/50 transition-all hover:border-primary/40 hover:bg-card/80 hover:shadow-lg hover:shadow-overlay/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
       <div className="flex items-start gap-3 p-4">
         <PhotoAvatar src={player.foto_url} initials={initials || "??"} />
@@ -127,7 +109,7 @@ export function PlayerCard({
 
         <span
           className={cn(
-            "shrink-0 rounded-lg bg-gradient-to-br px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ring-1",
+            "shrink-0 rounded-lg px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ring-1",
             votoCls,
           )}
           title={
@@ -171,7 +153,7 @@ export function PlayerCard({
             status.text,
           )}
         >
-          <span className={cn("h-1.5 w-1.5 rounded-full", status.dot)} />
+          <span className={cn("h-1.5 w-1.5 rounded-full", status.solid)} />
           {STATUS_OSSERVAZIONE_LABEL[player.status_osservazione]}
         </p>
       </div>

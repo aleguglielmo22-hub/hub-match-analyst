@@ -25,7 +25,7 @@ function KpiCard({
   label: string;
   value: number;
   href: string;
-  /** Se true, evidenzia in emerald (es. Profili Elite). */
+  /** Se true, evidenzia con la tinta dei voti più alti (es. Profili Élite). */
   accent?: boolean;
   children?: React.ReactNode;
 }) {
@@ -33,9 +33,9 @@ function KpiCard({
     <Link
       href={href}
       className={cn(
-        "group relative flex flex-col gap-3 rounded-2xl border bg-card/40 p-5 transition-all hover:bg-card/70 hover:shadow-lg hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "group relative flex flex-col gap-3 rounded-2xl border bg-card/40 p-5 transition-all hover:bg-card/70 hover:shadow-lg hover:shadow-overlay/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         accent
-          ? "border-emerald-400/30 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent hover:border-emerald-400/50"
+          ? "border-tone-voto-10/40 bg-gradient-to-br from-tone-voto-10-soft to-card hover:border-tone-voto-10/60"
           : "border-border/60 hover:border-primary/40",
       )}
     >
@@ -44,7 +44,7 @@ function KpiCard({
           className={cn(
             "grid h-10 w-10 place-items-center rounded-xl ring-1",
             accent
-              ? "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30"
+              ? "bg-tone-voto-10-soft text-tone-voto-10-fg ring-tone-voto-10/40"
               : "bg-primary/10 text-primary ring-primary/20",
           )}
         >
@@ -54,7 +54,7 @@ function KpiCard({
           className={cn(
             "h-4 w-4 transition-all",
             accent
-              ? "text-emerald-300/40 group-hover:text-emerald-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              ? "text-tone-voto-10-fg/50 group-hover:text-tone-voto-10-fg group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               : "text-muted-foreground/40 group-hover:text-foreground group-hover:translate-x-0.5 group-hover:-translate-y-0.5",
           )}
         />
@@ -63,7 +63,7 @@ function KpiCard({
         <p
           className={cn(
             "text-3xl font-semibold tabular-nums tracking-tight",
-            accent ? "text-emerald-100" : "text-foreground",
+            accent ? "text-tone-voto-10-fg" : "text-foreground",
           )}
         >
           {value.toLocaleString("it-IT")}
@@ -106,7 +106,7 @@ export async function KpiCards() {
         href="/scouting?voto=A1,A2"
         accent
       >
-        <p className="text-[11px] text-emerald-200/70">
+        <p className="text-[11px] text-tone-voto-10-fg">
           Top target sotto monitoraggio
         </p>
       </KpiCard>
@@ -119,7 +119,7 @@ export async function KpiCards() {
       >
         <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
           <span className="inline-flex items-center gap-1">
-            <Goal className="h-3 w-3 text-emerald-400" />
+            <Goal className="h-3 w-3 text-tone-possesso-fg" />
             <span className="font-semibold text-foreground">
               {k.setPiecesOffensivi}
             </span>{" "}
@@ -127,7 +127,7 @@ export async function KpiCards() {
           </span>
           <span className="opacity-30">·</span>
           <span className="inline-flex items-center gap-1">
-            <Shield className="h-3 w-3 text-sky-400" />
+            <Shield className="h-3 w-3 text-tone-non-possesso-fg" />
             <span className="font-semibold text-foreground">
               {k.setPiecesDifensivi}
             </span>{" "}

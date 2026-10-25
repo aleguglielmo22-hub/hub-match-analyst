@@ -203,17 +203,7 @@ export const ESITO_FINALE_LABEL: Record<EsitoFinaleEnum, string> = {
   TRANSIZIONE_SUBITA: "Transizione subìta",
 };
 
-/** Quale "tono" usare nei badge in base all'esito (positivo per noi / negativo / neutro). */
-export const ESITO_TINT: Record<EsitoFinaleEnum, "positive" | "negative" | "neutral"> = {
-  GOL: "positive",
-  TIRO_IN_PORTA: "positive",
-  TIRO_FUORI: "neutral",
-  LIBERATO_DIFESA: "neutral",
-  FALLO_COMMESSO: "negative",
-  FALLO_SUBITO: "neutral",
-  FUORIGIOCO: "neutral",
-  TRANSIZIONE_SUBITA: "negative",
-};
+// Colori degli esiti (per fase, dal punto di vista della mia squadra): vedi ESITO_TONE in lib/tones.ts.
 
 /** Sotto-insieme della Row usato nelle card della lista. */
 export type SetPieceListItem = Pick<

@@ -156,7 +156,7 @@ export function PlayersList({
           </div>
         ) : (
           <div className="mx-auto flex max-w-md flex-col items-center gap-5 rounded-2xl border border-dashed border-border/60 bg-card/20 py-12 text-center">
-            <span className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/15 ring-1 ring-primary/30 text-primary">
+            <span className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 ring-1 ring-primary/30 text-primary">
               <Users className="h-6 w-6" />
             </span>
             <div className="space-y-1">

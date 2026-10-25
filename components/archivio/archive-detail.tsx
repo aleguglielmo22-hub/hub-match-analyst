@@ -168,7 +168,7 @@ export function ArchiveDetail({ item }: { item: ArchiveDetailType }) {
                 {item.tags.map((tag) => (
                   <span
                     key={tag.id}
-                    className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary"
+                    className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
                   >
                     <Tag className="h-3 w-3" />
                     {tag.name}

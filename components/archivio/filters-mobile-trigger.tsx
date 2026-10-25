@@ -39,7 +39,7 @@ export function FiltersMobileTrigger({
         <SlidersHorizontal className="h-3.5 w-3.5" />
         Filtri
         {count > 0 && (
-          <span className="rounded-full bg-primary/15 px-1.5 text-[10px] font-semibold text-primary">
+          <span className="rounded-full bg-primary/10 px-1.5 text-[10px] font-semibold text-primary">
             {count}
           </span>
         )}

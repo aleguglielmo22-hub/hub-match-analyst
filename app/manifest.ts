@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { THEME_BACKGROUND_HEX, THEME_BAR_HEX } from "@/lib/theme";
+import { THEME } from "@/lib/theme";
 
 /** Manifest PWA: rende l'app installabile sulla schermata Home. */
 export default function manifest(): MetadataRoute.Manifest {
@@ -11,8 +11,9 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/dashboard",
     scope: "/",
     display: "standalone",
-    background_color: THEME_BACKGROUND_HEX,
-    theme_color: THEME_BAR_HEX,
+    // Il manifest non può cambiare col tema: si usa il tema chiaro predefinito.
+    background_color: THEME.light.background,
+    theme_color: THEME.light.bar,
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },

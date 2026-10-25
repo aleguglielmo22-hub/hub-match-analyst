@@ -7,6 +7,7 @@
  * filtri e dal CHECK del DB (replicato in chk_sotto_fase_belongs_macro).
  */
 import type { Database } from "./database";
+import { MACRO_FASE_TONE, TONE } from "@/lib/tones";
 
 export type SituationalRow =
   Database["public"]["Tables"]["situational_tactics"]["Row"];
@@ -47,38 +48,15 @@ export const MACRO_FASE_DESC: Record<MacroFaseEnum, string> = {
 };
 
 /**
- * Palette dei badge sulle card (verde / rosso / blu / giallo come da specs).
- * Restituisce classi Tailwind già pronte.
+ * Colori dei badge delle fasi: le tinte delle fasi di gioco (lib/tones.ts),
+ * uguali in tutta l'app. Restituisce classi Tailwind già pronte.
  */
-export const MACRO_FASE_BADGE: Record<
-  MacroFaseEnum,
-  { bg: string; text: string; ring: string; dot: string }
-> = {
-  POSSESSO: {
-    bg: "bg-emerald-500/15",
-    text: "text-emerald-200",
-    ring: "ring-emerald-400/40",
-    dot: "bg-emerald-400",
-  },
-  NON_POSSESSO: {
-    bg: "bg-rose-500/15",
-    text: "text-rose-200",
-    ring: "ring-rose-400/40",
-    dot: "bg-rose-400",
-  },
-  TRANSIZIONE_POSITIVA: {
-    bg: "bg-sky-500/15",
-    text: "text-sky-200",
-    ring: "ring-sky-400/40",
-    dot: "bg-sky-400",
-  },
-  TRANSIZIONE_NEGATIVA: {
-    bg: "bg-amber-500/15",
-    text: "text-amber-200",
-    ring: "ring-amber-400/40",
-    dot: "bg-amber-400",
-  },
-};
+export const MACRO_FASE_BADGE = Object.fromEntries(
+  MACRO_FASE_VALUES.map((m) => {
+    const t = TONE[MACRO_FASE_TONE[m]];
+    return [m, { bg: t.soft, text: t.text, ring: t.ring, dot: t.solid }];
+  }),
+) as Record<MacroFaseEnum, { bg: string; text: string; ring: string; dot: string }>;
 
 // ============================================================
 // LIVELLO 2 — Sotto fase (10 valori)

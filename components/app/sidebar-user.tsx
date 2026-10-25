@@ -9,7 +9,7 @@ export function SidebarUser({ email }: { email: string }) {
   return (
     <div className="border-t border-sidebar-border/60 p-3">
       <div className="flex items-center gap-2.5 rounded-lg px-2.5 py-2">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/15 ring-1 ring-primary/30 text-xs font-semibold text-primary">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/10 ring-1 ring-primary/30 text-xs font-semibold text-primary">
           {initial || <UserIcon className="h-4 w-4" />}
         </span>
         <div className="flex-1 overflow-hidden">

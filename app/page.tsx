@@ -148,7 +148,7 @@ export default async function LandingPage() {
                   key={f.title}
                   className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/40 p-5 transition-colors hover:border-primary/40 hover:bg-card/60"
                 >
-                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/30">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/30">
                     <Icon className="h-5 w-5" />
                   </span>
                   <h3 className="text-base font-semibold tracking-tight">

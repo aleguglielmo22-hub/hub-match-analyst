@@ -80,7 +80,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md border-border/60 bg-card/60 backdrop-blur-sm shadow-2xl shadow-black/40">
+    <Card className="w-full max-w-md border-border/60 bg-card/60 backdrop-blur-sm shadow-2xl shadow-overlay/40">
       <CardHeader className="space-y-2 text-center">
         <LogoMark size={44} className="mx-auto" />
         <p className="text-[10px] uppercase tracking-[0.25em] text-primary font-semibold">

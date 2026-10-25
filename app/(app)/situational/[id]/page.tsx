@@ -112,7 +112,7 @@ export default async function DettaglioSituazionalePage({
               <video
                 controls
                 preload="metadata"
-                className="block aspect-video w-full bg-black"
+                className="block aspect-video w-full bg-overlay"
                 src={s.lavagna_url}
               />
             ) : (
@@ -120,7 +120,7 @@ export default async function DettaglioSituazionalePage({
               <img
                 src={s.lavagna_url}
                 alt={`Lavagna: ${s.titolo}`}
-                className="block w-full max-h-[480px] object-contain bg-black/40"
+                className="block w-full max-h-[480px] object-contain bg-overlay/40"
               />
             )}
           </article>
@@ -178,7 +178,7 @@ export default async function DettaglioSituazionalePage({
               {s.focus_tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center rounded-md bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary"
+                  className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
                 >
                   {tag}
                 </span>
@@ -229,7 +229,7 @@ export default async function DettaglioSituazionalePage({
         <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary/15 text-primary">
+              <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
                 <FileText className="h-5 w-5" />
               </span>
               <div>
@@ -269,7 +269,7 @@ function VideoEmbed({ url }: { url: string }) {
         title="Video"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="aspect-video w-full bg-black"
+        className="aspect-video w-full bg-overlay"
       />
     );
   }
@@ -278,13 +278,13 @@ function VideoEmbed({ url }: { url: string }) {
       <video
         controls
         preload="metadata"
-        className="block aspect-video w-full bg-black"
+        className="block aspect-video w-full bg-overlay"
         src={url}
       />
     );
   }
   return (
-    <div className="flex aspect-video items-center justify-center bg-black/40 p-6 text-center">
+    <div className="flex aspect-video items-center justify-center bg-overlay/40 p-6 text-center">
       <a
         href={url}
         target="_blank"

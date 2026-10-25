@@ -25,10 +25,10 @@ export function SituationalCard({ item }: { item: SituationalListItem }) {
   return (
     <Link
       href={`/situational/${item.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/50 transition-all hover:border-primary/40 hover:bg-card/80 hover:shadow-lg hover:shadow-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/50 transition-all hover:border-primary/40 hover:bg-card/80 hover:shadow-lg hover:shadow-overlay/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       {/* Anteprima media */}
-      <div className="relative h-36 overflow-hidden bg-gradient-to-br from-slate-900 to-slate-950">
+      <div className="relative h-36 overflow-hidden bg-gradient-to-br from-primary-soft to-muted">
         {item.lavagna_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -63,13 +63,13 @@ export function SituationalCard({ item }: { item: SituationalListItem }) {
         {/* Indicatori media in basso a dx */}
         <div className="absolute bottom-3 right-3 flex gap-1">
           {item.video_url && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-black/40 px-1.5 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur-sm">
+            <span className="inline-flex items-center gap-1 rounded-md bg-overlay/75 px-1.5 py-0.5 text-[10px] font-semibold text-overlay-foreground/90 backdrop-blur-sm">
               <Play className="h-2.5 w-2.5" />
               Video
             </span>
           )}
           {item.pdf_url && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-black/40 px-1.5 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur-sm">
+            <span className="inline-flex items-center gap-1 rounded-md bg-overlay/75 px-1.5 py-0.5 text-[10px] font-semibold text-overlay-foreground/90 backdrop-blur-sm">
               <FileText className="h-2.5 w-2.5" />
               PDF
             </span>

@@ -119,7 +119,7 @@ export function SetPiecesFiltersSidebar({
           <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
           <h2 className="text-sm font-semibold tracking-tight">Filtri</h2>
           {activeCount > 0 && (
-            <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
               {activeCount}
             </span>
           )}

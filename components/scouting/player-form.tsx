@@ -130,7 +130,7 @@ function FreeChipInput({
       {value.map((t) => (
         <span
           key={t}
-          className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary"
+          className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
         >
           {t}
           <button
@@ -200,7 +200,7 @@ function RuoliSecondariToggle({
                     disabled
                       ? "border-border/40 bg-muted/30 text-muted-foreground/40 line-through"
                       : active
-                        ? "border-primary/60 bg-primary/15 text-primary"
+                        ? "border-primary/60 bg-primary/10 text-primary"
                         : "border-border bg-transparent text-muted-foreground hover:border-border/80 hover:text-foreground",
                   )}
                 >

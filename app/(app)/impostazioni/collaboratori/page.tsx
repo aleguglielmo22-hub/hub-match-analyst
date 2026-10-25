@@ -24,7 +24,7 @@ export default async function CollaboratoriPage() {
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 sm:px-8 sm:py-10">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/15 ring-1 ring-primary/30 text-primary">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 ring-1 ring-primary/30 text-primary">
             <Users className="h-4 w-4" />
           </span>
           <div>

@@ -50,7 +50,7 @@ function FileFrame({ file }: { file: ArchiveExistingFile }) {
   return (
     <article className="overflow-hidden rounded-xl border border-border/60 bg-card/40">
       <header className="flex items-center gap-3 border-b border-border/50 px-4 py-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
           <Icon className="h-4 w-4" />
         </span>
         <div className="min-w-0 flex-1">
@@ -79,7 +79,7 @@ function FileFrame({ file }: { file: ArchiveExistingFile }) {
         <video
           controls
           preload="metadata"
-          className="block w-full bg-black"
+          className="block w-full bg-overlay"
           src={url}
         />
       )}
@@ -89,7 +89,7 @@ function FileFrame({ file }: { file: ArchiveExistingFile }) {
         <img
           src={url}
           alt={file.file_name}
-          className="block w-full max-h-[640px] object-contain bg-black/40"
+          className="block w-full max-h-[640px] object-contain bg-overlay/40"
         />
       )}
 
@@ -97,7 +97,7 @@ function FileFrame({ file }: { file: ArchiveExistingFile }) {
         <iframe
           src={`${url}#toolbar=1`}
           title={file.file_name}
-          className="block h-[60vh] w-full bg-black/30"
+          className="block h-[60vh] w-full bg-overlay/30"
         />
       )}
 

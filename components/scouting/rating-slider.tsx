@@ -11,20 +11,12 @@ export function RatingSlider({
   label,
   value,
   onChange,
-  groupColor,
 }: {
   label: string;
   value: number; // 0 = off
   onChange: (next: number) => void;
-  groupColor?: "emerald" | "rose" | "sky";
 }) {
   const active = value > 0;
-  const colorRing =
-    groupColor === "rose"
-      ? "ring-rose-400/30"
-      : groupColor === "sky"
-        ? "ring-sky-400/30"
-        : "ring-emerald-400/30";
 
   return (
     <div className="space-y-1.5">
@@ -34,7 +26,7 @@ export function RatingSlider({
           className={cn(
             "inline-flex h-5 min-w-[2.25rem] items-center justify-center rounded-md px-1.5 text-[10px] font-semibold tabular-nums ring-1",
             active
-              ? `bg-primary/15 text-primary ${colorRing}`
+              ? `bg-primary/10 text-primary ring-primary/30`
               : "bg-muted/40 text-muted-foreground ring-border/40",
           )}
         >

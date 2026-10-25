@@ -86,7 +86,7 @@ function MemberRowItem({
         className={cn(
           "grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-semibold ring-1",
           member.role === "OWNER"
-            ? "bg-primary/15 text-primary ring-primary/30"
+            ? "bg-primary/10 text-primary ring-primary/30"
             : "bg-muted text-foreground/70 ring-border/60",
         )}
       >

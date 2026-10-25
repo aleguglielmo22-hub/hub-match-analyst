@@ -3,26 +3,49 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#121C2E" />
+    <meta name="theme-color" content="#0B2149" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121C2E" media="(prefers-color-scheme: dark)" />
     <title>Offline · AG Workspace</title>
+    <script>
+      // Stessa scelta di Impostazioni → Aspetto (chiave "ag-theme"); senza scelta segue il dispositivo.
+      (function () {
+        try {
+          var p = localStorage.getItem("ag-theme");
+          if (p === "light" || p === "dark") document.documentElement.className = p;
+        } catch (e) {}
+      })();
+    </script>
     <style>
-      /* Pagina statica (servita dal service worker senza rete): i colori
-         replicano la palette C "Notte blu" di globals.css. */
-      :root { color-scheme: dark; }
+      /* Pagina statica (servita dal service worker senza rete): i colori replicano
+         le palette di globals.css — B "Navy club" (chiaro) e C "Notte blu" (scuro). */
+      :root {
+        color-scheme: light;
+        --bg: #f4f6fa; --fg: #13203a; --muted: #5e6c84; --primary: #0b5fd9; --on-primary: #ffffff;
+      }
+      :root.dark {
+        color-scheme: dark;
+        --bg: #0b1220; --fg: #e8eef8; --muted: #93a3bc; --primary: #4c8dff; --on-primary: #0b1220;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not(.light) {
+          color-scheme: dark;
+          --bg: #0b1220; --fg: #e8eef8; --muted: #93a3bc; --primary: #4c8dff; --on-primary: #0b1220;
+        }
+      }
       html, body { height: 100%; margin: 0; }
       body {
         display: flex; align-items: center; justify-content: center;
         padding: 24px; box-sizing: border-box;
-        background: #0b1220; color: #e8eef8;
+        background: var(--bg); color: var(--fg);
         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       }
       main { max-width: 360px; text-align: center; }
       svg { display: block; width: 64px; height: 64px; margin: 0 auto 20px; }
       h1 { font-size: 20px; margin: 0 0 8px; }
-      p { margin: 0 0 24px; color: #93a3bc; line-height: 1.5; }
+      p { margin: 0 0 24px; color: var(--muted); line-height: 1.5; }
       button {
         min-height: 44px; padding: 0 24px; border: 0; border-radius: 10px;
-        font: inherit; font-weight: 600; background: #4c8dff; color: #0b1220;
+        font: inherit; font-weight: 600; background: var(--primary); color: var(--on-primary);
       }
     </style>
   </head>

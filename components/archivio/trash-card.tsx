@@ -44,27 +44,27 @@ const TIPO_MEDIA_META: Record<
   VIDEO_CLIP: {
     icon: Video,
     label: "Clip",
-    tint: "from-emerald-500/15 to-emerald-500/5 text-emerald-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
   INTERA_PARTITA: {
     icon: Film,
     label: "Partita",
-    tint: "from-cyan-500/15 to-cyan-500/5 text-cyan-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
   PDF_REPORT: {
     icon: FileText,
     label: "PDF",
-    tint: "from-rose-500/15 to-rose-500/5 text-rose-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
   SLIDE_PRESENTAZIONE: {
     icon: Presentation,
     label: "Slide",
-    tint: "from-amber-500/15 to-amber-500/5 text-amber-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
   EXCEL_DATI: {
     icon: FileSpreadsheet,
     label: "Excel",
-    tint: "from-violet-500/15 to-violet-500/5 text-violet-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
 };
 

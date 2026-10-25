@@ -60,20 +60,21 @@ function ActionCard({
   tone: "emerald" | "sky" | "amber";
 }) {
   const toneCls = {
-    emerald: "from-emerald-500/15 to-emerald-500/5 text-emerald-200 ring-emerald-400/30",
-    sky: "from-sky-500/15 to-sky-500/5 text-sky-200 ring-sky-400/30",
-    amber: "from-amber-500/15 to-amber-500/5 text-amber-200 ring-amber-400/30",
+    // Le azioni rapide non hanno un significato di colore: tinta informativa unica.
+    emerald: "from-tone-info-soft to-card text-tone-info-fg",
+    sky: "from-tone-info-soft to-card text-tone-info-fg",
+    amber: "from-tone-info-soft to-card text-tone-info-fg",
   }[tone];
 
   return (
     <Link
       href={href}
       className={cn(
-        "group flex items-center gap-3 rounded-xl border border-border/60 bg-gradient-to-br p-3 transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-black/20",
+        "group flex items-center gap-3 rounded-xl border border-border/60 bg-gradient-to-br p-3 transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-overlay/20",
         toneCls,
       )}
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-black/30 ring-1 ring-white/10">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-overlay/30 ring-1 ring-border">
         <LinkPendingIcon className="h-4.5 w-4.5">
           <Icon className="h-4.5 w-4.5" />
         </LinkPendingIcon>

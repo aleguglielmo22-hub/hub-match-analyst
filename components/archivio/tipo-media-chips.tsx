@@ -53,7 +53,7 @@ export function TipoMediaChips({
               "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all max-md:min-h-11",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
               active
-                ? "border-primary/60 bg-primary/15 text-primary"
+                ? "border-primary/60 bg-primary/10 text-primary"
                 : "border-border bg-card/30 text-muted-foreground hover:border-border/80 hover:text-foreground",
             )}
           >

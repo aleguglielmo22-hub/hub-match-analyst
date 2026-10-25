@@ -94,7 +94,7 @@ export function TagInput({
         {selected.map((tag) => (
           <span
             key={tag.id}
-            className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary"
+            className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
           >
             #{tag.label}
             <button

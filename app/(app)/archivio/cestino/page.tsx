@@ -43,7 +43,7 @@ export default async function CestinoPage({
         </h1>
       </div>
 
-      <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-amber-200">
+      <div className="flex items-start gap-3 rounded-xl border border-tone-warning/40 bg-tone-warning-soft text-tone-warning-fg px-4 py-3">
         <Info className="mt-0.5 h-4 w-4 shrink-0" />
         <p className="text-xs leading-relaxed">
           Le voci nel cestino vengono eliminate definitivamente dopo{" "}

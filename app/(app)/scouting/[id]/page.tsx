@@ -8,6 +8,13 @@ import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { isUuid, logLoadError } from "@/lib/load-result";
 import { PageLoadError } from "@/components/app/load-error";
 import { Badge } from "@/components/ui/badge";
+import {
+  STATUS_OSSERVAZIONE_TONE,
+  TONE,
+  potentialTone,
+  ratingTone,
+} from "@/lib/tones";
+import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import {
@@ -162,11 +169,23 @@ export default async function DettaglioGiocatorePage({
             </Link>
           )}
           <div className="flex flex-wrap justify-end gap-1.5">
-            <Badge variant="secondary" className="text-[10px]">
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-[10px] border-transparent ring-1",
+                TONE[STATUS_OSSERVAZIONE_TONE[p.status_osservazione]].badge,
+              )}
+            >
               {STATUS_OSSERVAZIONE_LABEL[p.status_osservazione]}
             </Badge>
             {p.voto_potenziale && (
-              <Badge variant="outline" className="text-[10px]">
+              <Badge
+                variant="outline"
+                className={cn(
+                  "text-[10px] border-transparent ring-1",
+                  TONE[potentialTone(p.voto_potenziale)].badge,
+                )}
+              >
                 {VOTO_POTENZIALE_LABEL[p.voto_potenziale]}
               </Badge>
             )}
@@ -363,15 +382,32 @@ export default async function DettaglioGiocatorePage({
                               <span className="truncate text-muted-foreground">
                                 {r.label}
                               </span>
-                              <span
-                                className={
-                                  "inline-flex h-5 min-w-[1.75rem] items-center justify-center rounded-md px-1.5 font-mono text-[11px] font-semibold " +
-                                  (typeof val === "number"
-                                    ? "bg-primary/15 text-primary"
-                                    : "bg-muted/40 text-muted-foreground")
-                                }
-                              >
-                                {typeof val === "number" ? val : "—"}
+                              <span className="flex shrink-0 items-center gap-2">
+                                {/* Barra e numero nella scala voti 1-10 */}
+                                {typeof val === "number" && (
+                                  <span
+                                    aria-hidden
+                                    className="h-1.5 w-10 overflow-hidden rounded-full bg-muted"
+                                  >
+                                    <span
+                                      className={cn(
+                                        "block h-full rounded-full",
+                                        TONE[ratingTone(val)].solid,
+                                      )}
+                                      style={{ width: `${Math.min(10, Math.max(1, val)) * 10}%` }}
+                                    />
+                                  </span>
+                                )}
+                                <span
+                                  className={cn(
+                                    "inline-flex h-5 min-w-[1.75rem] items-center justify-center rounded-md px-1.5 font-mono text-[11px] font-semibold",
+                                    typeof val === "number"
+                                      ? TONE[ratingTone(val)].badge + " ring-1"
+                                      : "bg-muted/40 text-muted-foreground",
+                                  )}
+                                >
+                                  {typeof val === "number" ? val : "—"}
+                                </span>
                               </span>
                             </li>
                           );

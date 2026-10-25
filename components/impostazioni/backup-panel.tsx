@@ -180,7 +180,7 @@ export function BackupPanel({ appVersion }: { appVersion: string }) {
           </label>
 
           {includeFiles && mobile && (
-            <p className="flex items-start gap-2 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
+            <p className="flex items-start gap-2 rounded-lg border border-tone-warning/40 bg-tone-warning-soft text-tone-warning-fg px-3 py-2 text-sm">
               <Smartphone className="mt-0.5 h-4 w-4 shrink-0" />
               Consigliato da computer: il telefono potrebbe non avere memoria
               sufficiente
@@ -268,8 +268,8 @@ function ResultBox({ result: r }: { result: BackupResult }) {
     <div
       className={
         complete
-          ? "flex items-start gap-2 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200"
-          : "flex items-start gap-2 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200"
+          ? "flex items-start gap-2 rounded-lg border border-tone-success/40 bg-tone-success-soft text-tone-success-fg px-3 py-2 text-sm"
+          : "flex items-start gap-2 rounded-lg border border-tone-warning/40 bg-tone-warning-soft text-tone-warning-fg px-3 py-2 text-sm"
       }
       role="status"
     >

@@ -1,7 +1,7 @@
 // Service worker minimo di AG Workspace.
 // NON mette in cache pagine o dati (contengono dati personali e richiedono login):
 // conserva solo la pagina statica /offline.html, mostrata quando manca la rete.
-const OFFLINE_CACHE = "ag-offline-v2"; // v2: nuova pagina offline (rinnova la cache)
+const OFFLINE_CACHE = "ag-offline-v3"; // v3: pagina offline con tema chiaro/scuro
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {

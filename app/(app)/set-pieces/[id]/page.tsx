@@ -16,6 +16,8 @@ import { isUuid, logLoadError } from "@/lib/load-result";
 import { PageLoadError } from "@/components/app/load-error";
 import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import { Badge } from "@/components/ui/badge";
+import { ESITO_TONE, FASE_SET_PIECE_TONE, TONE } from "@/lib/tones";
+import { cn } from "@/lib/utils";
 import {
   ALTEZZA_LINEA_LABEL,
   ESITO_FINALE_LABEL,
@@ -86,13 +88,16 @@ export default async function DettaglioSetPiecePage({
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge
-            variant="secondary"
-            className="text-[10px] inline-flex items-center gap-1"
+            variant="outline"
+            className={cn(
+              "text-[10px] inline-flex items-center gap-1 border-transparent ring-1",
+              TONE[FASE_SET_PIECE_TONE[sp.fase]].badge,
+            )}
           >
             {isOffensive ? (
-              <Goal className="h-3 w-3 text-primary" />
+              <Goal className="h-3 w-3" />
             ) : (
-              <Shield className="h-3 w-3 text-primary" />
+              <Shield className="h-3 w-3" />
             )}
             {FASE_LABEL[sp.fase]}
           </Badge>
@@ -105,7 +110,14 @@ export default async function DettaglioSetPiecePage({
             </Badge>
           )}
           {sp.esito_finale && (
-            <Badge variant="outline" className="text-[10px]">
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-[10px] border-transparent ring-1",
+                // Colore = esito per la mia squadra (si inverte nei piazzati difensivi).
+                TONE[ESITO_TONE[sp.fase][sp.esito_finale]].badge,
+              )}
+            >
               {ESITO_FINALE_LABEL[sp.esito_finale]}
             </Badge>
           )}
@@ -177,7 +189,7 @@ export default async function DettaglioSetPiecePage({
             <img
               src={sp.lavagna_image_url}
               alt={`Lavagna tattica: ${sp.titolo}`}
-              className="block w-full max-h-[480px] object-contain bg-black/40"
+              className="block w-full max-h-[480px] object-contain bg-overlay/40"
             />
           </article>
         ) : (
@@ -354,7 +366,7 @@ function VideoEmbed({ url }: { url: string }) {
         title="Video clip"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="aspect-video w-full bg-black"
+        className="aspect-video w-full bg-overlay"
       />
     );
   }
@@ -364,14 +376,14 @@ function VideoEmbed({ url }: { url: string }) {
       <video
         controls
         preload="metadata"
-        className="block aspect-video w-full bg-black"
+        className="block aspect-video w-full bg-overlay"
         src={url}
       />
     );
   }
   // URL non riconosciuto (es. Wyscout): apre in nuova scheda
   return (
-    <div className="flex aspect-video items-center justify-center bg-black/40 p-6 text-center">
+    <div className="flex aspect-video items-center justify-center bg-overlay/40 p-6 text-center">
       <a
         href={url}
         target="_blank"

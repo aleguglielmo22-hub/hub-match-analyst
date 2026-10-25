@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LoadErrorBox } from "@/components/app/load-error";
+import { TONE, potentialTone } from "@/lib/tones";
 import {
   loadRecentPlayers,
   loadRecentSchemes,
@@ -40,7 +41,7 @@ function PlayerRow({ p }: { p: RecentPlayer }) {
           className="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-border/50"
         />
       ) : (
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/15 text-xs font-bold uppercase text-primary ring-1 ring-primary/30">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-xs font-bold uppercase text-primary ring-1 ring-primary/30">
           {initials || <UserIcon className="h-4 w-4" />}
         </span>
       )}
@@ -59,9 +60,8 @@ function PlayerRow({ p }: { p: RecentPlayer }) {
           <span
             className={cn(
               "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1",
-              isElite
-                ? "bg-emerald-500/15 text-emerald-200 ring-emerald-400/30"
-                : "bg-muted/40 text-muted-foreground ring-border/40",
+              // Voto potenziale sulla scala voti (lib/tones.ts), come nelle card.
+              TONE[potentialTone(p.voto_potenziale)].badge,
             )}
           >
             {isElite && <Crown className="h-2.5 w-2.5" />}

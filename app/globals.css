@@ -49,6 +49,65 @@
   --color-voto-8: var(--voto-8);
   --color-voto-9: var(--voto-9);
   --color-voto-10: var(--voto-10);
+  --color-overlay: var(--overlay);
+  --color-overlay-foreground: var(--overlay-foreground);
+  --color-tone-success: var(--tone-success);
+  --color-tone-success-soft: var(--tone-success-soft);
+  --color-tone-success-fg: var(--tone-success-fg);
+  --color-tone-danger: var(--tone-danger);
+  --color-tone-danger-soft: var(--tone-danger-soft);
+  --color-tone-danger-fg: var(--tone-danger-fg);
+  --color-tone-neutral: var(--tone-neutral);
+  --color-tone-neutral-soft: var(--tone-neutral-soft);
+  --color-tone-neutral-fg: var(--tone-neutral-fg);
+  --color-tone-info: var(--tone-info);
+  --color-tone-info-soft: var(--tone-info-soft);
+  --color-tone-info-fg: var(--tone-info-fg);
+  --color-tone-warning: var(--tone-warning);
+  --color-tone-warning-soft: var(--tone-warning-soft);
+  --color-tone-warning-fg: var(--tone-warning-fg);
+  --color-tone-possesso: var(--tone-possesso);
+  --color-tone-possesso-soft: var(--tone-possesso-soft);
+  --color-tone-possesso-fg: var(--tone-possesso-fg);
+  --color-tone-transizione-difensiva: var(--tone-transizione-difensiva);
+  --color-tone-transizione-difensiva-soft: var(--tone-transizione-difensiva-soft);
+  --color-tone-transizione-difensiva-fg: var(--tone-transizione-difensiva-fg);
+  --color-tone-non-possesso: var(--tone-non-possesso);
+  --color-tone-non-possesso-soft: var(--tone-non-possesso-soft);
+  --color-tone-non-possesso-fg: var(--tone-non-possesso-fg);
+  --color-tone-transizione-offensiva: var(--tone-transizione-offensiva);
+  --color-tone-transizione-offensiva-soft: var(--tone-transizione-offensiva-soft);
+  --color-tone-transizione-offensiva-fg: var(--tone-transizione-offensiva-fg);
+  --color-tone-voto-1: var(--tone-voto-1);
+  --color-tone-voto-1-soft: var(--tone-voto-1-soft);
+  --color-tone-voto-1-fg: var(--tone-voto-1-fg);
+  --color-tone-voto-2: var(--tone-voto-2);
+  --color-tone-voto-2-soft: var(--tone-voto-2-soft);
+  --color-tone-voto-2-fg: var(--tone-voto-2-fg);
+  --color-tone-voto-3: var(--tone-voto-3);
+  --color-tone-voto-3-soft: var(--tone-voto-3-soft);
+  --color-tone-voto-3-fg: var(--tone-voto-3-fg);
+  --color-tone-voto-4: var(--tone-voto-4);
+  --color-tone-voto-4-soft: var(--tone-voto-4-soft);
+  --color-tone-voto-4-fg: var(--tone-voto-4-fg);
+  --color-tone-voto-5: var(--tone-voto-5);
+  --color-tone-voto-5-soft: var(--tone-voto-5-soft);
+  --color-tone-voto-5-fg: var(--tone-voto-5-fg);
+  --color-tone-voto-6: var(--tone-voto-6);
+  --color-tone-voto-6-soft: var(--tone-voto-6-soft);
+  --color-tone-voto-6-fg: var(--tone-voto-6-fg);
+  --color-tone-voto-7: var(--tone-voto-7);
+  --color-tone-voto-7-soft: var(--tone-voto-7-soft);
+  --color-tone-voto-7-fg: var(--tone-voto-7-fg);
+  --color-tone-voto-8: var(--tone-voto-8);
+  --color-tone-voto-8-soft: var(--tone-voto-8-soft);
+  --color-tone-voto-8-fg: var(--tone-voto-8-fg);
+  --color-tone-voto-9: var(--tone-voto-9);
+  --color-tone-voto-9-soft: var(--tone-voto-9-soft);
+  --color-tone-voto-9-fg: var(--tone-voto-9-fg);
+  --color-tone-voto-10: var(--tone-voto-10);
+  --color-tone-voto-10-soft: var(--tone-voto-10-soft);
+  --color-tone-voto-10-fg: var(--tone-voto-10-fg);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -81,7 +140,7 @@
   --primary-soft: #e3edfc; /* primario tenue */
   --secondary: var(--primary-soft);
   --secondary-foreground: #13203a;
-  --muted: color-mix(in oklab, #dde3ec 50%, #f4f6fa);
+  --muted: color-mix(in oklab, #dde3ec 40%, #f4f6fa);
   --muted-foreground: #5e6c84;
   --accent: var(--primary-soft);
   --accent-foreground: #13203a;
@@ -105,12 +164,12 @@
   --sidebar-border: color-mix(in oklab, #ffffff 14%, #0b2149);
   --sidebar-ring: #7fb0ff;
 
-  /* Non ancora applicate (Modifica 8): colori delle fasi di gioco */
+  /* Colori delle fasi di gioco */
   --fase-possesso: #2f9e44;
   --fase-transizione-difensiva: #e8590c;
   --fase-non-possesso: #1098ad;
   --fase-transizione-offensiva: #7048e8;
-  /* Non ancora applicate (Modifica 8): scala dei voti 1 → 10 */
+  /* Scala dei voti 1 → 10 */
   --voto-1: #b54708;
   --voto-2: #d9631e;
   --voto-3: #e98a4a;
@@ -121,6 +180,72 @@
   --voto-8: #4277e6;
   --voto-9: #1f5bd8;
   --voto-10: #123fa8;
+
+  /* ---- Tinte semantiche (badge, testi, punti, barre) ----
+   * Base: colore pieno. -soft: sfondo tenue del badge. -fg: testo della stessa tinta.
+   * Percentuali per tema scelte per il contrasto WCAG AA (min. 4,89:1 su badge, card e sfondo).
+   */
+  --tone-soft-pct: 14%;
+  --tone-fg-pct: 50%;
+  --overlay: #0b1220; /* veli e fondi dei media, uguale nei due temi */
+  --overlay-foreground: #ffffff;
+  --tone-success: var(--fase-possesso); /* positivo / riuscito */
+  --tone-success-soft: color-mix(in oklab, var(--tone-success) var(--tone-soft-pct), var(--card));
+  --tone-success-fg: color-mix(in oklab, var(--tone-success) var(--tone-fg-pct), var(--foreground));
+  --tone-danger: var(--destructive); /* negativo / errore */
+  --tone-danger-soft: color-mix(in oklab, var(--tone-danger) var(--tone-soft-pct), var(--card));
+  --tone-danger-fg: color-mix(in oklab, var(--tone-danger) var(--tone-fg-pct), var(--foreground));
+  --tone-neutral: var(--voto-5); /* neutro / in attesa */
+  --tone-neutral-soft: color-mix(in oklab, var(--tone-neutral) var(--tone-soft-pct), var(--card));
+  --tone-neutral-fg: color-mix(in oklab, var(--tone-neutral) var(--tone-fg-pct), var(--foreground));
+  --tone-info: var(--primary); /* informazione / in corso */
+  --tone-info-soft: color-mix(in oklab, var(--tone-info) var(--tone-soft-pct), var(--card));
+  --tone-info-fg: color-mix(in oklab, var(--tone-info) var(--tone-fg-pct), var(--foreground));
+  --tone-warning: var(--fase-transizione-difensiva); /* attenzione */
+  --tone-warning-soft: color-mix(in oklab, var(--tone-warning) var(--tone-soft-pct), var(--card));
+  --tone-warning-fg: color-mix(in oklab, var(--tone-warning) var(--tone-fg-pct), var(--foreground));
+  --tone-possesso: var(--fase-possesso);
+  --tone-possesso-soft: color-mix(in oklab, var(--tone-possesso) var(--tone-soft-pct), var(--card));
+  --tone-possesso-fg: color-mix(in oklab, var(--tone-possesso) var(--tone-fg-pct), var(--foreground));
+  --tone-transizione-difensiva: var(--fase-transizione-difensiva);
+  --tone-transizione-difensiva-soft: color-mix(in oklab, var(--tone-transizione-difensiva) var(--tone-soft-pct), var(--card));
+  --tone-transizione-difensiva-fg: color-mix(in oklab, var(--tone-transizione-difensiva) var(--tone-fg-pct), var(--foreground));
+  --tone-non-possesso: var(--fase-non-possesso);
+  --tone-non-possesso-soft: color-mix(in oklab, var(--tone-non-possesso) var(--tone-soft-pct), var(--card));
+  --tone-non-possesso-fg: color-mix(in oklab, var(--tone-non-possesso) var(--tone-fg-pct), var(--foreground));
+  --tone-transizione-offensiva: var(--fase-transizione-offensiva);
+  --tone-transizione-offensiva-soft: color-mix(in oklab, var(--tone-transizione-offensiva) var(--tone-soft-pct), var(--card));
+  --tone-transizione-offensiva-fg: color-mix(in oklab, var(--tone-transizione-offensiva) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-1: var(--voto-1);
+  --tone-voto-1-soft: color-mix(in oklab, var(--tone-voto-1) var(--tone-soft-pct), var(--card));
+  --tone-voto-1-fg: color-mix(in oklab, var(--tone-voto-1) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-2: var(--voto-2);
+  --tone-voto-2-soft: color-mix(in oklab, var(--tone-voto-2) var(--tone-soft-pct), var(--card));
+  --tone-voto-2-fg: color-mix(in oklab, var(--tone-voto-2) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-3: var(--voto-3);
+  --tone-voto-3-soft: color-mix(in oklab, var(--tone-voto-3) var(--tone-soft-pct), var(--card));
+  --tone-voto-3-fg: color-mix(in oklab, var(--tone-voto-3) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-4: var(--voto-4);
+  --tone-voto-4-soft: color-mix(in oklab, var(--tone-voto-4) var(--tone-soft-pct), var(--card));
+  --tone-voto-4-fg: color-mix(in oklab, var(--tone-voto-4) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-5: var(--voto-5);
+  --tone-voto-5-soft: color-mix(in oklab, var(--tone-voto-5) var(--tone-soft-pct), var(--card));
+  --tone-voto-5-fg: color-mix(in oklab, var(--tone-voto-5) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-6: var(--voto-6);
+  --tone-voto-6-soft: color-mix(in oklab, var(--tone-voto-6) var(--tone-soft-pct), var(--card));
+  --tone-voto-6-fg: color-mix(in oklab, var(--tone-voto-6) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-7: var(--voto-7);
+  --tone-voto-7-soft: color-mix(in oklab, var(--tone-voto-7) var(--tone-soft-pct), var(--card));
+  --tone-voto-7-fg: color-mix(in oklab, var(--tone-voto-7) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-8: var(--voto-8);
+  --tone-voto-8-soft: color-mix(in oklab, var(--tone-voto-8) var(--tone-soft-pct), var(--card));
+  --tone-voto-8-fg: color-mix(in oklab, var(--tone-voto-8) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-9: var(--voto-9);
+  --tone-voto-9-soft: color-mix(in oklab, var(--tone-voto-9) var(--tone-soft-pct), var(--card));
+  --tone-voto-9-fg: color-mix(in oklab, var(--tone-voto-9) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-10: var(--voto-10);
+  --tone-voto-10-soft: color-mix(in oklab, var(--tone-voto-10) var(--tone-soft-pct), var(--card));
+  --tone-voto-10-fg: color-mix(in oklab, var(--tone-voto-10) var(--tone-fg-pct), var(--foreground));
 }
 
 .dark {
@@ -158,6 +283,9 @@
   --sidebar-accent-foreground: #e8eef8;
   --sidebar-border: #22314a;
   --sidebar-ring: #4c8dff;
+  /* Tinte semantiche: sfondo più presente e testo più chiaro sul tema scuro */
+  --tone-soft-pct: 24%;
+  --tone-fg-pct: 42%;
 }
 
 @layer base {

@@ -24,27 +24,27 @@ const TIPO_MEDIA_META: Record<
   VIDEO_CLIP: {
     icon: Video,
     label: "Clip",
-    tint: "from-emerald-500/20 to-emerald-500/5 text-emerald-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
   INTERA_PARTITA: {
     icon: Film,
     label: "Partita",
-    tint: "from-cyan-500/20 to-cyan-500/5 text-cyan-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
   PDF_REPORT: {
     icon: FileText,
     label: "PDF",
-    tint: "from-rose-500/20 to-rose-500/5 text-rose-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
   SLIDE_PRESENTAZIONE: {
     icon: Presentation,
     label: "Slide",
-    tint: "from-amber-500/20 to-amber-500/5 text-amber-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
   EXCEL_DATI: {
     icon: FileSpreadsheet,
     label: "Excel",
-    tint: "from-violet-500/20 to-violet-500/5 text-violet-300",
+    tint: "from-tone-info-soft to-card text-tone-info-fg",
   },
 };
 
@@ -75,7 +75,7 @@ export function ArchiveCard({ item }: { item: ArchiveListItem }) {
   return (
     <Link
       href={`/archivio/${item.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card/50 transition-all hover:border-primary/40 hover:bg-card/80 hover:shadow-lg hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card/50 transition-all hover:border-primary/40 hover:bg-card/80 hover:shadow-lg hover:shadow-overlay/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       {/* banda colorata in alto in base al tipo media dominante */}
       <div
@@ -86,7 +86,7 @@ export function ArchiveCard({ item }: { item: ArchiveListItem }) {
           {meta.label}
         </span>
         {item.tipo_media.length > 1 && (
-          <span className="absolute right-3 top-3 rounded-full border border-white/15 bg-black/30 px-1.5 py-0.5 text-[9px] font-semibold text-white/90 backdrop-blur-sm">
+          <span className="absolute right-3 top-3 rounded-full border border-overlay-foreground/15 bg-overlay/75 px-1.5 py-0.5 text-[9px] font-semibold text-overlay-foreground/90 backdrop-blur-sm">
             +{item.tipo_media.length - 1}
           </span>
         )}

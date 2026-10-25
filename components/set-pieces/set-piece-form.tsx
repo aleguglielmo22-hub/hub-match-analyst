@@ -134,7 +134,7 @@ function PresetTagToggle({
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors max-md:min-h-11",
               active
-                ? "border-primary/60 bg-primary/15 text-primary"
+                ? "border-primary/60 bg-primary/10 text-primary"
                 : "border-border bg-card/30 text-muted-foreground hover:border-border/80 hover:text-foreground",
             )}
           >
