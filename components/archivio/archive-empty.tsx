@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Plus, Archive } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 export function ArchiveEmpty() {
   return (
@@ -24,7 +25,9 @@ export function ArchiveEmpty() {
         href="/archivio/nuovo"
         className={buttonVariants({ size: "lg" })}
       >
-        <Plus className="mr-2 h-4 w-4" />
+        <LinkPendingIcon className="mr-2 h-4 w-4">
+              <Plus className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
         Aggiungi la prima voce
       </Link>
     </div>

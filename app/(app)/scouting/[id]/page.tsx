@@ -32,6 +32,7 @@ import {
   type RatingKey,
   type RatingMacroGroup,
 } from "@/lib/types/scouting";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 export const dynamic = "force-dynamic";
 
@@ -154,7 +155,9 @@ export default async function DettaglioGiocatorePage({
               href={`/scouting/${p.id}/modifica`}
               className={buttonVariants({ variant: "outline", size: "default" })}
             >
+              <LinkPendingIcon className="mr-2 h-4 w-4">
               <Pencil className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
               Modifica
             </Link>
           )}

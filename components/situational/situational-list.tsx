@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import type { SituationalListItem } from "@/lib/types/situational";
 import type { SituationalFilters } from "@/lib/schemas/situational-filters";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 const SORT_OPTIONS: { value: SituationalSort; label: string }[] = [
   { value: "recent", label: "Aggiornati di recente" },
@@ -170,7 +171,9 @@ export function SituationalList({
               href="/situational/nuovo"
               className={buttonVariants({ size: "lg" })}
             >
+              <LinkPendingIcon className="mr-2 h-4 w-4">
               <Plus className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
               Nuova situazione
             </Link>
           </div>

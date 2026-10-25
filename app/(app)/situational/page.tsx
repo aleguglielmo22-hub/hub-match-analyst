@@ -11,6 +11,7 @@ import {
   countActiveSituationalFilters,
   parseSituationalFiltersFromSearchParams,
 } from "@/lib/schemas/situational-filters";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 export const metadata = {
   title: "Training · Football Hub",
@@ -43,7 +44,9 @@ export default async function SituationalPage({
         subtitle="Catalogo esercitazioni e situazioni di gioco"
         actions={
           <Link href="/situational/nuovo" className={buttonVariants({ size: "lg" })}>
-            <Plus className="mr-2 h-4 w-4" />
+            <LinkPendingIcon className="mr-2 h-4 w-4">
+              <Plus className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
             Nuova situazione
           </Link>
         }

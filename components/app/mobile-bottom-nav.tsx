@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NAV, isNavItemActive } from "./nav-items";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 /** Pagine con un form: al posto della barra compare la barra "Salva" del form. */
 export function isFormRoute(pathname: string): boolean {
@@ -42,7 +43,9 @@ export function MobileBottomNav() {
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <Icon className="h-5 w-5 shrink-0" />
+                <LinkPendingIcon className="h-5 w-5 shrink-0">
+                  <Icon className="h-5 w-5 shrink-0" />
+                </LinkPendingIcon>
                 <span className="max-w-full truncate">
                   {item.shortLabel ?? item.label}
                 </span>

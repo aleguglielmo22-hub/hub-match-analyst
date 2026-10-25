@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import type { PlayerListItem } from "@/lib/types/scouting";
 import type { ScoutingFilters } from "@/lib/schemas/scouting-filters";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 const SORT_OPTIONS: { value: ScoutingSort; label: string }[] = [
   { value: "recent", label: "Aggiornati di recente" },
@@ -168,7 +169,9 @@ export function PlayersList({
               href="/scouting/nuovo"
               className={buttonVariants({ size: "lg" })}
             >
+              <LinkPendingIcon className="mr-2 h-4 w-4">
               <Plus className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
               Aggiungi giocatore
             </Link>
           </div>

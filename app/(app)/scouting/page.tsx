@@ -12,6 +12,7 @@ import {
   countActiveScoutingFilters,
   parseScoutingFiltersFromSearchParams,
 } from "@/lib/schemas/scouting-filters";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 export const metadata = {
   title: "Scouting DB · Football Hub",
@@ -48,7 +49,9 @@ export default async function ScoutingPage({
         subtitle="Database giocatori osservati e valutazioni"
         actions={
           <Link href="/scouting/nuovo" className={buttonVariants({ size: "lg" })}>
-            <Plus className="mr-2 h-4 w-4" />
+            <LinkPendingIcon className="mr-2 h-4 w-4">
+              <Plus className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
             Aggiungi giocatore
           </Link>
         }

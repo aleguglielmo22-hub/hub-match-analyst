@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { UserPlus, Target, Brain, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 /**
  * Box azioni rapide: tre CTA visive che lanciano i workflow principali.
@@ -73,7 +74,9 @@ function ActionCard({
       )}
     >
       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-black/30 ring-1 ring-white/10">
-        <Icon className="h-4.5 w-4.5" />
+        <LinkPendingIcon className="h-4.5 w-4.5">
+          <Icon className="h-4.5 w-4.5" />
+        </LinkPendingIcon>
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-foreground">{title}</p>

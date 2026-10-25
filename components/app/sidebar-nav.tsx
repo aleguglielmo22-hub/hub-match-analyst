@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NAV, isNavItemActive } from "./nav-items";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 export function SidebarNav({
   isOwner,
@@ -33,14 +34,16 @@ export function SidebarNav({
                 : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
             )}
           >
-            <Icon
-              className={cn(
-                "h-4 w-4 shrink-0 transition-colors",
-                isActive
-                  ? "text-primary"
-                  : "text-sidebar-foreground/50 group-hover:text-sidebar-foreground/80",
-              )}
-            />
+            <LinkPendingIcon className="h-4 w-4 shrink-0 text-primary">
+              <Icon
+                className={cn(
+                  "h-4 w-4 shrink-0 transition-colors",
+                  isActive
+                    ? "text-primary"
+                    : "text-sidebar-foreground/50 group-hover:text-sidebar-foreground/80",
+                )}
+              />
+            </LinkPendingIcon>
             <span>{item.label}</span>
           </Link>
         );

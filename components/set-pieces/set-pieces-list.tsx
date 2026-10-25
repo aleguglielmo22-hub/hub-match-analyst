@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import type { SetPieceListItem } from "@/lib/types/set-pieces";
 import type { SetPiecesFilters } from "@/lib/schemas/set-pieces-filters";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 const SORT_OPTIONS: { value: SetPiecesSort; label: string }[] = [
   { value: "recent", label: "Aggiornati di recente" },
@@ -170,7 +171,9 @@ export function SetPiecesList({
               href="/set-pieces/nuovo"
               className={buttonVariants({ size: "lg" })}
             >
+              <LinkPendingIcon className="mr-2 h-4 w-4">
               <Plus className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
               Aggiungi schema
             </Link>
           </div>

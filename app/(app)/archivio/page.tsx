@@ -14,6 +14,7 @@ import {
   countActiveFilters,
   parseFiltersFromSearchParams,
 } from "@/lib/schemas/filters";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 export const metadata = {
   title: "Cloud · Football Hub",
@@ -58,7 +59,9 @@ export default async function ArchivioPage({
               Cestino
             </Link>
             <Link href="/archivio/nuovo" className={buttonVariants({ size: "lg" })}>
+              <LinkPendingIcon className="mr-2 h-4 w-4">
               <Plus className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
               Nuova voce
             </Link>
           </>

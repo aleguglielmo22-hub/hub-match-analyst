@@ -4,6 +4,19 @@ import { createClient } from "@/lib/supabase/server";
 import { ACCESS_DENIED_MESSAGE, isEmailAllowed } from "@/lib/auth/allowlist";
 
 /**
+ * Utente verificato con Supabase (getUser = controllo del token sul server Auth),
+ * una sola volta per richiesta: layout, pagine e azioni riusano lo stesso esito.
+ * La cache di React vale solo dentro la singola richiesta, mai tra utenti diversi.
+ */
+export const getAuthUser = cache(async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+});
+
+/**
  * Workspace dell'utente loggato (assumiamo un solo workspace attivo per utente).
  * Cached per-richiesta con React `cache`.
  * Ritorna null se non c'è utente o membership; lancia un errore se il DB non risponde.
@@ -11,17 +24,14 @@ import { ACCESS_DENIED_MESSAGE, isEmailAllowed } from "@/lib/auth/allowlist";
  * non autorizzato viene rifiutato qui anche se chiama le azioni direttamente.
  */
 export const getCurrentWorkspace = cache(async () => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getAuthUser();
   if (!user) return null;
   if (!isEmailAllowed(user.email)) {
     console.warn(`[Accesso] Operazione rifiutata, account non autorizzato: ${user.id}`);
     throw new Error(ACCESS_DENIED_MESSAGE);
   }
 
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("workspace_members")
     .select("workspace_id, role, workspaces(id, nome, owner_id)")

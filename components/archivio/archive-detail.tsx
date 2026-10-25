@@ -13,6 +13,7 @@ import {
 import { ArchiveFilesViewer } from "./archive-files-viewer";
 import { TrashButton } from "./trash-button";
 import type { ArchiveDetail as ArchiveDetailType } from "@/app/(app)/archivio/types";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 function Meta({
   label,
@@ -80,7 +81,9 @@ export function ArchiveDetail({ item }: { item: ArchiveDetailType }) {
               href={`/archivio/${item.id}/modifica`}
               className={buttonVariants({ variant: "outline", size: "default" })}
             >
+              <LinkPendingIcon className="mr-2 h-4 w-4">
               <Pencil className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
               Modifica
             </Link>
             <TrashButton itemId={item.id} />

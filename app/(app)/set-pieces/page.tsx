@@ -11,6 +11,7 @@ import {
   countActiveSetPiecesFilters,
   parseSetPiecesFiltersFromSearchParams,
 } from "@/lib/schemas/set-pieces-filters";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 export const metadata = {
   title: "Set Pieces DB · Football Hub",
@@ -44,7 +45,9 @@ export default async function SetPiecesPage({
         subtitle="Database calci piazzati: schemi ed efficacia"
         actions={
           <Link href="/set-pieces/nuovo" className={buttonVariants({ size: "lg" })}>
-            <Plus className="mr-2 h-4 w-4" />
+            <LinkPendingIcon className="mr-2 h-4 w-4">
+              <Plus className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
             Aggiungi schema
           </Link>
         }

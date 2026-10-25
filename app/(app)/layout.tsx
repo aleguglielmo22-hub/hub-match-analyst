@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { getAuthUser, getCurrentWorkspace } from "@/lib/supabase/queries";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { MobileHeader } from "@/components/app/mobile-header";
 import { MobileBottomNav } from "@/components/app/mobile-bottom-nav";
@@ -20,10 +19,8 @@ export default async function AppLayout({
 }) {
   if (!getSupabaseConfig()) return <MissingConfigNotice />;
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Stessa verifica riusata da getCurrentWorkspace (una sola chiamata per richiesta).
+  const user = await getAuthUser();
 
   if (!user) {
     redirect("/login");
