@@ -10,6 +10,8 @@ import {
   KpiCardsSkeleton,
   RecentActivitySkeleton,
 } from "@/components/dashboard/dashboard-skeletons";
+import { BackupReminder } from "@/components/dashboard/backup-reminder";
+import { getCurrentWorkspace } from "@/lib/supabase/queries";
 
 export const metadata = {
   title: "Dashboard · Football Hub",
@@ -26,7 +28,9 @@ export const dynamic = "force-dynamic";
  * è pronta. Le query corrono in parallelo all'interno di ogni Server
  * Component asincrono.
  */
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const workspace = await getCurrentWorkspace();
+
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-8 sm:py-10">
       <SectionHeader
@@ -35,6 +39,9 @@ export default function DashboardPage() {
         title="Centro di controllo"
         subtitle="Riepilogo dei dati analitici globali del workspace."
       />
+
+      {/* Promemoria backup (solo owner: la pagina Backup è riservata a lui) */}
+      {workspace?.isOwner && <BackupReminder />}
 
       {/* A. KPI cards (4 colonne su lg) */}
       <Suspense fallback={<KpiCardsSkeleton />}>

@@ -4,6 +4,7 @@ import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { listMembers } from "./actions";
 import { InviteForm } from "@/components/impostazioni/invite-form";
 import { MembersList } from "@/components/impostazioni/members-list";
+import { SettingsTabs } from "@/components/impostazioni/settings-tabs";
 
 export const metadata = {
   title: "Collaboratori · Impostazioni",
@@ -40,6 +41,8 @@ export default async function CollaboratoriPage() {
           voci. Solo tu potrai modificare le voci create dagli altri.
         </p>
       </div>
+
+      <SettingsTabs active="collaboratori" />
 
       <InviteForm />
 
