@@ -3,6 +3,12 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import type { PlayerListItem } from "@/lib/types/scouting";
 import { logLoadError } from "@/lib/load-result";
+import { ESITO_TONE } from "@/lib/tones";
+import {
+  computeSetPiecesEfficacy,
+  type EfficacyRow,
+  type SetPiecesEfficacy,
+} from "@/lib/set-pieces/efficacy";
 
 /* ============================================================
  * KPI numerici (count head-only: query veloci, niente payload)
@@ -15,8 +21,6 @@ export type DashboardKpis = {
   setPiecesOffensivi: number;
   setPiecesDifensivi: number;
   situationalTotal: number;
-  setPiecesGol: number;
-  setPiecesConEsito: number;
 };
 
 export async function loadDashboardKpis(): Promise<DashboardKpis> {
@@ -29,8 +33,6 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
       setPiecesOffensivi: 0,
       setPiecesDifensivi: 0,
       situationalTotal: 0,
-      setPiecesGol: 0,
-      setPiecesConEsito: 0,
     };
 
   const supabase = await createClient();
@@ -66,8 +68,6 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
     setPiecesOffRes,
     setPiecesDifRes,
     situationalRes,
-    setPiecesGolRes,
-    setPiecesConEsitoRes,
   ] = await Promise.all([
     players(),
     players().in("voto_potenziale", ["A1", "A2"]),
@@ -75,8 +75,6 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
     setPieces().eq("fase", "OFFENSIVO"),
     setPieces().eq("fase", "DIFENSIVO"),
     situational(),
-    setPieces().eq("esito_finale", "GOL"),
-    setPieces().not("esito_finale", "is", null),
   ]);
 
   const failed = [
@@ -86,8 +84,6 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
     setPiecesOffRes,
     setPiecesDifRes,
     situationalRes,
-    setPiecesGolRes,
-    setPiecesConEsitoRes,
   ].find((r) => r.error);
   if (failed) {
     // Un conteggio fallito non deve apparire come "0": il widget mostrerà l'errore.
@@ -102,9 +98,39 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
     setPiecesOffensivi: setPiecesOffRes.count ?? 0,
     setPiecesDifensivi: setPiecesDifRes.count ?? 0,
     situationalTotal: situationalRes.count ?? 0,
-    setPiecesGol: setPiecesGolRes.count ?? 0,
-    setPiecesConEsito: setPiecesConEsitoRes.count ?? 0,
   };
+}
+
+/* ============================================================
+ * Efficacia calci piazzati per fase (calcolo in lib/set-pieces/efficacy.ts)
+ * ============================================================ */
+
+const EFFICACY_PAGE = 1000;
+
+export async function loadSetPiecesEfficacy(): Promise<SetPiecesEfficacy> {
+  const workspace = await getCurrentWorkspace();
+  if (!workspace) return computeSetPiecesEfficacy([], ESITO_TONE);
+
+  const supabase = await createClient();
+  // Solo le 3 colonne necessarie; a pagine perché PostgREST limita le righe
+  // per richiesta. I piazzati nel cestino sono esclusi.
+  const rows: EfficacyRow[] = [];
+  for (let from = 0; ; from += EFFICACY_PAGE) {
+    const { data, error } = await supabase
+      .from("set_pieces")
+      .select("fase, tipo_piazzato, esito_finale")
+      .eq("workspace_id", workspace.id)
+      .is("deleted_at", null)
+      .order("id")
+      .range(from, from + EFFICACY_PAGE - 1);
+    if (error) {
+      logLoadError("Dashboard · efficacia piazzati", error);
+      throw new Error("Impossibile caricare l'efficacia dei piazzati");
+    }
+    rows.push(...(data ?? []));
+    if (!data || data.length < EFFICACY_PAGE) break;
+  }
+  return computeSetPiecesEfficacy(rows, ESITO_TONE);
 }
 
 /* ============================================================

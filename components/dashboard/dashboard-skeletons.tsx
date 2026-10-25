@@ -46,6 +46,6 @@ export function RecentActivitySkeleton() {
 
 export function EfficacyWidgetSkeleton() {
   return (
-    <section className="h-32 animate-pulse rounded-2xl border border-border/40 bg-card/30" />
+    <section className="h-72 animate-pulse rounded-2xl border border-border/40 bg-card/30 md:h-60" />
   );
 }
