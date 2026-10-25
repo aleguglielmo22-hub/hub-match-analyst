@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
+import { ACCESS_DENIED_PARAM } from "@/lib/auth/allowlist";
 
 /**
  * Rotte protette: l'utente deve essere autenticato per accedervi.
@@ -12,9 +13,26 @@ const PROTECTED_PREFIXES = ["/archivio", "/impostazioni"];
  */
 const ANON_ONLY_PATHS = ["/login"];
 
+/** Keep-alive: deve restare com'è, senza controllo dell'account. */
+const KEEP_ALIVE_PATH = "/api/keep-alive";
+
 export async function proxy(request: NextRequest) {
-  const { response, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
+  const { response, user, denied } = await updateSession(request, {
+    enforceAllowlist: pathname !== KEEP_ALIVE_PATH,
+  });
+
+  // Account non autorizzato: sessione già chiusa, nessuna pagina/azione eseguita.
+  // Si torna al login con il messaggio, portando i cookie di logout.
+  if (denied) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = "";
+    url.searchParams.set("errore", ACCESS_DENIED_PARAM);
+    const redirect = NextResponse.redirect(url);
+    response.cookies.getAll().forEach((c) => redirect.cookies.set(c));
+    return redirect;
+  }
 
   // Loggato che torna sul login → vai all'archivio.
   if (user && ANON_ONLY_PATHS.includes(pathname)) {

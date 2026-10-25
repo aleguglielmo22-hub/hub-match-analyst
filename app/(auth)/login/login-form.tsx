@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Lock, Loader2, ArrowRight, UserPlus } from "lucide-react";
+import { Mail, Lock, Loader2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -10,6 +10,11 @@ import {
   MISSING_SUPABASE_CONFIG_MESSAGE,
 } from "@/lib/supabase/config";
 import { loginErrorMessage } from "@/lib/auth/login-errors";
+import {
+  ACCESS_DENIED_MESSAGE,
+  ACCESS_DENIED_PARAM,
+  isEmailAllowed,
+} from "@/lib/auth/allowlist";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,16 +26,14 @@ import {
   CardContent,
 } from "@/components/ui/card";
 
-type Mode = "signin" | "signup";
-
 const configMissing = getSupabaseConfig() === null;
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") ?? "/dashboard";
+  const accessDenied = searchParams.get("errore") === ACCESS_DENIED_PARAM;
 
-  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,31 +47,24 @@ export function LoginForm() {
     const cleanEmail = email.trim().toLowerCase();
 
     try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: cleanEmail,
-          password,
-        });
-        if (error) {
-          const msg = loginErrorMessage(error);
-          toast.error(msg.title, { description: msg.description });
-          setLoading(false);
-          return;
-        }
-        toast.success("Accesso effettuato");
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email: cleanEmail,
-          password,
-        });
-        if (error) {
-          const msg = loginErrorMessage(error);
-          toast.error(msg.title, { description: msg.description });
-          setLoading(false);
-          return;
-        }
-        toast.success("Account creato");
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+      if (error) {
+        const msg = loginErrorMessage(error);
+        toast.error(msg.title, { description: msg.description });
+        setLoading(false);
+        return;
       }
+      // Account esistente ma non autorizzato: sessione chiusa subito.
+      if (!isEmailAllowed(data.user?.email)) {
+        await supabase.auth.signOut({ scope: "local" });
+        toast.error("Accesso negato", { description: ACCESS_DENIED_MESSAGE });
+        setLoading(false);
+        return;
+      }
+      toast.success("Accesso effettuato");
 
       // Successo: router.refresh per propagare la nuova sessione + push alla
       // pagina richiesta (di default "/dashboard").
@@ -88,16 +84,22 @@ export function LoginForm() {
           Football Hub
         </p>
         <CardTitle className="text-2xl font-semibold tracking-tight">
-          {mode === "signin" ? "Accedi" : "Crea il tuo account"}
+          Accedi
         </CardTitle>
         <CardDescription className="text-sm">
-          {mode === "signin"
-            ? "Email e password — entri subito, niente conferme."
-            : "Email e password — il tuo account è attivo immediatamente."}
+          Accesso riservato con email e password.
         </CardDescription>
       </CardHeader>
 
       <CardContent>
+        {accessDenied && (
+          <p
+            role="alert"
+            className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-muted-foreground"
+          >
+            {ACCESS_DENIED_MESSAGE}
+          </p>
+        )}
         {configMissing && (
           <p
             role="alert"
@@ -135,10 +137,8 @@ export function LoginForm() {
                 type="password"
                 required
                 minLength={6}
-                autoComplete={
-                  mode === "signin" ? "current-password" : "new-password"
-                }
-                placeholder={mode === "signup" ? "Min. 6 caratteri" : "••••••••"}
+                autoComplete="current-password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
@@ -156,33 +156,16 @@ export function LoginForm() {
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {mode === "signin" ? "Accesso…" : "Creazione…"}
+                Accesso…
               </>
-            ) : mode === "signin" ? (
+            ) : (
               <>
                 <ArrowRight className="mr-2 h-4 w-4" />
                 Accedi
               </>
-            ) : (
-              <>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Crea account
-              </>
             )}
           </Button>
         </form>
-
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-          {mode === "signin" ? "Non hai un account?" : "Hai già un account?"}{" "}
-          <button
-            type="button"
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            disabled={loading}
-            className="text-primary underline-offset-2 hover:underline disabled:opacity-50"
-          >
-            {mode === "signin" ? "Registrati" : "Accedi"}
-          </button>
-        </p>
       </CardContent>
     </Card>
   );

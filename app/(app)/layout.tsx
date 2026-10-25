@@ -5,10 +5,12 @@ import { AppSidebar } from "@/components/app/app-sidebar";
 import { MobileHeader } from "@/components/app/mobile-header";
 import { MissingConfigNotice } from "@/components/app/missing-config-notice";
 import { getSupabaseConfig } from "@/lib/supabase/config";
+import { ACCESS_DENIED_PARAM, isEmailAllowed } from "@/lib/auth/allowlist";
 
 /**
  * Layout autenticato: sidebar (desktop) o drawer (mobile) + area contenuto.
  * Tutta la zona (app) richiede sessione: in assenza di utente forziamo /login.
+ * Solo gli account in lib/auth/allowlist.ts possono entrare.
  */
 export default async function AppLayout({
   children,
@@ -24,6 +26,11 @@ export default async function AppLayout({
 
   if (!user) {
     redirect("/login");
+  }
+  // Seconda barriera (la prima è proxy.ts): account non autorizzato → login.
+  // Il proxy, su /login, chiude la sessione e mostra il messaggio.
+  if (!isEmailAllowed(user.email)) {
+    redirect(`/login?errore=${ACCESS_DENIED_PARAM}`);
   }
 
   // Se il DB non risponde la shell resta visibile: l'errore lo mostra la pagina.

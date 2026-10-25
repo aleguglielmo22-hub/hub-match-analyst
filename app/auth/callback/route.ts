@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { ACCESS_DENIED_PARAM, isEmailAllowed } from "@/lib/auth/allowlist";
 
 /**
  * Callback del magic link Supabase.
@@ -12,7 +13,14 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    // Account non autorizzato: la sessione appena creata viene chiusa subito.
+    if (!error && !isEmailAllowed(data.user?.email)) {
+      await supabase.auth.signOut({ scope: "local" });
+      const denied = new URL("/login", origin);
+      denied.searchParams.set("errore", ACCESS_DENIED_PARAM);
+      return NextResponse.redirect(denied);
+    }
     if (!error) {
       // `next` può essere un path relativo (es. /archivio/123). Restiamo sul nostro origin.
       const safeNext = next.startsWith("/") ? next : "/archivio";
