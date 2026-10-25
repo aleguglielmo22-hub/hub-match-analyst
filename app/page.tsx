@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getSupabaseConfig } from "@/lib/supabase/config";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -60,10 +61,10 @@ const SHOTS = [
 ];
 
 export default async function LandingPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Senza configurazione la landing resta visibile (il messaggio compare al login).
+  const user = getSupabaseConfig()
+    ? (await (await createClient()).auth.getUser()).data.user
+    : null;
 
   // Utente già autenticato sulla home → lo portiamo alla dashboard.
   if (user) redirect("/dashboard");

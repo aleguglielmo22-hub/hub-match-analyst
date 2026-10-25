@@ -8,6 +8,7 @@ import {
   useTransition,
 } from "react";
 import Link from "next/link";
+import { LoadErrorBox } from "@/components/app/load-error";
 import { Loader2, ArrowDownUp, Brain, Plus } from "lucide-react";
 import {
   loadSituationalPage,
@@ -34,11 +35,14 @@ const SORT_OPTIONS: { value: SituationalSort; label: string }[] = [
 export function SituationalList({
   initialItems,
   initialHasMore,
+  initialError,
   filters,
   hasActiveSearchOrFilters,
 }: {
   initialItems: SituationalListItem[];
   initialHasMore: boolean;
+  /** Il primo blocco non è stato caricato (errore del server). */
+  initialError?: boolean;
   filters: SituationalFilters;
   hasActiveSearchOrFilters?: boolean;
 }) {
@@ -48,6 +52,10 @@ export function SituationalList({
   const [sort, setSort] = useState<SituationalSort>("recent");
   const [isPending, startTransition] = useTransition();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  // "first" = lista non caricata; "more" = blocco successivo non caricato.
+  const [loadError, setLoadError] = useState<"first" | "more" | null>(
+    initialError ? "first" : null,
+  );
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const handleSortChange = useCallback(
@@ -58,12 +66,18 @@ export function SituationalList({
       setPage(0);
       setItems([]);
       setHasMore(true);
+      setLoadError(null);
       startTransition(async () => {
         const res = await loadSituationalPage({
           sort: next,
           page: 0,
           filters,
-        });
+        }).catch(() => null);
+        if (!res || res.error) {
+          setLoadError("first");
+          setHasMore(false);
+          return;
+        }
         setItems(res.items);
         setHasMore(res.hasMore);
       });
@@ -72,15 +86,20 @@ export function SituationalList({
   );
 
   const loadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingMore || !hasMore || loadError) return;
     setIsLoadingMore(true);
     const next = page + 1;
-    const res = await loadSituationalPage({ sort, page: next, filters });
+    const res = await loadSituationalPage({ sort, page: next, filters }).catch(() => null);
+    if (!res || res.error) {
+      setLoadError("more");
+      setIsLoadingMore(false);
+      return;
+    }
     setItems((prev) => [...prev, ...res.items]);
     setHasMore(res.hasMore);
     setPage(next);
     setIsLoadingMore(false);
-  }, [hasMore, isLoadingMore, page, sort, filters]);
+  }, [hasMore, isLoadingMore, loadError, page, sort, filters]);
 
   useEffect(() => {
     const target = sentinelRef.current;
@@ -95,13 +114,15 @@ export function SituationalList({
     return () => observer.disconnect();
   }, [hasMore, loadMore]);
 
-  const isEmpty = !isPending && items.length === 0;
+  const isEmpty = !isPending && items.length === 0 && !loadError;
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">
-          {items.length === 0
+          {loadError === "first"
+            ? ""
+            : items.length === 0
             ? "Nessuna situazione"
             : items.length === 1
               ? "1 situazione"
@@ -124,7 +145,9 @@ export function SituationalList({
         </div>
       </div>
 
-      {isEmpty ? (
+      {loadError === "first" && !isPending ? (
+        <LoadErrorBox onRetry={() => handleSortChange(sort)} />
+      ) : isEmpty ? (
         hasActiveSearchOrFilters ? (
           <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border/60 bg-card/20 py-12 text-center">
             <p className="text-sm font-medium">Nessun risultato</p>
@@ -167,7 +190,11 @@ export function SituationalList({
               ))}
           </div>
 
-          {hasMore && (
+          {loadError === "more" && (
+            <LoadErrorBox onRetry={() => setLoadError(null)} />
+          )}
+
+          {hasMore && !loadError && (
             <div ref={sentinelRef} className="flex items-center justify-center py-6">
               {isLoadingMore ? (
                 <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">

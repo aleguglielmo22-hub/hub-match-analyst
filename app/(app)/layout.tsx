@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { MobileHeader } from "@/components/app/mobile-header";
+import { MissingConfigNotice } from "@/components/app/missing-config-notice";
+import { getSupabaseConfig } from "@/lib/supabase/config";
 
 /**
  * Layout autenticato: sidebar (desktop) o drawer (mobile) + area contenuto.
@@ -13,6 +15,8 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
+  if (!getSupabaseConfig()) return <MissingConfigNotice />;
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,7 +26,8 @@ export default async function AppLayout({
     redirect("/login");
   }
 
-  const workspace = await getCurrentWorkspace();
+  // Se il DB non risponde la shell resta visibile: l'errore lo mostra la pagina.
+  const workspace = await getCurrentWorkspace().catch(() => null);
   const email = user.email ?? "Utente";
   const isOwner = workspace?.isOwner ?? false;
 

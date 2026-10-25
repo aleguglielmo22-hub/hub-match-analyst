@@ -9,6 +9,7 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LoadErrorBox } from "@/components/app/load-error";
 import {
   loadRecentPlayers,
   loadRecentSchemes,
@@ -106,10 +107,16 @@ function SchemeRow({ item }: { item: RecentItem }) {
 
 /** Server Component asincrono: carica e renderizza l'attività recente. */
 export async function RecentActivity() {
-  const [recentPlayers, recentSchemes] = await Promise.all([
-    loadRecentPlayers(),
-    loadRecentSchemes(3),
-  ]);
+  let recentPlayers: Awaited<ReturnType<typeof loadRecentPlayers>>;
+  let recentSchemes: Awaited<ReturnType<typeof loadRecentSchemes>>;
+  try {
+    [recentPlayers, recentSchemes] = await Promise.all([
+      loadRecentPlayers(),
+      loadRecentSchemes(3),
+    ]);
+  } catch {
+    return <LoadErrorBox />;
+  }
 
   return (
     <section className="rounded-2xl border border-border/60 bg-card/40 p-5">

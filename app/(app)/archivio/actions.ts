@@ -5,6 +5,13 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import {
+  failedListPage,
+  isUuid,
+  logLoadError,
+  type ListPage,
+  type LoadResult,
+} from "@/lib/load-result";
+import {
   createArchiveItemSchema,
   TIPO_MEDIA_VALUES,
   type CreateArchiveItemInput,
@@ -38,6 +45,17 @@ export type LoadArchiveOpts = {
  */
 export async function loadArchivePage(
   opts: LoadArchiveOpts,
+): Promise<ListPage<ArchiveListItem>> {
+  try {
+    return await queryArchivePage(opts);
+  } catch (err) {
+    logLoadError(opts.inTrash ? "Cestino" : "Cloud", err);
+    return failedListPage();
+  }
+}
+
+async function queryArchivePage(
+  opts: LoadArchiveOpts,
 ): Promise<{ items: ArchiveListItem[]; hasMore: boolean }> {
   const sort = sortSchema.parse(opts.sort);
   const page = pageSchema.parse(opts.page);
@@ -54,10 +72,11 @@ export async function loadArchivePage(
   // raccogliamo gli archive_item_id che hanno almeno un tag fra quelli selezionati.
   let tagFilteredIds: string[] | null = null;
   if (filters?.tag_ids.length) {
-    const { data: tagRows } = await supabase
+    const { data: tagRows, error: tagError } = await supabase
       .from("archive_item_tags")
       .select("archive_item_id")
       .in("tag_id", filters.tag_ids);
+    if (tagError) throw tagError;
     tagFilteredIds = Array.from(
       new Set((tagRows ?? []).map((r) => r.archive_item_id)),
     );
@@ -128,7 +147,7 @@ export async function loadArchivePage(
   q = q.range(from, to);
 
   const { data, error } = await q;
-  if (error || !data) return { items: [], hasMore: false };
+  if (error || !data) throw error ?? new Error("Risposta vuota");
 
   const items = data.slice(0, PAGE_SIZE) as unknown as ArchiveListItem[];
   return { items, hasMore: data.length > PAGE_SIZE };
@@ -174,6 +193,10 @@ export async function getLookupOptions(): Promise<{
       .eq("workspace_id", workspace.id)
       .order("name"),
   ]);
+
+  const lookupError =
+    teamsRes.error ?? compsRes.error ?? seasonsRes.error ?? tagsRes.error;
+  if (lookupError) logLoadError("Cloud · elenchi squadre/competizioni/stagioni/tag", lookupError);
 
   return {
     teams: (teamsRes.data ?? []).map((t) => ({ id: t.id, label: t.nome })),
@@ -354,12 +377,24 @@ export async function createArchiveItem(
 
 const SIGNED_URL_TTL = 3600; // 1 ora come da specs §4
 
-/** Carica una voce per il dettaglio, con file (incl. signed URL), tag e relazioni. */
+/**
+ * Carica una voce per il dettaglio, con file (incl. signed URL), tag e relazioni.
+ * Distingue voce inesistente ("not_found") da errore del server ("error").
+ */
 export async function getArchiveItem(
   itemId: string,
-): Promise<ArchiveDetail | null> {
-  z.string().uuid().parse(itemId);
+): Promise<LoadResult<ArchiveDetail>> {
+  if (!isUuid(itemId)) return { ok: false, reason: "not_found" };
+  try {
+    const item = await queryArchiveItem(itemId);
+    return item ? { ok: true, data: item } : { ok: false, reason: "not_found" };
+  } catch (err) {
+    logLoadError("Cloud · dettaglio", err);
+    return { ok: false, reason: "error" };
+  }
+}
 
+async function queryArchiveItem(itemId: string): Promise<ArchiveDetail | null> {
   const workspace = await getCurrentWorkspace();
   if (!workspace) return null;
 
@@ -398,7 +433,8 @@ export async function getArchiveItem(
     .eq("workspace_id", workspace.id)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error) throw error;
+  if (!data) return null;
 
   // Genera signed URL per ogni file (TTL 1h)
   const filesRaw = (data.files ?? []) as Array<{

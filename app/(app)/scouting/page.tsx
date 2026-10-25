@@ -27,7 +27,8 @@ export default async function ScoutingPage({
   const sp = await searchParams;
   const filters = parseScoutingFiltersFromSearchParams(sp);
 
-  const workspace = await getCurrentWorkspace();
+  // Se il DB non risponde, l'errore lo mostra la lista (con Riprova).
+  const workspace = await getCurrentWorkspace().catch(() => null);
 
   const initialPage = await loadPlayersPage({
     sort: "recent",
@@ -73,6 +74,7 @@ export default async function ScoutingPage({
             key={stateKey}
             initialItems={initialPage.items}
             initialHasMore={initialPage.hasMore}
+            initialError={!!initialPage.error}
             filters={filters}
             hasActiveSearchOrFilters={hasActiveSearchOrFilters}
             currentUserId={workspace?.userId ?? null}

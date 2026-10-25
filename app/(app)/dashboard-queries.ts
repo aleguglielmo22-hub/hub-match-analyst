@@ -2,6 +2,7 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import type { PlayerListItem } from "@/lib/types/scouting";
+import { logLoadError } from "@/lib/load-result";
 
 /* ============================================================
  * KPI numerici (count head-only: query veloci, niente payload)
@@ -78,6 +79,22 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
     setPieces().not("esito_finale", "is", null),
   ]);
 
+  const failed = [
+    playersTotalRes,
+    playersEliteRes,
+    setPiecesTotalRes,
+    setPiecesOffRes,
+    setPiecesDifRes,
+    situationalRes,
+    setPiecesGolRes,
+    setPiecesConEsitoRes,
+  ].find((r) => r.error);
+  if (failed) {
+    // Un conteggio fallito non deve apparire come "0": il widget mostrerà l'errore.
+    logLoadError("Dashboard · contatori", failed.error);
+    throw new Error("Impossibile caricare i contatori");
+  }
+
   return {
     playersTotal: playersTotalRes.count ?? 0,
     playersElite: playersEliteRes.count ?? 0,
@@ -113,7 +130,7 @@ export async function loadRecentPlayers(): Promise<RecentPlayer[]> {
   if (!workspace) return [];
 
   const supabase = await createClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("players")
     .select(
       "id, nome, cognome, ruolo_principale, voto_potenziale, foto_url, created_at",
@@ -122,6 +139,10 @@ export async function loadRecentPlayers(): Promise<RecentPlayer[]> {
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(4);
+  if (error) {
+    logLoadError("Dashboard · ultimi giocatori", error);
+    throw new Error("Impossibile caricare gli ultimi giocatori");
+  }
   return (data ?? []) as RecentPlayer[];
 }
 
@@ -151,6 +172,10 @@ export async function loadRecentSchemes(limit = 3): Promise<RecentItem[]> {
       .order("updated_at", { ascending: false })
       .limit(limit),
   ]);
+  if (spRes.error || stRes.error) {
+    logLoadError("Dashboard · ultimi schemi", spRes.error ?? stRes.error);
+    throw new Error("Impossibile caricare gli ultimi schemi");
+  }
 
   const setPieces: RecentItem[] = (spRes.data ?? []).map((r) => ({
     id: r.id,

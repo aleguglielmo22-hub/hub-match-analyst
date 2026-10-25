@@ -3,6 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, ExternalLink, FileText, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { isUuid, logLoadError } from "@/lib/load-result";
+import { PageLoadError } from "@/components/app/load-error";
 import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import { cn } from "@/lib/utils";
 import {
@@ -23,19 +25,32 @@ export default async function DettaglioSituazionalePage({
 }) {
   const { id } = await params;
 
-  const workspace = await getCurrentWorkspace();
+  // Id non valido nell'indirizzo = elemento inesistente, non errore del server.
+  if (!isUuid(id)) notFound();
+
+  let workspace: Awaited<ReturnType<typeof getCurrentWorkspace>> = null;
+  let data: SituationalRow | null = null;
+  try {
+    workspace = await getCurrentWorkspace();
+    if (workspace) {
+      const supabase = await createClient();
+      const res = await supabase
+        .from("situational_tactics")
+        .select("*")
+        .eq("id", id)
+        .eq("workspace_id", workspace.id)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (res.error) throw res.error;
+      data = res.data as SituationalRow | null;
+    }
+  } catch (err) {
+    logLoadError("Training · dettaglio", err);
+    return <PageLoadError />;
+  }
+
   if (!workspace) redirect("/login");
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("situational_tactics")
-    .select("*")
-    .eq("id", id)
-    .eq("workspace_id", workspace.id)
-    .is("deleted_at", null)
-    .maybeSingle();
-
-  if (error || !data) notFound();
+  if (!data) notFound();
   const s = data as SituationalRow;
 
   const macro = MACRO_FASE_BADGE[s.macro_fase];

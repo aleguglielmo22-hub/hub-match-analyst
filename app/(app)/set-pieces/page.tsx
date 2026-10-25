@@ -70,6 +70,7 @@ export default async function SetPiecesPage({
             key={stateKey}
             initialItems={initialPage.items}
             initialHasMore={initialPage.hasMore}
+            initialError={!!initialPage.error}
             filters={filters}
             hasActiveSearchOrFilters={hasActiveSearchOrFilters}
           />

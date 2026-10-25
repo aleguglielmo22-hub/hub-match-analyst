@@ -86,6 +86,7 @@ export default async function ArchivioPage({
             key={stateKey}
             initialItems={initialPage.items}
             initialHasMore={initialPage.hasMore}
+            initialError={!!initialPage.error}
             initialSort="recent"
             filters={filters}
             query={query}

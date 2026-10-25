@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { getPlayerForEdit } from "@/app/(app)/scouting/actions";
 import { PlayerForm } from "@/components/scouting/player-form";
+import { PageLoadError } from "@/components/app/load-error";
 
 export const metadata = {
   title: "Modifica giocatore · Scouting DB",
@@ -19,8 +20,12 @@ export default async function ModificaGiocatorePage({
   const workspace = await getCurrentWorkspace();
   if (!workspace) redirect("/login");
 
-  const player = await getPlayerForEdit(id);
-  if (!player) notFound();
+  const res = await getPlayerForEdit(id);
+  if (!res.ok) {
+    if (res.reason === "not_found") notFound();
+    return <PageLoadError />;
+  }
+  const player = res.data;
   // Solo creatore o owner del workspace: in caso contrario torna al dettaglio.
   if (!player.can_edit) redirect(`/scouting/${id}`);
 

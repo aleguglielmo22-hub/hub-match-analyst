@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { loadDashboardKpis } from "@/app/(app)/dashboard-queries";
+import { LoadErrorBox } from "@/components/app/load-error";
 
 /** Singola card KPI riusabile. */
 function KpiCard({
@@ -78,7 +79,12 @@ function KpiCard({
 
 /** Server Component asincrono che carica gli KPI in parallelo. */
 export async function KpiCards() {
-  const k = await loadDashboardKpis();
+  let k: Awaited<ReturnType<typeof loadDashboardKpis>>;
+  try {
+    k = await loadDashboardKpis();
+  } catch {
+    return <LoadErrorBox />;
+  }
 
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

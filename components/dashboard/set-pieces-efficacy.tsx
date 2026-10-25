@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Activity, ArrowUpRight } from "lucide-react";
 import { loadDashboardKpis } from "@/app/(app)/dashboard-queries";
+import { LoadErrorBox } from "@/components/app/load-error";
 
 /**
  * Widget di analisi rapida sull'efficacia dei calci piazzati.
@@ -8,7 +9,12 @@ import { loadDashboardKpis } from "@/app/(app)/dashboard-queries";
  * con esito tracciato (esclude i null che falserebbero la statistica).
  */
 export async function SetPiecesEfficacyWidget() {
-  const k = await loadDashboardKpis();
+  let k: Awaited<ReturnType<typeof loadDashboardKpis>>;
+  try {
+    k = await loadDashboardKpis();
+  } catch {
+    return <LoadErrorBox />;
+  }
 
   const ratioBase = k.setPiecesConEsito;
   const pct =

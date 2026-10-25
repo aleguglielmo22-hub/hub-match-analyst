@@ -4,6 +4,8 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { failedListPage, logLoadError, type ListPage } from "@/lib/load-result";
+import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
 import {
   setPieceFormSchema,
   type SetPieceFormValues,
@@ -25,6 +27,17 @@ export type LoadSetPiecesOpts = {
 };
 
 export async function loadSetPiecesPage(
+  opts: LoadSetPiecesOpts,
+): Promise<ListPage<SetPieceListItem>> {
+  try {
+    return await querySetPiecesPage(opts);
+  } catch (err) {
+    logLoadError("Set Pieces", err);
+    return failedListPage();
+  }
+}
+
+async function querySetPiecesPage(
   opts: LoadSetPiecesOpts,
 ): Promise<{ items: SetPieceListItem[]; hasMore: boolean }> {
   const sort = sortSchema.parse(opts.sort);
@@ -52,10 +65,7 @@ export async function loadSetPiecesPage(
     .is("deleted_at", null);
 
   if (filters?.q) {
-    const term = `%${filters.q.replace(/[%_]/g, "\\$&")}%`;
-    q = q.or(
-      `titolo.ilike.${term},squadra_esecutrice.ilike.${term},squadra_avversaria.ilike.${term}`,
-    );
+    q = q.or(ilikeAnyFilter(["titolo", "squadra_esecutrice", "squadra_avversaria"], filters.q));
   }
 
   if (filters?.fase.length) q = q.in("fase", filters.fase);
@@ -81,7 +91,7 @@ export async function loadSetPiecesPage(
   q = q.range(from, to);
 
   const { data, error } = await q;
-  if (error || !data) return { items: [], hasMore: false };
+  if (error || !data) throw error ?? new Error("Risposta vuota");
 
   const items = data.slice(0, PAGE_SIZE) as unknown as SetPieceListItem[];
   return { items, hasMore: data.length > PAGE_SIZE };

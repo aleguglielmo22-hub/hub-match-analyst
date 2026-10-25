@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { logLoadError } from "@/lib/load-result";
 import {
   ATTACHMENT_ENTITIES,
   ATTACHMENTS_BUCKET,
@@ -42,6 +43,7 @@ export async function listAttachments(
     .order("posizione", { ascending: true })
     .order("created_at", { ascending: true });
 
+  if (error) logLoadError("Allegati", error);
   if (error || !data) return [];
 
   const signed = await Promise.all(

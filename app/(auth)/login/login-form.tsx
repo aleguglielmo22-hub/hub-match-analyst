@@ -5,6 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Loader2, ArrowRight, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import {
+  getSupabaseConfig,
+  MISSING_SUPABASE_CONFIG_MESSAGE,
+} from "@/lib/supabase/config";
+import { loginErrorMessage } from "@/lib/auth/login-errors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +23,8 @@ import {
 
 type Mode = "signin" | "signup";
 
+const configMissing = getSupabaseConfig() === null;
+
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,7 +37,7 @@ export function LoginForm() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!email.trim() || !password) return;
+    if (!email.trim() || !password || configMissing) return;
 
     setLoading(true);
     const supabase = createClient();
@@ -43,7 +50,8 @@ export function LoginForm() {
           password,
         });
         if (error) {
-          toast.error("Accesso fallito", { description: error.message });
+          const msg = loginErrorMessage(error);
+          toast.error(msg.title, { description: msg.description });
           setLoading(false);
           return;
         }
@@ -54,7 +62,8 @@ export function LoginForm() {
           password,
         });
         if (error) {
-          toast.error("Registrazione fallita", { description: error.message });
+          const msg = loginErrorMessage(error);
+          toast.error(msg.title, { description: msg.description });
           setLoading(false);
           return;
         }
@@ -66,8 +75,8 @@ export function LoginForm() {
       router.replace(nextPath.startsWith("/") ? nextPath : "/dashboard");
       router.refresh();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Errore sconosciuto";
-      toast.error("Operazione fallita", { description: message });
+      const msg = loginErrorMessage(err);
+      toast.error(msg.title, { description: msg.description });
       setLoading(false);
     }
   }
@@ -89,6 +98,14 @@ export function LoginForm() {
       </CardHeader>
 
       <CardContent>
+        {configMissing && (
+          <p
+            role="alert"
+            className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-muted-foreground"
+          >
+            {MISSING_SUPABASE_CONFIG_MESSAGE}
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -134,7 +151,7 @@ export function LoginForm() {
             type="submit"
             size="lg"
             className="w-full"
-            disabled={loading || !email.trim() || !password}
+            disabled={loading || configMissing || !email.trim() || !password}
           >
             {loading ? (
               <>

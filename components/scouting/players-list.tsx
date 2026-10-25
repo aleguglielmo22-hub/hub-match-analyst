@@ -7,6 +7,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { LoadErrorBox } from "@/components/app/load-error";
 import { Loader2, ArrowDownUp, Users } from "lucide-react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -32,6 +33,7 @@ const SORT_OPTIONS: { value: ScoutingSort; label: string }[] = [
 export function PlayersList({
   initialItems,
   initialHasMore,
+  initialError,
   filters,
   hasActiveSearchOrFilters,
   currentUserId,
@@ -39,6 +41,8 @@ export function PlayersList({
 }: {
   initialItems: PlayerListItem[];
   initialHasMore: boolean;
+  /** Il primo blocco non è stato caricato (errore del server). */
+  initialError?: boolean;
   filters: ScoutingFilters;
   hasActiveSearchOrFilters?: boolean;
   currentUserId: string | null;
@@ -50,6 +54,10 @@ export function PlayersList({
   const [sort, setSort] = useState<ScoutingSort>("recent");
   const [isPending, startTransition] = useTransition();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  // "first" = lista non caricata; "more" = blocco successivo non caricato.
+  const [loadError, setLoadError] = useState<"first" | "more" | null>(
+    initialError ? "first" : null,
+  );
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const handleSortChange = useCallback(
@@ -60,8 +68,14 @@ export function PlayersList({
       setPage(0);
       setItems([]);
       setHasMore(true);
+      setLoadError(null);
       startTransition(async () => {
-        const res = await loadPlayersPage({ sort: next, page: 0, filters });
+        const res = await loadPlayersPage({ sort: next, page: 0, filters }).catch(() => null);
+        if (!res || res.error) {
+          setLoadError("first");
+          setHasMore(false);
+          return;
+        }
         setItems(res.items);
         setHasMore(res.hasMore);
       });
@@ -70,15 +84,20 @@ export function PlayersList({
   );
 
   const loadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingMore || !hasMore || loadError) return;
     setIsLoadingMore(true);
     const next = page + 1;
-    const res = await loadPlayersPage({ sort, page: next, filters });
+    const res = await loadPlayersPage({ sort, page: next, filters }).catch(() => null);
+    if (!res || res.error) {
+      setLoadError("more");
+      setIsLoadingMore(false);
+      return;
+    }
     setItems((prev) => [...prev, ...res.items]);
     setHasMore(res.hasMore);
     setPage(next);
     setIsLoadingMore(false);
-  }, [hasMore, isLoadingMore, page, sort, filters]);
+  }, [hasMore, isLoadingMore, loadError, page, sort, filters]);
 
   useEffect(() => {
     const target = sentinelRef.current;
@@ -93,13 +112,15 @@ export function PlayersList({
     return () => observer.disconnect();
   }, [hasMore, loadMore]);
 
-  const isEmpty = !isPending && items.length === 0;
+  const isEmpty = !isPending && items.length === 0 && !loadError;
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">
-          {items.length === 0
+          {loadError === "first"
+            ? ""
+            : items.length === 0
             ? "Nessun giocatore"
             : items.length === 1
               ? "1 giocatore"
@@ -122,7 +143,9 @@ export function PlayersList({
         </div>
       </div>
 
-      {isEmpty ? (
+      {loadError === "first" && !isPending ? (
+        <LoadErrorBox onRetry={() => handleSortChange(sort)} />
+      ) : isEmpty ? (
         hasActiveSearchOrFilters ? (
           <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border/60 bg-card/20 py-12 text-center">
             <p className="text-sm font-medium">Nessun risultato</p>
@@ -169,7 +192,11 @@ export function PlayersList({
               ))}
           </div>
 
-          {hasMore && (
+          {loadError === "more" && (
+            <LoadErrorBox onRetry={() => setLoadError(null)} />
+          )}
+
+          {hasMore && !loadError && (
             <div
               ref={sentinelRef}
               className="flex items-center justify-center py-6"

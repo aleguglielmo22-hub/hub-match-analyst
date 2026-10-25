@@ -1,5 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  getSupabaseConfig,
+  MISSING_SUPABASE_CONFIG_MESSAGE,
+} from "@/lib/supabase/config";
 
 /**
  * Aggiorna la sessione Supabase su ogni richiesta. Da richiamare dal middleware Next.js.
@@ -8,9 +12,16 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  // Senza configurazione niente sessione: le pagine mostreranno il messaggio esplicito.
+  const config = getSupabaseConfig();
+  if (!config) {
+    console.error(`[Sessione] ${MISSING_SUPABASE_CONFIG_MESSAGE}`);
+    return { response, user: null };
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    config.url,
+    config.anonKey,
     {
       cookies: {
         getAll() {

@@ -61,6 +61,7 @@ export default async function CestinoPage({
         key={query ?? ""}
         initialItems={initialPage.items}
         initialHasMore={initialPage.hasMore}
+        initialError={!!initialPage.error}
         query={query}
       />
     </div>

@@ -5,6 +5,8 @@ import { it } from "date-fns/locale";
 import { ArrowLeft, ExternalLink, Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { isUuid, logLoadError } from "@/lib/load-result";
+import { PageLoadError } from "@/components/app/load-error";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
@@ -40,19 +42,32 @@ export default async function DettaglioGiocatorePage({
 }) {
   const { id } = await params;
 
-  const workspace = await getCurrentWorkspace();
+  // Id non valido nell'indirizzo = elemento inesistente, non errore del server.
+  if (!isUuid(id)) notFound();
+
+  let workspace: Awaited<ReturnType<typeof getCurrentWorkspace>> = null;
+  let player: PlayerRow | null = null;
+  try {
+    workspace = await getCurrentWorkspace();
+    if (workspace) {
+      const supabase = await createClient();
+      const res = await supabase
+        .from("players")
+        .select("*")
+        .eq("id", id)
+        .eq("workspace_id", workspace.id)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (res.error) throw res.error;
+      player = res.data as PlayerRow | null;
+    }
+  } catch (err) {
+    logLoadError("Scouting · dettaglio", err);
+    return <PageLoadError />;
+  }
+
   if (!workspace) redirect("/login");
-
-  const supabase = await createClient();
-  const { data: player, error } = await supabase
-    .from("players")
-    .select("*")
-    .eq("id", id)
-    .eq("workspace_id", workspace.id)
-    .is("deleted_at", null)
-    .maybeSingle();
-
-  if (error || !player) notFound();
+  if (!player) notFound();
   const p = player as PlayerRow;
 
   // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).

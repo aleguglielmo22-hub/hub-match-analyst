@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { isUuid, logLoadError } from "@/lib/load-result";
+import { PageLoadError } from "@/components/app/load-error";
 import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -38,19 +40,32 @@ export default async function DettaglioSetPiecePage({
 }) {
   const { id } = await params;
 
-  const workspace = await getCurrentWorkspace();
+  // Id non valido nell'indirizzo = elemento inesistente, non errore del server.
+  if (!isUuid(id)) notFound();
+
+  let workspace: Awaited<ReturnType<typeof getCurrentWorkspace>> = null;
+  let data: SetPieceRow | null = null;
+  try {
+    workspace = await getCurrentWorkspace();
+    if (workspace) {
+      const supabase = await createClient();
+      const res = await supabase
+        .from("set_pieces")
+        .select("*")
+        .eq("id", id)
+        .eq("workspace_id", workspace.id)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (res.error) throw res.error;
+      data = res.data as SetPieceRow | null;
+    }
+  } catch (err) {
+    logLoadError("Set Pieces · dettaglio", err);
+    return <PageLoadError />;
+  }
+
   if (!workspace) redirect("/login");
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("set_pieces")
-    .select("*")
-    .eq("id", id)
-    .eq("workspace_id", workspace.id)
-    .is("deleted_at", null)
-    .maybeSingle();
-
-  if (error || !data) notFound();
+  if (!data) notFound();
   const sp = data as SetPieceRow;
 
   const isOffensive = sp.fase === "OFFENSIVO";

@@ -4,6 +4,14 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import {
+  failedListPage,
+  isUuid,
+  logLoadError,
+  type ListPage,
+  type LoadResult,
+} from "@/lib/load-result";
+import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
 import { playerFormSchema, type PlayerFormValues } from "@/lib/schemas/scouting";
 import type { ScoutingFilters } from "@/lib/schemas/scouting-filters";
 import {
@@ -57,6 +65,17 @@ export type LoadPlayersOpts = {
 
 export async function loadPlayersPage(
   opts: LoadPlayersOpts,
+): Promise<ListPage<PlayerListItem>> {
+  try {
+    return await queryPlayersPage(opts);
+  } catch (err) {
+    logLoadError("Scouting", err);
+    return failedListPage();
+  }
+}
+
+async function queryPlayersPage(
+  opts: LoadPlayersOpts,
 ): Promise<{ items: PlayerListItem[]; hasMore: boolean }> {
   const sort = sortSchema.parse(opts.sort);
   const page = pageSchema.parse(opts.page);
@@ -82,10 +101,7 @@ export async function loadPlayersPage(
     .is("deleted_at", null);
 
   if (filters?.q) {
-    const term = `%${filters.q.replace(/[%_]/g, "\\$&")}%`;
-    q = q.or(
-      `nome.ilike.${term},cognome.ilike.${term},squadra_attuale.ilike.${term}`,
-    );
+    q = q.or(ilikeAnyFilter(["nome", "cognome", "squadra_attuale"], filters.q));
   }
 
   if (
@@ -143,7 +159,7 @@ export async function loadPlayersPage(
   q = q.range(from, to);
 
   const { data, error } = await q;
-  if (error || !data) return { items: [], hasMore: false };
+  if (error || !data) throw error ?? new Error("Risposta vuota");
 
   const items = data.slice(0, PAGE_SIZE) as unknown as PlayerListItem[];
   return { items, hasMore: data.length > PAGE_SIZE };
@@ -281,18 +297,34 @@ function playerRowToFormValues(p: PlayerRow): PlayerFormValues {
   return base as PlayerFormValues;
 }
 
+type PlayerForEdit = {
+  id: string;
+  values: PlayerFormValues;
+  can_edit: boolean;
+};
+
 /**
  * Carica un giocatore per la pagina di modifica.
  * Ritorna i valori già pronti per il form e il flag `can_edit`
  * (creatore o owner del workspace — coerente con le RLS).
+ * Distingue giocatore inesistente ("not_found") da errore del server ("error").
  */
-export async function getPlayerForEdit(playerId: string): Promise<{
-  id: string;
-  values: PlayerFormValues;
-  can_edit: boolean;
-} | null> {
-  z.string().uuid().parse(playerId);
+export async function getPlayerForEdit(
+  playerId: string,
+): Promise<LoadResult<PlayerForEdit>> {
+  if (!isUuid(playerId)) return { ok: false, reason: "not_found" };
+  try {
+    const player = await queryPlayerForEdit(playerId);
+    return player
+      ? { ok: true, data: player }
+      : { ok: false, reason: "not_found" };
+  } catch (err) {
+    logLoadError("Scouting · modifica", err);
+    return { ok: false, reason: "error" };
+  }
+}
 
+async function queryPlayerForEdit(playerId: string): Promise<PlayerForEdit | null> {
   const workspace = await getCurrentWorkspace();
   if (!workspace) return null;
 
@@ -305,7 +337,8 @@ export async function getPlayerForEdit(playerId: string): Promise<{
     .is("deleted_at", null)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error) throw error;
+  if (!data) return null;
   const p = data as PlayerRow;
 
   return {

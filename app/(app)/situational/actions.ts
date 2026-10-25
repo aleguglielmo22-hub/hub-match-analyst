@@ -4,6 +4,8 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { failedListPage, logLoadError, type ListPage } from "@/lib/load-result";
+import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
 import {
   situationalFormSchema,
   type SituationalFormValues,
@@ -25,6 +27,17 @@ export type LoadSituationalOpts = {
 };
 
 export async function loadSituationalPage(
+  opts: LoadSituationalOpts,
+): Promise<ListPage<SituationalListItem>> {
+  try {
+    return await querySituationalPage(opts);
+  } catch (err) {
+    logLoadError("Training", err);
+    return failedListPage();
+  }
+}
+
+async function querySituationalPage(
   opts: LoadSituationalOpts,
 ): Promise<{ items: SituationalListItem[]; hasMore: boolean }> {
   const sort = sortSchema.parse(opts.sort);
@@ -50,10 +63,7 @@ export async function loadSituationalPage(
     .is("deleted_at", null);
 
   if (filters?.q) {
-    const term = `%${filters.q.replace(/[%_]/g, "\\$&")}%`;
-    q = q.or(
-      `titolo.ilike.${term},descrizione_flusso.ilike.${term},regole_provocazione.ilike.${term}`,
-    );
+    q = q.or(ilikeAnyFilter(["titolo", "descrizione_flusso", "regole_provocazione"], filters.q));
   }
 
   if (filters?.macro_fase.length) q = q.in("macro_fase", filters.macro_fase);
@@ -76,7 +86,7 @@ export async function loadSituationalPage(
   q = q.range(from, to);
 
   const { data, error } = await q;
-  if (error || !data) return { items: [], hasMore: false };
+  if (error || !data) throw error ?? new Error("Risposta vuota");
 
   const items = data.slice(0, PAGE_SIZE) as unknown as SituationalListItem[];
   return { items, hasMore: data.length > PAGE_SIZE };
@@ -131,12 +141,13 @@ export async function listFocusTags(): Promise<string[]> {
   if (!workspace) return [];
 
   const supabase = await createClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("situational_tactics")
     .select("focus_tags")
     .eq("workspace_id", workspace.id)
     .is("deleted_at", null);
 
+  if (error) logLoadError("Training · elenco focus tag", error);
   if (!data) return [];
   const set = new Set<string>();
   for (const row of data) {

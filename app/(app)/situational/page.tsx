@@ -73,6 +73,7 @@ export default async function SituationalPage({
             key={stateKey}
             initialItems={initialPage.items}
             initialHasMore={initialPage.hasMore}
+            initialError={!!initialPage.error}
             filters={filters}
             hasActiveSearchOrFilters={hasActiveSearchOrFilters}
           />

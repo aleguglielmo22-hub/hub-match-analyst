@@ -5,6 +5,7 @@ import {
   getLookupOptions,
 } from "@/app/(app)/archivio/actions";
 import { ArchiveForm } from "@/components/archivio/archive-form";
+import { PageLoadError } from "@/components/app/load-error";
 import type { ArchiveFormValues } from "@/lib/schemas/archivio";
 
 export const dynamic = "force-dynamic";
@@ -19,8 +20,12 @@ export default async function ModificaVocePage({
   const workspace = await getCurrentWorkspace();
   if (!workspace) redirect("/login");
 
-  const item = await getArchiveItem(id);
-  if (!item) notFound();
+  const res = await getArchiveItem(id);
+  if (!res.ok) {
+    if (res.reason === "not_found") notFound();
+    return <PageLoadError />;
+  }
+  const item = res.data;
   if (item.deleted_at) redirect("/archivio/cestino");
   if (!item.can_edit) redirect(`/archivio/${id}`);
 

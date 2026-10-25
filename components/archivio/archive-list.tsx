@@ -7,6 +7,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { LoadErrorBox } from "@/components/app/load-error";
 import { Loader2, ArrowDownUp } from "lucide-react";
 import { loadArchivePage } from "@/app/(app)/archivio/actions";
 import {
@@ -30,6 +31,8 @@ const SORT_OPTIONS: ArchiveSort[] = ["recent", "oldest", "az"];
 type Props = {
   initialItems: ArchiveListItem[];
   initialHasMore: boolean;
+  /** Il primo blocco non è stato caricato (errore del server). */
+  initialError?: boolean;
   initialSort: ArchiveSort;
   filters: ArchiveFilters;
   query?: string;
@@ -41,6 +44,7 @@ type Props = {
 export function ArchiveList({
   initialItems,
   initialHasMore,
+  initialError,
   initialSort,
   filters,
   query,
@@ -53,6 +57,10 @@ export function ArchiveList({
   const [sort, setSort] = useState<ArchiveSort>(initialSort);
   const [isPending, startTransition] = useTransition();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  // "first" = lista non caricata; "more" = blocco successivo non caricato.
+  const [loadError, setLoadError] = useState<"first" | "more" | null>(
+    initialError ? "first" : null,
+  );
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const handleSortChange = useCallback(
@@ -63,6 +71,7 @@ export function ArchiveList({
       setPage(0);
       setItems([]);
       setHasMore(true);
+      setLoadError(null);
       startTransition(async () => {
         const res = await loadArchivePage({
           sort: nextSort,
@@ -70,7 +79,12 @@ export function ArchiveList({
           filters,
           query,
           inTrash,
-        });
+        }).catch(() => null);
+        if (!res || res.error) {
+          setLoadError("first");
+          setHasMore(false);
+          return;
+        }
         setItems(res.items);
         setHasMore(res.hasMore);
       });
@@ -79,7 +93,7 @@ export function ArchiveList({
   );
 
   const loadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingMore || !hasMore || loadError) return;
     setIsLoadingMore(true);
     const nextPage = page + 1;
     const res = await loadArchivePage({
@@ -88,12 +102,17 @@ export function ArchiveList({
       filters,
       query,
       inTrash,
-    });
+    }).catch(() => null);
+    if (!res || res.error) {
+      setLoadError("more");
+      setIsLoadingMore(false);
+      return;
+    }
     setItems((prev) => [...prev, ...res.items]);
     setHasMore(res.hasMore);
     setPage(nextPage);
     setIsLoadingMore(false);
-  }, [hasMore, isLoadingMore, page, sort, filters, query, inTrash]);
+  }, [hasMore, isLoadingMore, loadError, page, sort, filters, query, inTrash]);
 
   useEffect(() => {
     const target = sentinelRef.current;
@@ -108,13 +127,15 @@ export function ArchiveList({
     return () => observer.disconnect();
   }, [hasMore, loadMore]);
 
-  const showEmpty = !isPending && items.length === 0;
+  const showEmpty = !isPending && items.length === 0 && !loadError;
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">
-          {items.length === 0
+          {loadError === "first"
+            ? ""
+            : items.length === 0
             ? "Nessuna voce"
             : items.length === 1
               ? "1 voce"
@@ -137,7 +158,9 @@ export function ArchiveList({
         </div>
       </div>
 
-      {showEmpty ? (
+      {loadError === "first" && !isPending ? (
+        <LoadErrorBox onRetry={() => handleSortChange(sort)} />
+      ) : showEmpty ? (
         hasActiveSearchOrFilters ? (
           <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border/60 bg-card/20 py-12 text-center">
             <p className="text-sm font-medium">Nessun risultato</p>
@@ -163,7 +186,11 @@ export function ArchiveList({
               ))}
           </div>
 
-          {hasMore && (
+          {loadError === "more" && (
+            <LoadErrorBox onRetry={() => setLoadError(null)} />
+          )}
+
+          {hasMore && !loadError && (
             <div
               ref={sentinelRef}
               className="flex items-center justify-center py-6"
