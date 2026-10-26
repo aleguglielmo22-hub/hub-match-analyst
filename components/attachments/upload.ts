@@ -28,18 +28,26 @@ function slugifyFilename(name: string): string {
 /**
  * Carica i file su storage privato (bucket "media") e ne registra i record.
  * Path: {workspace_id}/{entity_type}/{entity_id}/{uuid}-{slug}
+ * Registra i file caricati anche se altri falliscono; ritorna i nomi dei
+ * file non caricati (vuoto = tutto ok).
  */
 export async function uploadPendingAttachments(
   entityType: AttachmentEntity,
   entityId: string,
   files: File[],
-): Promise<void> {
-  if (files.length === 0) return;
-  const workspaceId = await getAttachmentWorkspaceId();
-  if (!workspaceId) throw new Error("Workspace non trovato");
+): Promise<{ failed: string[] }> {
+  if (files.length === 0) return { failed: [] };
+  const allNames = files.map((f) => f.name);
+  let workspaceId: string | null;
+  try {
+    workspaceId = await getAttachmentWorkspaceId();
+  } catch {
+    return { failed: allNames };
+  }
+  if (!workspaceId) return { failed: allNames };
 
   const supabase = createClient();
-  const records = await Promise.all(
+  const results = await Promise.allSettled(
     files.map(async (file) => {
       const fileId = crypto.randomUUID();
       const path = `${workspaceId}/${entityType}/${entityId}/${fileId}-${slugifyFilename(file.name)}`;
@@ -50,9 +58,7 @@ export async function uploadPendingAttachments(
           contentType: uploadMimeType(file) ?? undefined,
           upsert: false,
         });
-      if (error) {
-        throw new Error(`Upload "${file.name}" fallito: ${error.message}`);
-      }
+      if (error) throw error;
       return {
         file_name: file.name,
         file_path: path,
@@ -62,5 +68,19 @@ export async function uploadPendingAttachments(
     }),
   );
 
-  await saveAttachments(entityType, entityId, records);
+  const uploaded = results.flatMap((r) => (r.status === "fulfilled" ? [r.value] : []));
+  const failed = files.flatMap((f, i) => (results[i].status === "rejected" ? [f.name] : []));
+  if (uploaded.length === 0) return { failed };
+
+  try {
+    await saveAttachments(entityType, entityId, uploaded);
+  } catch {
+    // File caricati ma non registrati: la pulizia dello storage è best-effort.
+    await supabase.storage
+      .from(ATTACHMENTS_BUCKET)
+      .remove(uploaded.map((u) => u.file_path))
+      .catch(() => undefined);
+    return { failed: allNames };
+  }
+  return { failed };
 }

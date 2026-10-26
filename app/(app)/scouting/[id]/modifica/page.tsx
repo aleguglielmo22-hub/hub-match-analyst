@@ -31,7 +31,13 @@ export default async function ModificaGiocatorePage({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-8 sm:py-10">
-      <PlayerForm existing={{ id: player.id, values: player.values }} />
+      <PlayerForm
+        existing={{
+          id: player.id,
+          values: player.values,
+          updatedAt: player.updated_at,
+        }}
+      />
     </div>
   );
 }

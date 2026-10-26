@@ -12,6 +12,7 @@ import {
   type LoadResult,
 } from "@/lib/load-result";
 import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
+import { insertOnce } from "@/lib/forms/insert-once";
 import {
   situationalFormSchema,
   type SituationalFormValues,
@@ -121,35 +122,49 @@ function situationalColumns(v: SituationalFormValues) {
   };
 }
 
+/**
+ * Crea un'esercitazione con l'id generato all'apertura del form: un secondo
+ * invio con lo stesso id (risposta persa) non crea un doppione.
+ */
 export async function createSituational(
+  id: string,
   raw: SituationalFormValues,
 ): Promise<{ id: string }> {
+  z.string().uuid().parse(id);
   const v = situationalFormSchema.parse(raw);
 
   const workspace = await getCurrentWorkspace();
   if (!workspace) throw new Error("Workspace non trovato");
 
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("situational_tactics")
-    .insert({
-      workspace_id: workspace.id,
-      created_by: workspace.userId,
-      ...situationalColumns(v),
-    })
-    .select("id")
-    .single();
-
-  if (error || !data)
-    throw new Error(error?.message ?? "Errore creazione situazionale");
+  await insertOnce({
+    insert: () =>
+      supabase.from("situational_tactics").insert({
+        id,
+        workspace_id: workspace.id,
+        created_by: workspace.userId,
+        ...situationalColumns(v),
+      }),
+      exists: async () => {
+        const { data } = await supabase
+          .from("situational_tactics")
+          .select("id")
+          .eq("id", id)
+          .eq("workspace_id", workspace.id)
+          .maybeSingle();
+        return !!data;
+      },
+  });
 
   revalidatePath("/situational");
-  return { id: data.id };
+  revalidatePath("/dashboard");
+  return { id };
 }
 
 type SituationalForEdit = {
   id: string;
   values: SituationalFormValues;
+  updated_at: string;
   can_edit: boolean;
 };
 
@@ -194,6 +209,7 @@ export async function getSituationalForEdit(
           lavagna_url: r.lavagna_url,
           pdf_url: r.pdf_url,
         },
+        updated_at: r.updated_at,
         can_edit: workspace.isOwner || r.created_by === workspace.userId,
       },
     };

@@ -12,6 +12,7 @@ import {
   type LoadResult,
 } from "@/lib/load-result";
 import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
+import { insertOnce } from "@/lib/forms/insert-once";
 import { playerFormSchema, type PlayerFormValues } from "@/lib/schemas/scouting";
 import type { ScoutingFilters } from "@/lib/schemas/scouting-filters";
 import {
@@ -169,9 +170,15 @@ async function queryPlayersPage(
  * Creazione giocatore
  * ============================================================ */
 
+/**
+ * Crea un giocatore con l'id generato all'apertura del form: un secondo invio
+ * con lo stesso id (risposta persa) non crea un doppione.
+ */
 export async function createPlayer(
+  id: string,
   raw: PlayerFormValues,
 ): Promise<{ id: string }> {
+  z.string().uuid().parse(id);
   const v = playerFormSchema.parse(raw);
 
   const workspace = await getCurrentWorkspace();
@@ -186,60 +193,68 @@ export async function createPlayer(
     INFLUENZE_NEG.map((i) => [i.key, v[i.key]]),
   );
 
-  const { data, error } = await supabase
-    .from("players")
-    .insert({
-      workspace_id: workspace.id,
-      created_by: workspace.userId,
+  await insertOnce({
+    insert: () =>
+      supabase.from("players").insert({
+        id,
+        workspace_id: workspace.id,
+        created_by: workspace.userId,
 
-      nome: v.nome,
-      cognome: v.cognome,
-      foto_url: v.foto_url,
-      data_nascita: v.data_nascita,
-      nazionalita: v.nazionalita,
-      passaporto: v.passaporto ?? null,
-      piede: v.piede ?? null,
+        nome: v.nome,
+        cognome: v.cognome,
+        foto_url: v.foto_url,
+        data_nascita: v.data_nascita,
+        nazionalita: v.nazionalita,
+        passaporto: v.passaporto ?? null,
+        piede: v.piede ?? null,
 
-      ruolo_principale: v.ruolo_principale ?? null,
-      ruoli_secondari: v.ruoli_secondari,
-      stili_gioco: v.stili_gioco,
+        ruolo_principale: v.ruolo_principale ?? null,
+        ruoli_secondari: v.ruoli_secondari,
+        stili_gioco: v.stili_gioco,
 
-      transfermarkt_url: v.transfermarkt_url,
-      squadra_attuale: v.squadra_attuale,
-      campionato: v.campionato,
-      scadenza_contratto: v.scadenza_contratto,
-      agenzia: v.agenzia,
-      valore_mercato_eur: v.valore_mercato_eur,
-      fascia_ingaggio: v.fascia_ingaggio ?? null,
+        transfermarkt_url: v.transfermarkt_url,
+        squadra_attuale: v.squadra_attuale,
+        campionato: v.campionato,
+        scadenza_contratto: v.scadenza_contratto,
+        agenzia: v.agenzia,
+        valore_mercato_eur: v.valore_mercato_eur,
+        fascia_ingaggio: v.fascia_ingaggio ?? null,
 
-      altezza_cm: v.altezza_cm,
-      peso_kg: v.peso_kg,
-      struttura_corporea: v.struttura_corporea ?? null,
-      gesti_motori: v.gesti_motori ?? null,
-      muscolatura: v.muscolatura ?? null,
-      capacita_condizionali: v.capacita_condizionali,
+        altezza_cm: v.altezza_cm,
+        peso_kg: v.peso_kg,
+        struttura_corporea: v.struttura_corporea ?? null,
+        gesti_motori: v.gesti_motori ?? null,
+        muscolatura: v.muscolatura ?? null,
+        capacita_condizionali: v.capacita_condizionali,
 
-      behav_delega_altri: v.behav_delega_altri ?? null,
-      behav_assume_responsabilita: v.behav_assume_responsabilita ?? null,
-      ...influenze,
-      ...ratings,
+        behav_delega_altri: v.behav_delega_altri ?? null,
+        behav_assume_responsabilita: v.behav_assume_responsabilita ?? null,
+        ...influenze,
+        ...ratings,
 
-      status_osservazione: v.status_osservazione,
-      voto_potenziale: v.voto_potenziale ?? null,
-      data_ultimo_aggiornamento: v.data_ultimo_aggiornamento,
-      scout_assegnato: v.scout_assegnato,
+        status_osservazione: v.status_osservazione,
+        voto_potenziale: v.voto_potenziale ?? null,
+        data_ultimo_aggiornamento: v.data_ultimo_aggiornamento,
+        scout_assegnato: v.scout_assegnato,
 
-      scouting_report_url: v.scouting_report_url,
-      note_rapide: v.note_rapide,
-      clip_video_urls: v.clip_video_urls,
-    })
-    .select("id")
-    .single();
-
-  if (error || !data) throw new Error(error?.message ?? "Errore creazione giocatore");
+        scouting_report_url: v.scouting_report_url,
+        note_rapide: v.note_rapide,
+        clip_video_urls: v.clip_video_urls,
+      }),
+      exists: async () => {
+        const { data } = await supabase
+          .from("players")
+          .select("id")
+          .eq("id", id)
+          .eq("workspace_id", workspace.id)
+          .maybeSingle();
+        return !!data;
+      },
+  });
 
   revalidatePath("/scouting");
-  return { id: data.id };
+  revalidatePath("/dashboard");
+  return { id };
 }
 
 /* ============================================================
@@ -300,6 +315,7 @@ function playerRowToFormValues(p: PlayerRow): PlayerFormValues {
 type PlayerForEdit = {
   id: string;
   values: PlayerFormValues;
+  updated_at: string;
   can_edit: boolean;
 };
 
@@ -344,6 +360,7 @@ async function queryPlayerForEdit(playerId: string): Promise<PlayerForEdit | nul
   return {
     id: p.id,
     values: playerRowToFormValues(p),
+    updated_at: p.updated_at,
     can_edit: workspace.isOwner || p.created_by === workspace.userId,
   };
 }

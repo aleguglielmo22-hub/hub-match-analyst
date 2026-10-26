@@ -95,15 +95,6 @@ export type UpdateArchiveItemInput = {
   titolo_archivio: string;
   descrizione_estesa: string | null;
   tag_ids: string[];
-  /** File da aggiungere (appena uploadati su Storage). */
-  new_files: {
-    file_name: string;
-    file_path: string;
-    file_size_bytes: number | null;
-    mime_type: string | null;
-    tipo_media: TipoMediaEnum;
-    posizione: number;
-  }[];
   /**
    * Elenco completo dei link, nell'ordine finale. Quelli con `id` esistono già;
    * quelli salvati e assenti dall'elenco vengono eliminati.

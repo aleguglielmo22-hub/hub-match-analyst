@@ -82,8 +82,8 @@ export const archiveLinkSchema = z.object({
 export type ArchiveLinkInput = z.input<typeof archiveLinkSchema>;
 
 /**
- * Payload completo del form di creazione, dopo che gli upload sono andati
- * a buon fine e i lookup (teams/comp/season) sono stati creati o selezionati.
+ * Payload del form di creazione, con i lookup (teams/comp/season) già creati
+ * o selezionati. I file si registrano dopo, con addArchiveFiles.
  */
 export const createArchiveItemSchema = z.object({
   id: z.string().uuid(),
@@ -101,7 +101,6 @@ export const createArchiveItemSchema = z.object({
     .min(2, "Il titolo è troppo corto")
     .max(200, "Massimo 200 caratteri"),
   descrizione_estesa: z.string().max(5000).nullable().optional(),
-  files: z.array(archiveFileMetaSchema).default([]),
   links: z.array(archiveLinkSchema).max(50).default([]),
   tag_ids: z.array(z.string().uuid()).default([]),
 });

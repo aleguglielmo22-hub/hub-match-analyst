@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
+import { insertOnce } from "@/lib/forms/insert-once";
 import {
   failedListPage,
   isUuid,
@@ -12,6 +13,7 @@ import {
   type LoadResult,
 } from "@/lib/load-result";
 import {
+  archiveFileMetaSchema,
   archiveLinkSchema,
   createArchiveItemSchema,
   TIPO_MEDIA_VALUES,
@@ -304,8 +306,9 @@ export async function createTag(name: string): Promise<LookupOption> {
  * ============================================================ */
 
 /**
- * Crea una voce d'archivio + i suoi file_meta + le associazioni tag.
- * Gli upload file su Storage avvengono prima lato client, qui registriamo solo i metadati.
+ * Crea una voce d'archivio + link + tag. L'id arriva dal form (generato
+ * all'apertura): un secondo invio con lo stesso id non crea un doppione.
+ * I file si caricano DOPO la creazione e si registrano con addArchiveFiles.
  */
 export async function createArchiveItem(
   raw: CreateArchiveItemInput,
@@ -317,42 +320,36 @@ export async function createArchiveItem(
 
   const supabase = await createClient();
 
-  const { error: insertError } = await supabase.from("archive_items").insert({
-    id: payload.id,
-    workspace_id: workspace.id,
-    created_by: workspace.userId,
-    data_lavoro: payload.data_lavoro,
-    season_id: payload.season_id ?? null,
-    team_principale_id: payload.team_principale_id ?? null,
-    team_avversario_id: payload.team_avversario_id ?? null,
-    competition_id: payload.competition_id ?? null,
-    ambito: payload.ambito,
-    categoria_lavoro: payload.categoria_lavoro,
-    tipo_media: payload.tipo_media,
-    sorgente_video: payload.sorgente_video ?? null,
-    titolo_archivio: payload.titolo_archivio,
-    descrizione_estesa: payload.descrizione_estesa ?? null,
+  const outcome = await insertOnce({
+    insert: () =>
+      supabase.from("archive_items").insert({
+        id: payload.id,
+        workspace_id: workspace.id,
+        created_by: workspace.userId,
+        data_lavoro: payload.data_lavoro,
+        season_id: payload.season_id ?? null,
+        team_principale_id: payload.team_principale_id ?? null,
+        team_avversario_id: payload.team_avversario_id ?? null,
+        competition_id: payload.competition_id ?? null,
+        ambito: payload.ambito,
+        categoria_lavoro: payload.categoria_lavoro,
+        tipo_media: payload.tipo_media,
+        sorgente_video: payload.sorgente_video ?? null,
+        titolo_archivio: payload.titolo_archivio,
+        descrizione_estesa: payload.descrizione_estesa ?? null,
+      }),
+    exists: async () => {
+      const { data } = await supabase
+        .from("archive_items")
+        .select("id")
+        .eq("id", payload.id)
+        .eq("workspace_id", workspace.id)
+        .maybeSingle();
+      return !!data;
+    },
   });
-  if (insertError) throw new Error(insertError.message);
-
-  if (payload.files.length > 0) {
-    const { error: filesError } = await supabase.from("archive_files").insert(
-      payload.files.map((f, i) => ({
-        archive_item_id: payload.id,
-        file_name: f.file_name,
-        file_path: f.file_path,
-        file_size_bytes: f.file_size_bytes ?? null,
-        mime_type: f.mime_type ?? null,
-        tipo_media: f.tipo_media,
-        posizione: f.posizione ?? i,
-      })),
-    );
-    if (filesError) {
-      // Voce creata ma file non agganciati: lasciamo la voce, l'utente potrà ricaricare i file.
-      // Loggo lato server.
-      console.error("Errore inserimento archive_files:", filesError.message);
-    }
-  }
+  // Secondo invio: link e tag sono già stati registrati dal primo.
+  if (outcome === "existing") return { id: payload.id };
 
   if (payload.links.length > 0) {
     const { error: linksError } = await supabase
@@ -385,7 +382,48 @@ export async function createArchiveItem(
   }
 
   revalidatePath("/archivio");
+  revalidatePath("/dashboard");
   return { id: payload.id };
+}
+
+/**
+ * Registra i file appena caricati su Storage per una voce esistente
+ * (dopo creazione o modifica). Posizioni in coda a quelle già presenti.
+ */
+export async function addArchiveFiles(
+  itemId: string,
+  rawFiles: z.input<typeof archiveFileMetaSchema>[],
+): Promise<{ ok: true }> {
+  z.string().uuid().parse(itemId);
+  const files = z.array(archiveFileMetaSchema).parse(rawFiles);
+  if (files.length === 0) return { ok: true };
+
+  const workspace = await getCurrentWorkspace();
+  if (!workspace) throw new Error("Workspace non trovato");
+
+  const supabase = await createClient();
+  const { count, error: countError } = await supabase
+    .from("archive_files")
+    .select("id", { count: "exact", head: true })
+    .eq("archive_item_id", itemId);
+  if (countError) throw new Error(countError.message);
+
+  const base = count ?? 0;
+  const { error } = await supabase.from("archive_files").insert(
+    files.map((f, i) => ({
+      archive_item_id: itemId,
+      file_name: f.file_name,
+      file_path: f.file_path,
+      file_size_bytes: f.file_size_bytes ?? null,
+      mime_type: f.mime_type ?? null,
+      tipo_media: f.tipo_media,
+      posizione: base + i,
+    })),
+  );
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/archivio/${itemId}`);
+  return { ok: true };
 }
 
 /* ============================================================
@@ -557,16 +595,6 @@ const updateSchema = z.object({
   titolo_archivio: z.string().min(2).max(200),
   descrizione_estesa: z.string().max(5000).nullable(),
   tag_ids: z.array(z.string().uuid()),
-  new_files: z.array(
-    z.object({
-      file_name: z.string(),
-      file_path: z.string(),
-      file_size_bytes: z.number().nullable(),
-      mime_type: z.string().nullable(),
-      tipo_media: z.enum(TIPO_MEDIA_VALUES),
-      posizione: z.number().int().nonnegative(),
-    }),
-  ),
   links: z.array(archiveLinkSchema).max(50),
   remove_file_ids: z.array(z.string().uuid()),
   update_file_tipi: z.array(
@@ -617,21 +645,7 @@ export async function updateArchiveItem(
       .eq("archive_item_id", payload.id);
   }
 
-  // 3) Inserisci i nuovi file.
-  if (payload.new_files.length > 0) {
-    const { error: filesErr } = await supabase.from("archive_files").insert(
-      payload.new_files.map((f) => ({
-        archive_item_id: payload.id,
-        file_name: f.file_name,
-        file_path: f.file_path,
-        file_size_bytes: f.file_size_bytes,
-        mime_type: f.mime_type,
-        tipo_media: f.tipo_media,
-        posizione: f.posizione,
-      })),
-    );
-    if (filesErr) throw new Error(filesErr.message);
-  }
+  // I nuovi file si caricano dopo il salvataggio (addArchiveFiles).
 
   // 3b) Link: aggiorna quelli rimasti (url, etichetta, ordine), inserisce i
   // nuovi ed elimina quelli tolti dall'elenco.

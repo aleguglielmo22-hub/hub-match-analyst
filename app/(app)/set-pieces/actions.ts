@@ -12,6 +12,7 @@ import {
   type LoadResult,
 } from "@/lib/load-result";
 import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
+import { insertOnce } from "@/lib/forms/insert-once";
 import {
   setPieceFormSchema,
   type SetPieceFormValues,
@@ -144,9 +145,15 @@ function setPieceColumns(v: SetPieceFormValues) {
   };
 }
 
+/**
+ * Crea un piazzato con l'id generato all'apertura del form: un secondo invio
+ * con lo stesso id (risposta persa) non crea un doppione.
+ */
 export async function createSetPiece(
+  id: string,
   raw: SetPieceFormValues,
 ): Promise<{ id: string }> {
+  z.string().uuid().parse(id);
   const v = setPieceFormSchema.parse(raw);
 
   const workspace = await getCurrentWorkspace();
@@ -154,26 +161,34 @@ export async function createSetPiece(
 
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("set_pieces")
-    .insert({
-      workspace_id: workspace.id,
-      created_by: workspace.userId,
-      ...setPieceColumns(v),
-    })
-    .select("id")
-    .single();
-
-  if (error || !data)
-    throw new Error(error?.message ?? "Errore creazione schema");
+  await insertOnce({
+    insert: () =>
+      supabase.from("set_pieces").insert({
+        id,
+        workspace_id: workspace.id,
+        created_by: workspace.userId,
+        ...setPieceColumns(v),
+      }),
+      exists: async () => {
+        const { data } = await supabase
+          .from("set_pieces")
+          .select("id")
+          .eq("id", id)
+          .eq("workspace_id", workspace.id)
+          .maybeSingle();
+        return !!data;
+      },
+  });
 
   revalidatePath("/set-pieces");
-  return { id: data.id };
+  revalidatePath("/dashboard");
+  return { id };
 }
 
 type SetPieceForEdit = {
   id: string;
   values: SetPieceFormValues;
+  updated_at: string;
   can_edit: boolean;
 };
 
@@ -233,6 +248,7 @@ export async function getSetPieceForEdit(
           lavagna_image_url: r.lavagna_image_url,
           pdf_url: r.pdf_url,
         },
+        updated_at: r.updated_at,
         can_edit: workspace.isOwner || r.created_by === workspace.userId,
       },
     };

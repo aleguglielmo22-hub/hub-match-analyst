@@ -3,6 +3,7 @@ import { getAuthUser, getCurrentWorkspace } from "@/lib/supabase/queries";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { MobileHeader } from "@/components/app/mobile-header";
 import { MobileBottomNav } from "@/components/app/mobile-bottom-nav";
+import { DraftsCleanup } from "@/components/forms/drafts-cleanup";
 import { MissingConfigNotice } from "@/components/app/missing-config-notice";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { ACCESS_DENIED_PARAM, isEmailAllowed } from "@/lib/auth/allowlist";
@@ -55,6 +56,7 @@ export default async function AppLayout({
         </main>
       </div>
       <MobileBottomNav />
+      <DraftsCleanup />
     </div>
   );
 }

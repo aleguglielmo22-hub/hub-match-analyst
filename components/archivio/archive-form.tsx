@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
@@ -28,6 +28,7 @@ import {
   createSeason,
   createTag,
   createTeam,
+  addArchiveFiles,
   updateArchiveItem,
   type LookupOption,
 } from "@/app/(app)/archivio/actions";
@@ -62,6 +63,8 @@ import {
   ExistingFilesList,
   type ExistingFileState,
 } from "@/components/archivio/existing-files-list";
+import { useFormDraft } from "@/components/forms/use-form-draft";
+import { DraftBanner } from "@/components/forms/draft-banner";
 import {
   LinksEditor,
   validateLinkDrafts,
@@ -85,6 +88,7 @@ type ExistingPayload = {
   values: ArchiveFormValues;
   files: ArchiveExistingFile[];
   links: ArchiveLink[];
+  updatedAt: string;
 };
 
 type Props = {
@@ -180,46 +184,74 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
     defaultValues,
   });
 
+  // Id della nuova voce, generato all'apertura: un secondo invio non crea doppioni.
+  const [newId, setNewId] = useState(() => crypto.randomUUID());
+  const submittingRef = useRef(false);
+  const draft = useFormDraft({
+    section: "cloud",
+    itemId: existing?.id ?? null,
+    form,
+    itemUpdatedAt: existing?.updatedAt,
+    newItemId: existing ? undefined : newId,
+    onRestoreNewItemId: setNewId,
+    extra: links,
+    onRestoreExtra: setLinks,
+  });
+
   const watchTipoMedia = form.watch("tipo_media");
   const needsSorgente =
     watchTipoMedia.includes("VIDEO_CLIP") ||
     watchTipoMedia.includes("INTERA_PARTITA");
 
-  async function uploadPendingFiles(
-    archiveId: string,
-    startPosition: number,
-  ) {
+  /**
+   * Carica i file in attesa per una voce già salvata e li registra.
+   * Ritorna i nomi dei file non caricati (vuoto = tutto ok).
+   */
+  async function uploadPendingFiles(archiveId: string): Promise<string[]> {
     if (files.length === 0) return [];
     const supabase = createSupabaseBrowserClient();
-    return Promise.all(
-      files.map(async (pf, i) => {
+    const results = await Promise.allSettled(
+      files.map(async (pf) => {
         const fileId = crypto.randomUUID();
         const path = `${workspaceId}/${archiveId}/${fileId}-${slugifyFilename(pf.file.name)}`;
-        const { error: uploadError } = await supabase.storage
+        const { error } = await supabase.storage
           .from("archivio")
           .upload(path, pf.file, {
             cacheControl: "3600",
             contentType: uploadMimeType(pf.file) ?? undefined,
             upsert: false,
           });
-        if (uploadError) {
-          throw new Error(
-            `Upload "${pf.file.name}" fallito: ${uploadError.message}`,
-          );
-        }
+        if (error) throw error;
         return {
           file_name: pf.file.name,
           file_path: path,
           file_size_bytes: pf.file.size,
           mime_type: uploadMimeType(pf.file),
           tipo_media: pf.tipo_media,
-          posizione: startPosition + i,
         };
       }),
     );
+    const uploaded = results.flatMap((r) => (r.status === "fulfilled" ? [r.value] : []));
+    const failed = files.flatMap((pf, i) =>
+      results[i].status === "rejected" ? [pf.file.name] : [],
+    );
+    if (uploaded.length === 0) return failed;
+    try {
+      await addArchiveFiles(archiveId, uploaded);
+    } catch {
+      // Caricati ma non registrati: la pulizia dello storage è best-effort.
+      await supabase.storage
+        .from("archivio")
+        .remove(uploaded.map((u) => u.file_path))
+        .catch(() => undefined);
+      return files.map((pf) => pf.file.name);
+    }
+    return failed;
   }
 
   async function onSubmit(values: ArchiveFormValues) {
+    // Blocca un secondo invio (doppio clic, Invio) mentre il primo è in corso.
+    if (submittingRef.current) return;
     const checkedLinks = validateLinkDrafts(links);
     if (!checkedLinks.ok) {
       setLinks(checkedLinks.drafts);
@@ -228,83 +260,68 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
       });
       return;
     }
+    submittingRef.current = true;
     setSubmitting(true);
 
+    const common = {
+      data_lavoro: values.data_lavoro,
+      season_id: values.season_id ?? null,
+      team_principale_id: values.team_principale_id ?? null,
+      team_avversario_id: values.team_avversario_id ?? null,
+      competition_id: values.competition_id ?? null,
+      ambito: values.ambito,
+      categoria_lavoro: values.categoria_lavoro,
+      tipo_media: values.tipo_media,
+      sorgente_video: needsSorgente ? (values.sorgente_video ?? null) : null,
+      titolo_archivio: values.titolo_archivio.trim(),
+      descrizione_estesa: values.descrizione_estesa?.trim() || null,
+      tag_ids: values.tag_ids,
+      links: checkedLinks.links,
+    };
+
+    let id: string;
     try {
       if (isEdit && existing) {
-        // Calcola diff sui file esistenti
-        const remove_file_ids = existingFiles
-          .filter((f) => f.removed)
-          .map((f) => f.id);
-        const update_file_tipi = existingFiles
-          .filter(
-            (f) => !f.removed && f.current_tipo_media !== f.original_tipo_media,
-          )
-          .map((f) => ({ id: f.id, tipo_media: f.current_tipo_media }));
-
-        const keptCount = existingFiles.filter((f) => !f.removed).length;
-        const new_files = await uploadPendingFiles(existing.id, keptCount);
-
         await updateArchiveItem({
           id: existing.id,
-          data_lavoro: values.data_lavoro,
-          season_id: values.season_id ?? null,
-          team_principale_id: values.team_principale_id ?? null,
-          team_avversario_id: values.team_avversario_id ?? null,
-          competition_id: values.competition_id ?? null,
-          ambito: values.ambito,
-          categoria_lavoro: values.categoria_lavoro,
-          tipo_media: values.tipo_media,
-          sorgente_video: needsSorgente
-            ? (values.sorgente_video ?? null)
-            : null,
-          titolo_archivio: values.titolo_archivio.trim(),
-          descrizione_estesa: values.descrizione_estesa?.trim() || null,
-          tag_ids: values.tag_ids,
-          new_files,
-          links: checkedLinks.links,
-          remove_file_ids,
-          update_file_tipi,
+          ...common,
+          remove_file_ids: existingFiles.filter((f) => f.removed).map((f) => f.id),
+          update_file_tipi: existingFiles
+            .filter((f) => !f.removed && f.current_tipo_media !== f.original_tipo_media)
+            .map((f) => ({ id: f.id, tipo_media: f.current_tipo_media })),
         });
-
-        toast.success("Modifiche salvate");
-        router.push(`/archivio/${existing.id}`);
-        router.refresh();
+        id = existing.id;
       } else {
-        const archiveId = crypto.randomUUID();
-        const uploaded = await uploadPendingFiles(archiveId, 0);
-
-        await createArchiveItem({
-          id: archiveId,
-          data_lavoro: values.data_lavoro,
-          season_id: values.season_id ?? null,
-          team_principale_id: values.team_principale_id ?? null,
-          team_avversario_id: values.team_avversario_id ?? null,
-          competition_id: values.competition_id ?? null,
-          ambito: values.ambito,
-          categoria_lavoro: values.categoria_lavoro,
-          tipo_media: values.tipo_media,
-          sorgente_video: needsSorgente
-            ? (values.sorgente_video ?? null)
-            : null,
-          titolo_archivio: values.titolo_archivio.trim(),
-          descrizione_estesa: values.descrizione_estesa?.trim() || null,
-          files: uploaded,
-          links: checkedLinks.links,
-          tag_ids: values.tag_ids,
-        });
-
-        toast.success("Voce salvata");
-        router.push(`/archivio/${archiveId}`);
+        id = (await createArchiveItem({ id: newId, ...common })).id;
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore sconosciuto";
       toast.error("Salvataggio fallito", { description: message });
+      submittingRef.current = false;
       setSubmitting(false);
+      return;
     }
+    draft.markSaved();
+
+    const failed = await uploadPendingFiles(id);
+    if (failed.length > 0) {
+      toast.warning("Elemento salvato, ma alcuni allegati non sono stati caricati", {
+        description: `${failed.join(", ")}. Riprova dalla pagina di modifica.`,
+        duration: 10000,
+      });
+      // Pagina di modifica ricaricata da capo, con i file aggiornati.
+      window.location.assign(`/archivio/${id}/modifica`);
+      return;
+    }
+    toast.success(isEdit ? "Modifiche salvate" : "Voce salvata");
+    router.push(`/archivio/${id}`);
+    if (isEdit) router.refresh();
   }
 
   const cancelHref = existing ? `/archivio/${existing.id}` : "/archivio";
+  const leave = () => {
+    if (draft.confirmLeave()) router.push(cancelHref);
+  };
   const headerLabel = isEdit ? "Modifica voce" : "Nuova voce";
   const submitLabel = isEdit ? "Salva modifiche" : "Salva voce";
 
@@ -332,7 +349,7 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
             type="button"
             variant="ghost"
             disabled={submitting}
-            onClick={() => router.push(cancelHref)}
+            onClick={leave}
           >
             <X className="mr-2 h-4 w-4" />
             Annulla
@@ -352,6 +369,12 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
           </Button>
         </div>
       </header>
+
+      <DraftBanner
+        draft={draft.pending}
+        onRestore={draft.restore}
+        onDiscard={draft.discard}
+      />
 
       {/* METADATI */}
       <FormSection
@@ -667,7 +690,7 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
       <MobileSaveBar
         label={submitLabel}
         submitting={submitting}
-        onCancel={() => router.push(cancelHref)}
+        onCancel={leave}
       />
 
       <div className="flex items-center justify-end gap-2 pb-8 max-md:hidden">
@@ -675,7 +698,7 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
           type="button"
           variant="ghost"
           disabled={submitting}
-          onClick={() => router.push(cancelHref)}
+          onClick={leave}
         >
           Annulla
         </Button>

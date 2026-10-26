@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
@@ -54,6 +54,8 @@ import {
   type PendingAttachment,
 } from "@/components/attachments/attachments-field";
 import { uploadPendingAttachments } from "@/components/attachments/upload";
+import { useFormDraft } from "@/components/forms/use-form-draft";
+import { DraftBanner } from "@/components/forms/draft-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -167,7 +169,7 @@ export function SetPieceForm({
   existing,
 }: {
   /** Se presente, il form è in modalità modifica (valori precompilati). */
-  existing?: { id: string; values: SetPieceFormValues };
+  existing?: { id: string; values: SetPieceFormValues; updatedAt: string };
 } = {}) {
   const router = useRouter();
   const isEdit = !!existing;
@@ -182,6 +184,21 @@ export function SetPieceForm({
     resolver: zodResolver(setPieceFormSchema),
     defaultValues: existing?.values ?? emptySetPieceForm(),
   });
+
+  // Id del nuovo elemento, generato all'apertura: un secondo invio non crea doppioni.
+  const [newId, setNewId] = useState(() => crypto.randomUUID());
+  const submittingRef = useRef(false);
+  const draft = useFormDraft({
+    section: "set-pieces",
+    itemId: existing?.id ?? null,
+    form,
+    itemUpdatedAt: existing?.updatedAt,
+    newItemId: existing ? undefined : newId,
+    onRestoreNewItemId: setNewId,
+  });
+  const leave = () => {
+    if (draft.confirmLeave()) router.push(cancelHref);
+  };
 
   // Osserviamo i due valori che pilotano la reattività condizionale.
   const fase = form.watch("fase");
@@ -223,25 +240,41 @@ export function SetPieceForm({
   }, [fase, form]);
 
   async function onSubmit(values: SetPieceFormValues) {
+    // Blocca un secondo invio (doppio clic, Invio) mentre il primo è in corso.
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
+
+    let id: string;
     try {
-      const { id } = existing
-        ? await updateSetPiece(existing.id, values)
-        : await createSetPiece(values);
-      if (pendingAttachments.length > 0) {
-        await uploadPendingAttachments(
-          "set_piece",
-          id,
-          pendingAttachments.map((p) => p.file),
-        );
-      }
-      toast.success(isEdit ? "Modifiche salvate" : "Schema salvato");
-      router.push(`/set-pieces/${id}`);
+      id = existing
+        ? (await updateSetPiece(existing.id, values)).id
+        : (await createSetPiece(newId, values)).id;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore sconosciuto";
       toast.error("Salvataggio fallito", { description: message });
+      submittingRef.current = false;
       setSubmitting(false);
+      return;
     }
+    draft.markSaved();
+
+    const { failed } = await uploadPendingAttachments(
+      "set_piece",
+      id,
+      pendingAttachments.map((p) => p.file),
+    );
+    if (failed.length > 0) {
+      toast.warning("Elemento salvato, ma alcuni allegati non sono stati caricati", {
+        description: `${failed.join(", ")}. Riprova dalla pagina di modifica.`,
+        duration: 10000,
+      });
+      // Pagina di modifica ricaricata da capo, con gli allegati aggiornati.
+      window.location.assign(`/set-pieces/${id}/modifica`);
+      return;
+    }
+    toast.success(existing ? "Modifiche salvate" : "Schema salvato");
+    router.push(`/set-pieces/${id}`);
   }
 
   return (
@@ -268,7 +301,7 @@ export function SetPieceForm({
             type="button"
             variant="ghost"
             disabled={submitting}
-            onClick={() => router.push(cancelHref)}
+            onClick={leave}
           >
             <X className="mr-2 h-4 w-4" />
             Annulla
@@ -288,6 +321,12 @@ export function SetPieceForm({
           </Button>
         </div>
       </header>
+
+      <DraftBanner
+        draft={draft.pending}
+        onRestore={draft.restore}
+        onDiscard={draft.discard}
+      />
 
       {/* § 1 Metadati */}
       <FormSection
@@ -863,7 +902,7 @@ export function SetPieceForm({
       <MobileSaveBar
         label={submitLabel}
         submitting={submitting}
-        onCancel={() => router.push(cancelHref)}
+        onCancel={leave}
       />
 
       <div className="flex items-center justify-end gap-2 pb-8 max-md:hidden">
@@ -871,7 +910,7 @@ export function SetPieceForm({
           type="button"
           variant="ghost"
           disabled={submitting}
-          onClick={() => router.push(cancelHref)}
+          onClick={leave}
         >
           Annulla
         </Button>

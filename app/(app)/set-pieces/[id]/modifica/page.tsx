@@ -31,7 +31,9 @@ export default async function ModificaSetPiecePage({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-8 sm:py-10">
-      <SetPieceForm existing={{ id: sp.id, values: sp.values }} />
+      <SetPieceForm
+        existing={{ id: sp.id, values: sp.values, updatedAt: sp.updated_at }}
+      />
     </div>
   );
 }
