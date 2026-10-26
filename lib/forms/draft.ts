@@ -9,7 +9,12 @@
 export const DRAFT_PREFIX = "agw:draft:";
 export const DRAFT_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 giorni
 
-export type DraftSection = "scouting" | "set-pieces" | "training" | "cloud";
+export type DraftSection =
+  | "scouting"
+  | "osservazione"
+  | "set-pieces"
+  | "training"
+  | "cloud";
 
 export type StorageLike = Pick<
   Storage,

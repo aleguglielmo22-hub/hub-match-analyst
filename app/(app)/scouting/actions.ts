@@ -25,9 +25,9 @@ import {
 
 const PAGE_SIZE = 24;
 
-export type ScoutingSort = "recent" | "alpha" | "scadenza";
+export type ScoutingSort = "recent" | "osservati" | "alpha" | "scadenza";
 
-const sortSchema = z.enum(["recent", "alpha", "scadenza"]);
+const sortSchema = z.enum(["recent", "osservati", "alpha", "scadenza"]);
 const pageSchema = z.number().int().min(0).max(1000);
 
 function ageRangeToDates(ages: { min?: number; max?: number }): {
@@ -95,7 +95,8 @@ async function queryPlayersPage(
       `
         id, created_by, nome, cognome, foto_url, data_nascita, nazionalita, piede,
         ruolo_principale, ruoli_secondari, squadra_attuale, campionato,
-        scadenza_contratto, valore_mercato_eur, status_osservazione, voto_potenziale
+        scadenza_contratto, valore_mercato_eur, status_osservazione, voto_potenziale,
+        ultima_osservazione, numero_osservazioni
       `,
     )
     .eq("workspace_id", workspace.id)
@@ -128,6 +129,12 @@ async function queryPlayersPage(
   if (filters?.voto_potenziale.length)
     q = q.in("voto_potenziale", filters.voto_potenziale);
 
+  if (filters?.osservati_giorni) {
+    const d = new Date();
+    d.setDate(d.getDate() - filters.osservati_giorni);
+    q = q.gte("ultima_osservazione", d.toISOString().slice(0, 10));
+  }
+
   const scad = scadenzaCutoff(filters?.scadenza_quick);
   if (scad) {
     q = q.not("scadenza_contratto", "is", null).lte("scadenza_contratto", scad);
@@ -145,6 +152,10 @@ async function queryPlayersPage(
   if (sort === "recent") {
     q = q
       .order("updated_at", { ascending: false })
+      .order("id", { ascending: false });
+  } else if (sort === "osservati") {
+    q = q
+      .order("ultima_osservazione", { ascending: false, nullsFirst: false })
       .order("id", { ascending: false });
   } else if (sort === "alpha") {
     q = q
@@ -234,11 +245,9 @@ export async function createPlayer(
 
         status_osservazione: v.status_osservazione,
         voto_potenziale: v.voto_potenziale ?? null,
-        data_ultimo_aggiornamento: v.data_ultimo_aggiornamento,
         scout_assegnato: v.scout_assegnato,
 
         scouting_report_url: v.scouting_report_url,
-        note_rapide: v.note_rapide,
         clip_video_urls: v.clip_video_urls,
       }),
       exists: async () => {
@@ -296,11 +305,9 @@ function playerRowToFormValues(p: PlayerRow): PlayerFormValues {
 
     status_osservazione: p.status_osservazione,
     voto_potenziale: p.voto_potenziale,
-    data_ultimo_aggiornamento: p.data_ultimo_aggiornamento,
     scout_assegnato: p.scout_assegnato,
 
     scouting_report_url: p.scouting_report_url,
-    note_rapide: p.note_rapide,
     clip_video_urls: p.clip_video_urls ?? [],
   };
   const row = p as unknown as Record<string, unknown>;
@@ -433,7 +440,6 @@ export async function updatePlayer(
       scout_assegnato: v.scout_assegnato,
 
       scouting_report_url: v.scouting_report_url,
-      note_rapide: v.note_rapide,
       clip_video_urls: v.clip_video_urls,
     })
     .eq("id", playerId)

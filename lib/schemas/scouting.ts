@@ -21,10 +21,6 @@ import {
  * I default del form passano sempre `null`, mai `undefined`.
  * ============================================================ */
 
-const isoDate = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Inserisci una data valida");
-
 const isoDateOrNull = z
   .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal(""), z.null()])
   .transform((v) => (v === "" || v == null ? null : (v as string)));
@@ -35,14 +31,6 @@ const httpUrlOrNull = z
 
 const optionalText = z
   .union([z.string().max(1000), z.null()])
-  .transform((v) => {
-    if (v == null) return null;
-    const t = v.trim();
-    return t ? t : null;
-  });
-
-const longText = z
-  .union([z.string().max(10000), z.null()])
   .transform((v) => {
     if (v == null) return null;
     const t = v.trim();
@@ -129,12 +117,12 @@ export const playerFormSchema = z.object({
   // Workflow
   status_osservazione: z.enum(STATUS_OSSERVAZIONE_VALUES),
   voto_potenziale: z.enum(VOTO_POTENZIALE_VALUES).nullable(),
-  data_ultimo_aggiornamento: isoDate,
   scout_assegnato: optionalText,
 
   // Media
   scouting_report_url: httpUrlOrNull,
-  note_rapide: longText,
+  // Le vecchie "note rapide" non si modificano più dal form: ora ci sono le
+  // osservazioni datate (la colonna resta nel DB, mostrata come "Note storiche").
   clip_video_urls: z.array(z.string().url("URL non valido")),
 });
 
@@ -174,11 +162,9 @@ export function emptyPlayerForm(): PlayerFormValues {
 
     status_osservazione: "DA_VISIONARE",
     voto_potenziale: null,
-    data_ultimo_aggiornamento: new Date().toISOString().slice(0, 10),
     scout_assegnato: null,
 
     scouting_report_url: null,
-    note_rapide: null,
     clip_video_urls: [],
   };
   for (const i of INFLUENZE_NEG) base[i.key] = false;

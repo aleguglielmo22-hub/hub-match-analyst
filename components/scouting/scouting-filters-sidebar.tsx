@@ -40,6 +40,8 @@ import {
   EMPTY_SCOUTING_FILTERS,
   ETA_MAX,
   ETA_MIN,
+  OSSERVATI_GIORNI,
+  type OsservatiGiorni,
   countActiveScoutingFilters,
   scoutingFiltersToSearchParams,
   type ScoutingFilters,
@@ -136,6 +138,43 @@ function ScadenzaQuickPicker({
               }
             >
               {SCADENZA_QUICK_LABEL[v]}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function OsservatiPicker({
+  value,
+  onChange,
+}: {
+  value: OsservatiGiorni | undefined;
+  onChange: (v: OsservatiGiorni | undefined) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <span className="text-xs font-medium text-sidebar-foreground/80">
+        Osservati negli ultimi
+      </span>
+      <div className="flex flex-wrap gap-1">
+        {OSSERVATI_GIORNI.map((v) => {
+          const active = value === v;
+          return (
+            <button
+              key={v}
+              type="button"
+              onClick={() => onChange(active ? undefined : v)}
+              aria-pressed={active}
+              className={
+                "rounded-md border px-2 py-1 text-[11px] font-medium transition-colors max-md:min-h-11 " +
+                (active
+                  ? "border-primary/60 bg-primary/10 text-primary"
+                  : "border-border bg-transparent text-muted-foreground hover:border-border/80 hover:text-foreground")
+              }
+            >
+              {v} giorni
             </button>
           );
         })}
@@ -347,6 +386,10 @@ export function ScoutingFiltersSidebar({
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-3">
+              <OsservatiPicker
+                value={local.osservati_giorni}
+                onChange={(v) => update({ osservati_giorni: v })}
+              />
               <ToggleChipGroup<StatusOsservazioneEnum>
                 label="Status osservazione"
                 options={statusOpts}

@@ -95,7 +95,9 @@ export async function KpiCards() {
         href="/scouting"
       >
         <p className="text-[11px] text-muted-foreground">
-          Profili a sistema
+          Profili a sistema ·{" "}
+          <span className="font-semibold text-foreground">{k.observationsTotal}</span>{" "}
+          {k.observationsTotal === 1 ? "osservazione" : "osservazioni"}
         </p>
       </KpiCard>
 

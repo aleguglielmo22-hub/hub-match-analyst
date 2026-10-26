@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import { ArrowLeft, ExternalLink, Pencil } from "lucide-react";
+import { ArrowLeft, ExternalLink, Pencil, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { isUuid, logLoadError } from "@/lib/load-result";
@@ -41,6 +41,8 @@ import {
 } from "@/lib/types/scouting";
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
+import { ObservationsSection } from "@/components/scouting/observations-section";
+import { listPlayerObservations } from "@/app/(app)/scouting/osservazioni/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -82,6 +84,12 @@ export default async function DettaglioGiocatorePage({
   // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
   const canEdit = workspace.isOwner || p.created_by === workspace.userId;
 
+  const obsRes = await listPlayerObservations(p.id);
+  const observations = obsRes.ok ? obsRes.data : null;
+  // Le vecchie note rapide si mostrano solo se non sono già state importate.
+  const showNoteStoriche =
+    !!p.note_rapide?.trim() && !!observations && !observations.some((o) => o.importata);
+
   const eta = calcolaEta(p.data_nascita);
   const dataNascitaFmt = p.data_nascita
     ? format(parseISO(p.data_nascita), "d MMMM yyyy", { locale: it })
@@ -89,11 +97,8 @@ export default async function DettaglioGiocatorePage({
   const scadenzaFmt = p.scadenza_contratto
     ? format(parseISO(p.scadenza_contratto), "d MMMM yyyy", { locale: it })
     : null;
-  const aggiornatoFmt = format(
-    parseISO(p.data_ultimo_aggiornamento),
-    "d MMM yyyy",
-    { locale: it },
-  );
+  // Data reale dell'ultima modifica del profilo.
+  const aggiornatoFmt = format(parseISO(p.updated_at), "d MMM yyyy", { locale: it });
 
   // Raggruppo RATINGS per macro-area
   const ratingsByMacro = new Map<
@@ -158,6 +163,15 @@ export default async function DettaglioGiocatorePage({
         </div>
 
         <div className="flex flex-col items-end gap-3">
+          <Link
+            href={`/scouting/osservazioni/nuova?giocatore=${p.id}`}
+            className={buttonVariants({ size: "lg" })}
+          >
+            <LinkPendingIcon className="mr-2 h-4 w-4">
+              <Plus className="mr-2 h-4 w-4" />
+            </LinkPendingIcon>
+            Osservazione
+          </Link>
           {canEdit && (
             <div className="flex flex-wrap items-center justify-end gap-2">
               <Link
@@ -205,6 +219,8 @@ export default async function DettaglioGiocatorePage({
           </div>
         </div>
       </header>
+
+      <ObservationsSection playerId={p.id} observations={observations} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Identità */}
@@ -319,7 +335,7 @@ export default async function DettaglioGiocatorePage({
                 value={VOTO_POTENZIALE_LABEL[p.voto_potenziale]}
               />
             )}
-            <Row label="Ultimo aggiornamento" value={aggiornatoFmt} />
+            <Row label="Profilo modificato il" value={aggiornatoFmt} />
             {p.scout_assegnato && (
               <Row label="Scout assegnato" value={p.scout_assegnato} />
             )}
@@ -432,7 +448,7 @@ export default async function DettaglioGiocatorePage({
 
       {/* Media */}
       {(p.scouting_report_url ||
-        p.note_rapide ||
+        showNoteStoriche ||
         p.clip_video_urls.length > 0) && (
         <section className="space-y-4">
           {p.scouting_report_url && (
@@ -451,10 +467,10 @@ export default async function DettaglioGiocatorePage({
               </a>
             </div>
           )}
-          {p.note_rapide && (
+          {showNoteStoriche && (
             <div className="rounded-2xl border border-border/60 bg-card/40 p-5">
               <h2 className="mb-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Note rapide
+                Note storiche
               </h2>
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
                 {p.note_rapide}

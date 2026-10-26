@@ -229,7 +229,9 @@ function DeleteForeverDialog({
           <DialogDescription>
             Stai per eliminare <strong>«{item?.title}»</strong> (
             {item ? TRASH_SECTION[item.section].label : ""}) insieme a tutti i
-            suoi file allegati. L&apos;azione è <strong>irreversibile</strong>.
+            suoi file allegati
+            {item?.section === "scouting" && " e a tutte le sue osservazioni"}.
+            L&apos;azione è <strong>irreversibile</strong>.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

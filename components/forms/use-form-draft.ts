@@ -194,12 +194,23 @@ export function useFormDraft<V extends FieldValues, X = undefined>({
     setDismissed(true);
   }, [key]);
 
-  /** Dopo un salvataggio riuscito: cancella la bozza e non avvisa più all'uscita. */
-  const markSaved = useCallback(() => {
-    doneRef.current = true;
-    if (timerRef.current) clearTimeout(timerRef.current);
-    clearDraft(browserStorage(), key);
-  }, [key]);
+  /**
+   * Dopo un salvataggio riuscito: cancella la bozza e non avvisa più all'uscita.
+   * Con `continueEditing` il form resta aperto per un nuovo inserimento
+   * (es. "Salva e osserva un altro giocatore") e la bozza riparte da zero.
+   */
+  const markSaved = useCallback(
+    (opts?: { continueEditing?: boolean }) => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      clearDraft(browserStorage(), key);
+      if (opts?.continueEditing) {
+        dirtyRef.current = false;
+      } else {
+        doneRef.current = true;
+      }
+    },
+    [key],
+  );
 
   /** Per i pulsanti "Annulla": chiede conferma se ci sono modifiche non salvate. */
   const confirmLeave = useCallback(

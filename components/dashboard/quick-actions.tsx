@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { UserPlus, Target, Brain, ArrowRight } from "lucide-react";
+import { UserPlus, Target, Brain, ArrowRight, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 /**
- * Box azioni rapide: tre CTA visive che lanciano i workflow principali.
+ * Box azioni rapide: CTA visive che lanciano i workflow principali.
  * Non richiede dati lato server quindi è un Server Component sincrono.
  */
 export function QuickActions() {
@@ -20,6 +20,13 @@ export function QuickActions() {
       </header>
 
       <div className="space-y-2.5">
+        <ActionCard
+          href="/scouting/osservazioni/nuova"
+          icon={Eye}
+          title="+ Osservazione"
+          subtitle="Giocatore, partita, voto e nota in 30 secondi"
+          tone="emerald"
+        />
         <ActionCard
           href="/scouting/nuovo"
           icon={UserPlus}

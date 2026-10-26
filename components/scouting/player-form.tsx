@@ -1022,19 +1022,6 @@ export function PlayerForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="data_ultimo_aggiornamento">
-              Data ultimo aggiornamento *
-            </Label>
-            <Input
-              id="data_ultimo_aggiornamento"
-              type="date"
-              {...form.register("data_ultimo_aggiornamento")}
-            />
-            <FieldError
-              message={form.formState.errors.data_ultimo_aggiornamento?.message}
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="scout_assegnato">Scout assegnato</Label>
             <Input
               id="scout_assegnato"
@@ -1058,16 +1045,6 @@ export function PlayerForm({
           </p>
           <FieldError
             message={form.formState.errors.scouting_report_url?.message}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="note_rapide">Note rapide / Diario live</Label>
-          <Textarea
-            id="note_rapide"
-            rows={5}
-            placeholder="Appunti dal vivo o post-visione…"
-            {...form.register("note_rapide")}
           />
         </div>
 

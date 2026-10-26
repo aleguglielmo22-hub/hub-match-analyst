@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import { Calendar, MapPin, Pencil } from "lucide-react";
+import { Calendar, Eye, MapPin, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STATUS_OSSERVAZIONE_TONE, TONE, potentialTone } from "@/lib/tones";
 import {
@@ -147,6 +147,20 @@ export function PlayerCard({
             </span>
           </p>
         )}
+        <p className="flex items-center gap-1.5 text-muted-foreground">
+          <Eye className="h-3 w-3" />
+          {player.ultima_osservazione ? (
+            <span>
+              Ultima osservazione {format(parseISO(player.ultima_osservazione), "d MMM", { locale: it })}
+              {" · "}
+              {player.numero_osservazioni === 1
+                ? "1 osservazione"
+                : `${player.numero_osservazioni} osservazioni`}
+            </span>
+          ) : (
+            <span>Nessuna osservazione</span>
+          )}
+        </p>
         <p
           className={cn(
             "flex items-center gap-1.5 text-[10px] uppercase tracking-wider",

@@ -17,6 +17,8 @@ import {
 export type DashboardKpis = {
   playersTotal: number;
   playersElite: number;
+  /** Osservazioni su giocatori non nel cestino. */
+  observationsTotal: number;
   setPiecesTotal: number;
   setPiecesOffensivi: number;
   setPiecesDifensivi: number;
@@ -29,6 +31,7 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
     return {
       playersTotal: 0,
       playersElite: 0,
+      observationsTotal: 0,
       setPiecesTotal: 0,
       setPiecesOffensivi: 0,
       setPiecesDifensivi: 0,
@@ -61,9 +64,17 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
       .eq("workspace_id", wsId)
       .is("deleted_at", null);
 
+  const observations = () =>
+    supabase
+      .from("player_observations")
+      .select("id, players!inner(id)", { count: "exact", head: true })
+      .eq("workspace_id", wsId)
+      .is("players.deleted_at", null);
+
   const [
     playersTotalRes,
     playersEliteRes,
+    observationsRes,
     setPiecesTotalRes,
     setPiecesOffRes,
     setPiecesDifRes,
@@ -71,6 +82,7 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
   ] = await Promise.all([
     players(),
     players().in("voto_potenziale", ["A1", "A2"]),
+    observations(),
     setPieces(),
     setPieces().eq("fase", "OFFENSIVO"),
     setPieces().eq("fase", "DIFENSIVO"),
@@ -80,6 +92,7 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
   const failed = [
     playersTotalRes,
     playersEliteRes,
+    observationsRes,
     setPiecesTotalRes,
     setPiecesOffRes,
     setPiecesDifRes,
@@ -94,6 +107,7 @@ export async function loadDashboardKpis(): Promise<DashboardKpis> {
   return {
     playersTotal: playersTotalRes.count ?? 0,
     playersElite: playersEliteRes.count ?? 0,
+    observationsTotal: observationsRes.count ?? 0,
     setPiecesTotal: setPiecesTotalRes.count ?? 0,
     setPiecesOffensivi: setPiecesOffRes.count ?? 0,
     setPiecesDifensivi: setPiecesDifRes.count ?? 0,

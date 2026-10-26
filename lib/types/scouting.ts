@@ -404,4 +404,6 @@ export type PlayerListItem = Pick<
   | "valore_mercato_eur"
   | "status_osservazione"
   | "voto_potenziale"
+  | "ultima_osservazione"
+  | "numero_osservazioni"
 >;

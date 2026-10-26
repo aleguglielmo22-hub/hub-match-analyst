@@ -27,6 +27,7 @@ import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 const SORT_OPTIONS: { value: ScoutingSort; label: string }[] = [
   { value: "recent", label: "Aggiornati di recente" },
+  { value: "osservati", label: "Osservati di recente" },
   { value: "alpha", label: "A → Z (cognome)" },
   { value: "scadenza", label: "Scadenza vicina" },
 ];

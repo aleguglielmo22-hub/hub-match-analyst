@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Users } from "lucide-react";
+import { Eye, Plus, Users } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { SectionHeader } from "@/components/app/section-header";
 import { PlayersList } from "@/components/scouting/players-list";
@@ -48,12 +48,26 @@ export default async function ScoutingPage({
         title="Scouting DB"
         subtitle="Database giocatori osservati e valutazioni"
         actions={
-          <Link href="/scouting/nuovo" className={buttonVariants({ size: "lg" })}>
-            <LinkPendingIcon className="mr-2 h-4 w-4">
-              <Plus className="mr-2 h-4 w-4" />
-            </LinkPendingIcon>
-            Aggiungi giocatore
-          </Link>
+          <>
+            <Link
+              href="/scouting/nuovo"
+              className={buttonVariants({ variant: "outline", size: "lg" })}
+            >
+              <LinkPendingIcon className="mr-2 h-4 w-4">
+                <Plus className="mr-2 h-4 w-4" />
+              </LinkPendingIcon>
+              Giocatore
+            </Link>
+            <Link
+              href="/scouting/osservazioni/nuova"
+              className={buttonVariants({ size: "lg" })}
+            >
+              <LinkPendingIcon className="mr-2 h-4 w-4">
+                <Eye className="mr-2 h-4 w-4" />
+              </LinkPendingIcon>
+              + Osservazione
+            </Link>
+          </>
         }
       />
 

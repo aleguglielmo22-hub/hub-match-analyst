@@ -21,6 +21,10 @@ import {
   type VotoPotenzialeEnum,
 } from "@/lib/types/scouting";
 
+/** Filtro "Osservati negli ultimi N giorni". */
+export const OSSERVATI_GIORNI = [7, 30, 90] as const;
+export type OsservatiGiorni = (typeof OSSERVATI_GIORNI)[number];
+
 /** Limiti ragionevoli per l'età di un calciatore. */
 export const ETA_MIN = 14;
 export const ETA_MAX = 50;
@@ -37,6 +41,8 @@ export type ScoutingFilters = {
   status_osservazione: StatusOsservazioneEnum[];
   voto_potenziale: VotoPotenzialeEnum[];
   scadenza_quick?: ScadenzaQuick;
+  /** Solo giocatori con un'osservazione negli ultimi N giorni. */
+  osservati_giorni?: OsservatiGiorni;
   /** Soglia minima per ogni attributo FM (assente = nessun filtro). */
   ratings_min: Partial<Record<RatingKey, number>>;
 };
@@ -108,8 +114,14 @@ export function parseScoutingFiltersFromSearchParams(
       ? (scadenza as ScadenzaQuick)
       : undefined;
 
+  const ossRaw = Number(getParam(params, "oss"));
+  const osservati_giorni = (OSSERVATI_GIORNI as readonly number[]).includes(ossRaw)
+    ? (ossRaw as OsservatiGiorni)
+    : undefined;
+
   return {
     q,
+    osservati_giorni,
     eta_min: parseAge(getParam(params, "eta_min")),
     eta_max: parseAge(getParam(params, "eta_max")),
     passaporto: parseList(getParam(params, "pass"), PASSAPORTO_VALUES),
@@ -145,6 +157,7 @@ export function scoutingFiltersToSearchParams(
     "status",
     "voto",
     "scad",
+    "oss",
     ...RATING_KEYS.map((k) => ratingUrlKey(k)),
   ];
   for (const k of KEYS_TO_RESET) sp.delete(k);
@@ -163,6 +176,7 @@ export function scoutingFiltersToSearchParams(
   if (filters.voto_potenziale.length)
     sp.set("voto", filters.voto_potenziale.join(","));
   if (filters.scadenza_quick) sp.set("scad", filters.scadenza_quick);
+  if (filters.osservati_giorni) sp.set("oss", String(filters.osservati_giorni));
   for (const k of RATING_KEYS) {
     const v = filters.ratings_min[k];
     if (typeof v === "number" && v >= 1 && v <= 10)
@@ -182,6 +196,7 @@ export function countActiveScoutingFilters(f: ScoutingFilters): number {
   if (f.status_osservazione.length) n++;
   if (f.voto_potenziale.length) n++;
   if (f.scadenza_quick) n++;
+  if (f.osservati_giorni) n++;
   n += Object.keys(f.ratings_min).length;
   return n;
 }

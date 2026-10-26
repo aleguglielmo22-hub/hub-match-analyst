@@ -352,6 +352,100 @@ export type Database = {
           },
         ]
       }
+      player_observations: {
+        Row: {
+          competition_id: string | null
+          created_at: string
+          created_by: string
+          data_osservazione: string
+          id: string
+          importata: boolean
+          nota: string | null
+          player_id: string
+          ruolo_giocato: Database["public"]["Enums"]["ruolo_enum"] | null
+          team_casa_id: string | null
+          team_ospite_id: string | null
+          updated_at: string
+          voto: number | null
+          workspace_id: string
+        }
+        Insert: {
+          competition_id?: string | null
+          created_at?: string
+          created_by: string
+          data_osservazione?: string
+          id?: string
+          importata?: boolean
+          nota?: string | null
+          player_id: string
+          ruolo_giocato?: Database["public"]["Enums"]["ruolo_enum"] | null
+          team_casa_id?: string | null
+          team_ospite_id?: string | null
+          updated_at?: string
+          voto?: number | null
+          workspace_id: string
+        }
+        Update: {
+          competition_id?: string | null
+          created_at?: string
+          created_by?: string
+          data_osservazione?: string
+          id?: string
+          importata?: boolean
+          nota?: string | null
+          player_id?: string
+          ruolo_giocato?: Database["public"]["Enums"]["ruolo_enum"] | null
+          team_casa_id?: string | null
+          team_ospite_id?: string | null
+          updated_at?: string
+          voto?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_observations_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_observations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_observations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_observations_team_casa_id_fkey"
+            columns: ["team_casa_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_observations_team_ospite_id_fkey"
+            columns: ["team_ospite_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_observations_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       players: {
         Row: {
           agenzia: string | null
@@ -419,6 +513,7 @@ export type Database = {
           nazionalita: string | null
           nome: string
           note_rapide: string | null
+          numero_osservazioni: number
           passaporto: Database["public"]["Enums"]["passaporto_enum"] | null
           peso_kg: number | null
           piede: Database["public"]["Enums"]["piede_enum"] | null
@@ -448,6 +543,7 @@ export type Database = {
           tec_tecnica: number | null
           tec_tiri_lontano: number | null
           transfermarkt_url: string | null
+          ultima_osservazione: string | null
           updated_at: string
           valore_mercato_eur: number | null
           voto_potenziale:
@@ -521,6 +617,7 @@ export type Database = {
           nazionalita?: string | null
           nome: string
           note_rapide?: string | null
+          numero_osservazioni?: number
           passaporto?: Database["public"]["Enums"]["passaporto_enum"] | null
           peso_kg?: number | null
           piede?: Database["public"]["Enums"]["piede_enum"] | null
@@ -550,6 +647,7 @@ export type Database = {
           tec_tecnica?: number | null
           tec_tiri_lontano?: number | null
           transfermarkt_url?: string | null
+          ultima_osservazione?: string | null
           updated_at?: string
           valore_mercato_eur?: number | null
           voto_potenziale?:
@@ -623,6 +721,7 @@ export type Database = {
           nazionalita?: string | null
           nome?: string
           note_rapide?: string | null
+          numero_osservazioni?: number
           passaporto?: Database["public"]["Enums"]["passaporto_enum"] | null
           peso_kg?: number | null
           piede?: Database["public"]["Enums"]["piede_enum"] | null
@@ -652,6 +751,7 @@ export type Database = {
           tec_tecnica?: number | null
           tec_tiri_lontano?: number | null
           transfermarkt_url?: string | null
+          ultima_osservazione?: string | null
           updated_at?: string
           valore_mercato_eur?: number | null
           voto_potenziale?:

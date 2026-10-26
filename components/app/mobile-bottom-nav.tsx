@@ -8,7 +8,7 @@ import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 /** Pagine con un form: al posto della barra compare la barra "Salva" del form. */
 export function isFormRoute(pathname: string): boolean {
-  return /\/(nuovo|modifica)$/.test(pathname);
+  return /\/(nuovo|nuova|modifica)$/.test(pathname);
 }
 
 const ITEMS = NAV.filter((item) => item.inBottomNav);
