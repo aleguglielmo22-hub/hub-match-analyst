@@ -40,6 +40,8 @@ type Props = {
     competitions: LookupOption[];
     seasons: LookupOption[];
     tags: LookupOption[];
+    /** Giocatori per il filtro "Giocatore". */
+    players: LookupOption[];
   };
   className?: string;
 };
@@ -194,6 +196,13 @@ export function FiltersSidebar({ filters, lookups, className }: Props) {
             value={local.season_ids}
             onChange={(v) => update({ season_ids: v })}
             placeholder="Tutte"
+          />
+          <MultiSelectPopover
+            label="Giocatore"
+            options={lookups.players}
+            value={local.player_ids}
+            onChange={(v) => update({ player_ids: v })}
+            placeholder="Tutti"
           />
           <MultiSelectPopover
             label="Squadra principale"

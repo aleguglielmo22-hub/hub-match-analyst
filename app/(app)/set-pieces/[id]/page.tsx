@@ -20,6 +20,9 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
+import { ArchiveLinksSection } from "@/components/links/archive-links-section";
+import { SetPiecePlayersList } from "@/components/links/linked-lists";
+import { getSetPieceLinks } from "@/app/(app)/collegamenti/actions";
 import { ESITO_TONE, FASE_SET_PIECE_TONE, TONE } from "@/lib/tones";
 import { cn } from "@/lib/utils";
 import { videoEmbedUrl } from "@/lib/links/external-links";
@@ -91,6 +94,7 @@ export default async function DettaglioSetPiecePage({
 
   // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
   const canEdit = workspace.isOwner || sp.created_by === workspace.userId;
+  const links = await getSetPieceLinks(sp.id);
   const isOffensive = sp.fase === "OFFENSIVO";
   // Nomi attuali delle anagrafiche collegate, altrimenti i vecchi testi.
   const esecutrice = setPieceTeamName(sp.team_esecutrice, sp.squadra_esecutrice);
@@ -371,6 +375,20 @@ export default async function DettaglioSetPiecePage({
           </a>
         </section>
       )}
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <SetPiecePlayersList
+          players={links?.players ?? null}
+          editHint={canEdit ? "Aggiungili da Modifica." : undefined}
+        />
+        <ArchiveLinksSection
+          title="Clip e documenti"
+          emptyText="Nessuna voce del Cloud collegata."
+          canEdit={canEdit}
+          initial={links?.archive ?? null}
+          other={{ kind: "set_piece", id: sp.id }}
+        />
+      </div>
 
       <AttachmentsViewer entityType="set_piece" entityId={sp.id} />
     </div>

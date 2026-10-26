@@ -25,6 +25,23 @@ import {
 
 const PAGE_SIZE = 24;
 
+/** Nome dell'anagrafica squadra (per il vecchio campo di testo). */
+async function teamNameFor(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  workspaceId: string,
+  teamId: string | null,
+): Promise<string | null> {
+  if (!teamId) return null;
+  const { data, error } = await supabase
+    .from("teams")
+    .select("nome")
+    .eq("id", teamId)
+    .eq("workspace_id", workspaceId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data?.nome ?? null;
+}
+
 export type ScoutingSort = "recent" | "osservati" | "alpha" | "scadenza";
 
 const sortSchema = z.enum(["recent", "osservati", "alpha", "scadenza"]);
@@ -94,7 +111,8 @@ async function queryPlayersPage(
     .select(
       `
         id, created_by, nome, cognome, foto_url, data_nascita, nazionalita, piede,
-        ruolo_principale, ruoli_secondari, squadra_attuale, campionato,
+        ruolo_principale, ruoli_secondari, squadra_attuale, campionato, team_attuale_id,
+        team_attuale:teams!players_team_attuale_id_fkey(nome),
         scadenza_contratto, valore_mercato_eur, status_osservazione, voto_potenziale,
         ultima_osservazione, numero_osservazioni
       `,
@@ -103,8 +121,23 @@ async function queryPlayersPage(
     .is("deleted_at", null);
 
   if (filters?.q) {
-    // search_text (0013): nome, cognome, squadra, campionato, stili e ruoli.
-    q = q.or(ilikeAnyFilter(["search_text"], filters.q));
+    // search_text (0013): nome, cognome, squadra, campionato, stili e ruoli;
+    // in più il nome attuale della squadra collegata (es. dopo una rinomina).
+    const { data: teamHits, error: teamErr } = await supabase
+      .from("teams")
+      .select("id")
+      .eq("workspace_id", workspace.id)
+      .or(ilikeAnyFilter(["nome"], filters.q))
+      .limit(50);
+    if (teamErr) throw teamErr;
+    const ids = (teamHits ?? []).map((t) => t.id);
+    q = q.or(
+      ilikeAnyFilter(["search_text"], filters.q) +
+        (ids.length ? `,team_attuale_id.in.(${ids.join(",")})` : ""),
+    );
+  }
+  if (filters?.team_ids.length) {
+    q = q.in("team_attuale_id", filters.team_ids);
   }
 
   if (
@@ -205,6 +238,9 @@ export async function createPlayer(
     INFLUENZE_NEG.map((i) => [i.key, v[i.key]]),
   );
 
+  // Il vecchio testo resta allineato al nome della squadra scelta.
+  const teamName = await teamNameFor(supabase, workspace.id, v.team_attuale_id);
+
   await insertOnce({
     insert: () =>
       supabase.from("players").insert({
@@ -225,7 +261,8 @@ export async function createPlayer(
         stili_gioco: v.stili_gioco,
 
         transfermarkt_url: v.transfermarkt_url,
-        squadra_attuale: v.squadra_attuale,
+        team_attuale_id: v.team_attuale_id,
+        squadra_attuale: teamName,
         campionato: v.campionato,
         scadenza_contratto: v.scadenza_contratto,
         agenzia: v.agenzia,
@@ -287,7 +324,7 @@ function playerRowToFormValues(p: PlayerRow): PlayerFormValues {
     stili_gioco: p.stili_gioco ?? [],
 
     transfermarkt_url: p.transfermarkt_url,
-    squadra_attuale: p.squadra_attuale,
+    team_attuale_id: p.team_attuale_id,
     campionato: p.campionato,
     scadenza_contratto: p.scadenza_contratto,
     agenzia: p.agenzia,
@@ -416,7 +453,8 @@ export async function updatePlayer(
       stili_gioco: v.stili_gioco,
 
       transfermarkt_url: v.transfermarkt_url,
-      squadra_attuale: v.squadra_attuale,
+      team_attuale_id: v.team_attuale_id,
+      squadra_attuale: await teamNameFor(supabase, workspace.id, v.team_attuale_id),
       campionato: v.campionato,
       scadenza_contratto: v.scadenza_contratto,
       agenzia: v.agenzia,

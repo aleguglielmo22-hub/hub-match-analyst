@@ -74,6 +74,22 @@ export async function getSharedLookups(): Promise<SharedLookups> {
   };
 }
 
+/** Giocatori (non nel cestino) per i filtri "Giocatore", dal più recente. */
+export async function getPlayerOptions(): Promise<LookupOption[]> {
+  const workspace = await getCurrentWorkspace();
+  if (!workspace) return [];
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("players")
+    .select("id, nome, cognome")
+    .eq("workspace_id", workspace.id)
+    .is("deleted_at", null)
+    .order("cognome")
+    .limit(1000);
+  if (error) logLoadError("Elenco giocatori", error);
+  return (data ?? []).map((p) => ({ id: p.id, label: [p.cognome, p.nome].filter(Boolean).join(" ") }));
+}
+
 /* ============================================================
  * Preferenze di lavoro (tabella user_preferences, per utente e workspace)
  * ============================================================ */

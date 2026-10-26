@@ -31,10 +31,11 @@ const KINDS: { key: LookupKind; label: string; singular: string }[] = [
   { key: "season", label: "Stagioni", singular: "stagione" },
 ];
 
-const total = (u: LookupUsage) => u.cloud + u.set_pieces + u.osservazioni;
+const total = (u: LookupUsage) => u.cloud + u.set_pieces + u.osservazioni + u.giocatori;
 
-function usageParts(u: Pick<LookupUsage, "cloud" | "set_pieces" | "osservazioni">): string {
+function usageParts(u: Pick<LookupUsage, "cloud" | "set_pieces" | "osservazioni" | "giocatori">): string {
   const parts = [
+    u.giocatori && `${u.giocatori} ${u.giocatori === 1 ? "giocatore" : "giocatori"}`,
     u.cloud && `${u.cloud} nel Cloud`,
     u.set_pieces && `${u.set_pieces} ${u.set_pieces === 1 ? "piazzato" : "piazzati"}`,
     u.osservazioni && `${u.osservazioni} ${u.osservazioni === 1 ? "osservazione" : "osservazioni"}`,

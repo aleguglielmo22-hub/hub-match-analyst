@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
+import { ArchiveLinksSection } from "@/components/links/archive-links-section";
+import { getSituationalLinks } from "@/app/(app)/collegamenti/actions";
 import { videoEmbedUrl } from "@/lib/links/external-links";
 import {
   MACRO_FASE_BADGE,
@@ -60,6 +62,7 @@ export default async function DettaglioSituazionalePage({
   const macro = MACRO_FASE_BADGE[s.macro_fase];
   // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
   const canEdit = workspace.isOwner || s.created_by === workspace.userId;
+  const archiveLinks = await getSituationalLinks(s.id);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-8 sm:py-10">
@@ -273,6 +276,14 @@ export default async function DettaglioSituazionalePage({
           </div>
         </section>
       )}
+
+      <ArchiveLinksSection
+        title="Clip e documenti"
+        emptyText="Nessuna voce del Cloud collegata."
+        canEdit={canEdit}
+        initial={archiveLinks}
+        other={{ kind: "situational", id: s.id }}
+      />
 
       <AttachmentsViewer entityType="situational" entityId={s.id} />
     </div>

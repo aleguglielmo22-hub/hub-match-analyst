@@ -9,7 +9,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ToggleChipGroup } from "@/components/archivio/multi-select-popover";
+import { MultiSelectPopover, ToggleChipGroup } from "@/components/archivio/multi-select-popover";
+import type { LookupOption } from "@/app/(app)/archivio/actions";
 import { RatingSlider } from "@/components/scouting/rating-slider";
 import {
   FASCIA_INGAGGIO_LABEL,
@@ -185,9 +186,12 @@ function OsservatiPicker({
 
 export function ScoutingFiltersSidebar({
   filters,
+  teams,
   className,
 }: {
   filters: ScoutingFilters;
+  /** Squadre condivise, per il filtro "Squadra attuale". */
+  teams: LookupOption[];
   className?: string;
 }) {
   const router = useRouter();
@@ -302,6 +306,13 @@ export function ScoutingFiltersSidebar({
         <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/50">
           Anagrafica
         </h3>
+        <MultiSelectPopover
+          label="Squadra attuale"
+          options={teams}
+          value={local.team_ids}
+          onChange={(v) => update({ team_ids: v })}
+          placeholder="Tutte"
+        />
         <AgeRange
           min={local.eta_min}
           max={local.eta_max}

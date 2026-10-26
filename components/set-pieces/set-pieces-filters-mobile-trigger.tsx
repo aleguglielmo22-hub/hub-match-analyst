@@ -14,13 +14,14 @@ import {
   type SetPiecesFilters,
 } from "@/lib/schemas/set-pieces-filters";
 import type { SharedLookups } from "@/app/(app)/lookups/actions";
+import type { LookupOption } from "@/app/(app)/archivio/actions";
 
 export function SetPiecesFiltersMobileTrigger({
   filters,
   lookups,
 }: {
   filters: SetPiecesFilters;
-  lookups: SharedLookups;
+  lookups: SharedLookups & { players: LookupOption[] };
 }) {
   const [open, setOpen] = useState(false);
   const count = countActiveSetPiecesFilters(filters);

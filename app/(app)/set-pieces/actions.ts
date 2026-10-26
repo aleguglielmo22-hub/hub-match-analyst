@@ -97,6 +97,17 @@ async function querySetPiecesPage(
   }
   if (filters?.competition_ids.length) q = q.in("competition_id", filters.competition_ids);
   if (filters?.season_ids.length) q = q.in("season_id", filters.season_ids);
+  if (filters?.player_ids.length) {
+    // Giocatore coinvolto (0014): piazzati collegati a quei giocatori.
+    const { data: rows, error: plError } = await supabase
+      .from("set_piece_players")
+      .select("set_piece_id")
+      .in("player_id", filters.player_ids);
+    if (plError) throw plError;
+    const ids = Array.from(new Set((rows ?? []).map((r) => r.set_piece_id)));
+    if (ids.length === 0) return { items: [], hasMore: false };
+    q = q.in("id", ids);
+  }
 
   if (filters?.fase.length) q = q.in("fase", filters.fase);
   if (filters?.tipo_piazzato.length)

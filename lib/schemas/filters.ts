@@ -27,6 +27,8 @@ export type ArchiveFilters = {
   tipo_media: TipoMediaEnum[];
   sorgente_video: SorgenteVideoEnum[];
   tag_ids: string[];
+  /** Voci collegate a questi giocatori (0014). */
+  player_ids: string[];
 };
 
 export const EMPTY_FILTERS: ArchiveFilters = {
@@ -39,6 +41,7 @@ export const EMPTY_FILTERS: ArchiveFilters = {
   tipo_media: [],
   sorgente_video: [],
   tag_ids: [],
+  player_ids: [],
 };
 
 /** Chiavi URL — corte e leggibili. */
@@ -54,6 +57,7 @@ const KEYS = {
   tipo: "tipo",
   sorgente: "sorgente",
   tag: "tag",
+  giocatore: "giocatore",
   q: "q",
   sort: "sort",
 } as const;
@@ -98,6 +102,7 @@ export function parseFiltersFromSearchParams(
     tipo_media: parseList(get(KEYS.tipo), TIPO_MEDIA_VALUES),
     sorgente_video: parseList(get(KEYS.sorgente), SORGENTE_VIDEO_VALUES),
     tag_ids: parseList(get(KEYS.tag)),
+    player_ids: parseList(get(KEYS.giocatore)),
   };
 }
 
@@ -127,6 +132,7 @@ export function filtersToSearchParams(
   if (filters.sorgente_video.length)
     sp.set(KEYS.sorgente, filters.sorgente_video.join(","));
   if (filters.tag_ids.length) sp.set(KEYS.tag, filters.tag_ids.join(","));
+  if (filters.player_ids.length) sp.set(KEYS.giocatore, filters.player_ids.join(","));
   return sp;
 }
 
@@ -138,6 +144,7 @@ export function countActiveFilters(f: ArchiveFilters): number {
   n += f.team_principale_ids.length ? 1 : 0;
   n += f.team_avversario_ids.length ? 1 : 0;
   n += f.competition_ids.length ? 1 : 0;
+  n += f.player_ids.length ? 1 : 0;
   n += f.ambito.length ? 1 : 0;
   n += f.categoria_lavoro.length ? 1 : 0;
   n += f.tipo_media.length ? 1 : 0;

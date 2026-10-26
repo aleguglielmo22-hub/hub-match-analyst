@@ -42,9 +42,14 @@ import {
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 import { ObservationsSection } from "@/components/scouting/observations-section";
+import { ArchiveLinksSection } from "@/components/links/archive-links-section";
+import { PlayerSetPiecesList } from "@/components/links/linked-lists";
+import { getPlayerLinks } from "@/app/(app)/collegamenti/actions";
 import { listPlayerObservations } from "@/app/(app)/scouting/osservazioni/actions";
 
 export const dynamic = "force-dynamic";
+
+type PlayerDetailRow = PlayerRow & { team_attuale: { nome: string } | null };
 
 export default async function DettaglioGiocatorePage({
   params,
@@ -57,20 +62,20 @@ export default async function DettaglioGiocatorePage({
   if (!isUuid(id)) notFound();
 
   let workspace: Awaited<ReturnType<typeof getCurrentWorkspace>> = null;
-  let player: PlayerRow | null = null;
+  let player: PlayerDetailRow | null = null;
   try {
     workspace = await getCurrentWorkspace();
     if (workspace) {
       const supabase = await createClient();
       const res = await supabase
         .from("players")
-        .select("*")
+        .select("*, team_attuale:teams!players_team_attuale_id_fkey(nome)")
         .eq("id", id)
         .eq("workspace_id", workspace.id)
         .is("deleted_at", null)
         .maybeSingle();
       if (res.error) throw res.error;
-      player = res.data as PlayerRow | null;
+      player = res.data as unknown as PlayerDetailRow | null;
     }
   } catch (err) {
     logLoadError("Scouting · dettaglio", err);
@@ -79,17 +84,18 @@ export default async function DettaglioGiocatorePage({
 
   if (!workspace) redirect("/login");
   if (!player) notFound();
-  const p = player as PlayerRow;
+  const p = player as PlayerDetailRow;
 
   // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
   const canEdit = workspace.isOwner || p.created_by === workspace.userId;
 
-  const obsRes = await listPlayerObservations(p.id);
+  const [obsRes, links] = await Promise.all([listPlayerObservations(p.id), getPlayerLinks(p.id)]);
   const observations = obsRes.ok ? obsRes.data : null;
   // Le vecchie note rapide si mostrano solo se non sono già state importate.
   const showNoteStoriche =
     !!p.note_rapide?.trim() && !!observations && !observations.some((o) => o.importata);
 
+  const squadra = p.team_attuale?.nome ?? p.squadra_attuale;
   const eta = calcolaEta(p.data_nascita);
   const dataNascitaFmt = p.data_nascita
     ? format(parseISO(p.data_nascita), "d MMMM yyyy", { locale: it })
@@ -223,6 +229,17 @@ export default async function DettaglioGiocatorePage({
       <ObservationsSection playerId={p.id} observations={observations} />
 
       <div className="grid gap-6 lg:grid-cols-2">
+        <PlayerSetPiecesList setPieces={links?.setPieces ?? null} />
+        <ArchiveLinksSection
+          title="Clip e documenti"
+          emptyText="Nessuna voce del Cloud collegata."
+          canEdit={canEdit}
+          initial={links?.archive ?? null}
+          other={{ kind: "player", id: p.id }}
+        />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Identità */}
         <section className="rounded-2xl border border-border/60 bg-card/40 p-5">
           <h2 className="mb-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -256,8 +273,23 @@ export default async function DettaglioGiocatorePage({
             Contratto & Mercato
           </h2>
           <dl className="space-y-2 text-sm">
-            {p.squadra_attuale && (
-              <Row label="Squadra attuale" value={p.squadra_attuale} />
+            {squadra && (
+              <Row
+                label="Squadra attuale"
+                value={
+                  p.team_attuale_id ? (
+                    <Link
+                      href={`/scouting?squadra=${p.team_attuale_id}`}
+                      className="text-primary hover:underline"
+                      title="Altri giocatori di questa squadra"
+                    >
+                      {squadra}
+                    </Link>
+                  ) : (
+                    squadra
+                  )
+                }
+              />
             )}
             {p.campionato && <Row label="Campionato" value={p.campionato} />}
             {scadenzaFmt && <Row label="Scadenza contratto" value={scadenzaFmt} />}

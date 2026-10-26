@@ -28,6 +28,8 @@ export function FiltersMobileTrigger({
     competitions: LookupOption[];
     seasons: LookupOption[];
     tags: LookupOption[];
+    /** Giocatori per il filtro "Giocatore". */
+    players: LookupOption[];
   };
 }) {
   const [open, setOpen] = useState(false);

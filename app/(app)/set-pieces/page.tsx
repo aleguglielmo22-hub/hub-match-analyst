@@ -6,7 +6,7 @@ import { SetPiecesList } from "@/components/set-pieces/set-pieces-list";
 import { SetPiecesFiltersSidebar } from "@/components/set-pieces/set-pieces-filters-sidebar";
 import { SetPiecesFiltersMobileTrigger } from "@/components/set-pieces/set-pieces-filters-mobile-trigger";
 import { SearchInput } from "@/components/archivio/search-input";
-import { getSharedLookups } from "@/app/(app)/lookups/actions";
+import { getPlayerOptions, getSharedLookups } from "@/app/(app)/lookups/actions";
 import { loadSetPiecesPage } from "./actions";
 import {
   countActiveSetPiecesFilters,
@@ -28,10 +28,12 @@ export default async function SetPiecesPage({
   const sp = await searchParams;
   const filters = parseSetPiecesFiltersFromSearchParams(sp);
 
-  const [initialPage, lookups] = await Promise.all([
+  const [initialPage, shared, players] = await Promise.all([
     loadSetPiecesPage({ sort: "recent", page: 0, filters }),
     getSharedLookups(),
+    getPlayerOptions(),
   ]);
+  const lookups = { ...shared, players };
 
   const activeCount = countActiveSetPiecesFilters(filters);
   const hasActiveSearchOrFilters = activeCount > 0 || !!filters.q;

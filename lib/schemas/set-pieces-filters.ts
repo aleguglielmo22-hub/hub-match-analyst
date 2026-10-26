@@ -25,6 +25,8 @@ export type SetPiecesFilters = {
   team_ids: string[];
   competition_ids: string[];
   season_ids: string[];
+  /** Giocatore coinvolto (0014). */
+  player_ids: string[];
 };
 
 export const EMPTY_SET_PIECES_FILTERS: SetPiecesFilters = {
@@ -36,6 +38,7 @@ export const EMPTY_SET_PIECES_FILTERS: SetPiecesFilters = {
   team_ids: [],
   competition_ids: [],
   season_ids: [],
+  player_ids: [],
 };
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -83,6 +86,7 @@ export function parseSetPiecesFiltersFromSearchParams(
     team_ids: parseUuidList(getParam(params, "squadra")),
     competition_ids: parseUuidList(getParam(params, "comp")),
     season_ids: parseUuidList(getParam(params, "stag")),
+    player_ids: parseUuidList(getParam(params, "giocatore")),
   };
 }
 
@@ -91,7 +95,7 @@ export function setPiecesFiltersToSearchParams(
   base?: URLSearchParams,
 ): URLSearchParams {
   const sp = new URLSearchParams(base);
-  for (const k of ["q", "fase", "tipo", "spec", "lato", "esito", "squadra", "comp", "stag"]) sp.delete(k);
+  for (const k of ["q", "fase", "tipo", "spec", "lato", "esito", "squadra", "comp", "stag", "giocatore"]) sp.delete(k);
   if (filters.q) sp.set("q", filters.q);
   if (filters.fase.length) sp.set("fase", filters.fase.join(","));
   if (filters.tipo_piazzato.length)
@@ -105,6 +109,7 @@ export function setPiecesFiltersToSearchParams(
   if (filters.team_ids.length) sp.set("squadra", filters.team_ids.join(","));
   if (filters.competition_ids.length) sp.set("comp", filters.competition_ids.join(","));
   if (filters.season_ids.length) sp.set("stag", filters.season_ids.join(","));
+  if (filters.player_ids.length) sp.set("giocatore", filters.player_ids.join(","));
   return sp;
 }
 
@@ -119,5 +124,6 @@ export function countActiveSetPiecesFilters(f: SetPiecesFilters): number {
   if (f.team_ids.length) n++;
   if (f.competition_ids.length) n++;
   if (f.season_ids.length) n++;
+  if (f.player_ids.length) n++;
   return n;
 }

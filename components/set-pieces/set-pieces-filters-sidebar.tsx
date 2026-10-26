@@ -34,6 +34,7 @@ import {
   type SetPiecesFilters,
 } from "@/lib/schemas/set-pieces-filters";
 import type { SharedLookups } from "@/app/(app)/lookups/actions";
+import type { LookupOption } from "@/app/(app)/archivio/actions";
 
 export function SetPiecesFiltersSidebar({
   filters,
@@ -41,8 +42,8 @@ export function SetPiecesFiltersSidebar({
   className,
 }: {
   filters: SetPiecesFilters;
-  /** Squadre, competizioni e stagioni per i filtri di contesto. */
-  lookups: SharedLookups;
+  /** Squadre, competizioni e stagioni per i filtri di contesto, più i giocatori. */
+  lookups: SharedLookups & { players: LookupOption[] };
   className?: string;
 }) {
   const router = useRouter();
@@ -166,6 +167,13 @@ export function SetPiecesFiltersSidebar({
         <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/50">
           Contesto
         </h3>
+        <MultiSelectPopover
+          label="Giocatore coinvolto"
+          options={lookups.players}
+          value={local.player_ids}
+          onChange={(v) => update({ player_ids: v })}
+          placeholder="Tutti"
+        />
         <MultiSelectPopover
           label="Squadra (esecutrice o avversaria)"
           options={lookups.teams}

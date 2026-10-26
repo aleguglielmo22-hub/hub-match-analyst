@@ -54,6 +54,8 @@ import {
   type RuoloEnum,
 } from "@/lib/types/scouting";
 import { createPlayer, updatePlayer } from "@/app/(app)/scouting/actions";
+import { createTeam, type LookupOption } from "@/app/(app)/archivio/actions";
+import { Combobox } from "@/components/archivio/combobox";
 import {
   AttachmentsField,
   type PendingAttachment,
@@ -333,10 +335,14 @@ function RatingNumberInput({
  */
 export function PlayerForm({
   existing,
+  teams: initialTeams,
 }: {
   existing?: { id: string; values: PlayerFormValues; updatedAt: string };
+  /** Squadre condivise (recenti in cima). */
+  teams: LookupOption[];
 }) {
   const router = useRouter();
+  const [teams, setTeams] = useState(initialTeams);
   const [submitting, setSubmitting] = useState(false);
   const [pendingAttachments, setPendingAttachments] = useState<
     PendingAttachment[]
@@ -666,8 +672,21 @@ export function PlayerForm({
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="squadra_attuale">Squadra attuale</Label>
-            <Input id="squadra_attuale" {...form.register("squadra_attuale")} />
+            <Label>Squadra attuale</Label>
+            <Controller
+              control={form.control}
+              name="team_attuale_id"
+              render={({ field }) => (
+                <Combobox
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                  options={teams}
+                  placeholder="Cerca o crea…"
+                  onCreate={createTeam}
+                  onCreated={(opt) => setTeams((t) => [opt, ...t])}
+                />
+              )}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="campionato">Campionato / Lega</Label>

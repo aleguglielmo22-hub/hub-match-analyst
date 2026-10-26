@@ -118,6 +118,135 @@ export type Database = {
           },
         ]
       }
+      archive_item_players: {
+        Row: {
+          archive_item_id: string
+          created_at: string
+          created_by: string
+          player_id: string
+        }
+        Insert: {
+          archive_item_id: string
+          created_at?: string
+          created_by?: string
+          player_id: string
+        }
+        Update: {
+          archive_item_id?: string
+          created_at?: string
+          created_by?: string
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archive_item_players_archive_item_id_fkey"
+            columns: ["archive_item_id"]
+            isOneToOne: false
+            referencedRelation: "archive_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "archive_item_players_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "archive_item_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      archive_item_set_pieces: {
+        Row: {
+          archive_item_id: string
+          created_at: string
+          created_by: string
+          set_piece_id: string
+        }
+        Insert: {
+          archive_item_id: string
+          created_at?: string
+          created_by?: string
+          set_piece_id: string
+        }
+        Update: {
+          archive_item_id?: string
+          created_at?: string
+          created_by?: string
+          set_piece_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archive_item_set_pieces_archive_item_id_fkey"
+            columns: ["archive_item_id"]
+            isOneToOne: false
+            referencedRelation: "archive_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "archive_item_set_pieces_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "archive_item_set_pieces_set_piece_id_fkey"
+            columns: ["set_piece_id"]
+            isOneToOne: false
+            referencedRelation: "set_pieces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      archive_item_situational: {
+        Row: {
+          archive_item_id: string
+          created_at: string
+          created_by: string
+          situational_id: string
+        }
+        Insert: {
+          archive_item_id: string
+          created_at?: string
+          created_by?: string
+          situational_id: string
+        }
+        Update: {
+          archive_item_id?: string
+          created_at?: string
+          created_by?: string
+          situational_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "archive_item_situational_archive_item_id_fkey"
+            columns: ["archive_item_id"]
+            isOneToOne: false
+            referencedRelation: "archive_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "archive_item_situational_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "archive_item_situational_situational_id_fkey"
+            columns: ["situational_id"]
+            isOneToOne: false
+            referencedRelation: "situational_tactics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       archive_item_tags: {
         Row: {
           archive_item_id: string
@@ -529,6 +658,7 @@ export type Database = {
           struttura_corporea:
             | Database["public"]["Enums"]["struttura_corporea_enum"]
             | null
+          team_attuale_id: string | null
           tec_calci_angolo: number | null
           tec_colpi_testa: number | null
           tec_contrasti: number | null
@@ -634,6 +764,7 @@ export type Database = {
           struttura_corporea?:
             | Database["public"]["Enums"]["struttura_corporea_enum"]
             | null
+          team_attuale_id?: string | null
           tec_calci_angolo?: number | null
           tec_colpi_testa?: number | null
           tec_contrasti?: number | null
@@ -739,6 +870,7 @@ export type Database = {
           struttura_corporea?:
             | Database["public"]["Enums"]["struttura_corporea_enum"]
             | null
+          team_attuale_id?: string | null
           tec_calci_angolo?: number | null
           tec_colpi_testa?: number | null
           tec_contrasti?: number | null
@@ -768,6 +900,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "players_team_attuale_id_fkey"
+            columns: ["team_attuale_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
           {
@@ -831,6 +970,55 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      set_piece_players: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          player_id: string
+          ruolo: Database["public"]["Enums"]["sp_ruolo_giocatore_enum"]
+          set_piece_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          player_id: string
+          ruolo?: Database["public"]["Enums"]["sp_ruolo_giocatore_enum"]
+          set_piece_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          player_id?: string
+          ruolo?: Database["public"]["Enums"]["sp_ruolo_giocatore_enum"]
+          set_piece_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "set_piece_players_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "set_piece_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "set_piece_players_set_piece_id_fkey"
+            columns: ["set_piece_id"]
+            isOneToOne: false
+            referencedRelation: "set_pieces"
             referencedColumns: ["id"]
           },
         ]
@@ -1432,6 +1620,18 @@ export type Database = {
       sp_fase_enum: "OFFENSIVO" | "DIFENSIVO"
       sp_lato_battuta_enum: "DESTRO" | "SINISTRO" | "CENTRALE"
       sp_piede_battitore_enum: "DESTRO" | "SINISTRO" | "DUE_SULLA_PALLA"
+      sp_ruolo_giocatore_enum:
+        | "BATTITORE"
+        | "BERSAGLIO"
+        | "BLOCCO"
+        | "SECONDO_PALO"
+        | "FINALIZZATORE"
+        | "MARCATORE"
+        | "ZONA"
+        | "PALO"
+        | "BARRIERA"
+        | "UOMO_RIPARTENZA"
+        | "ALTRO"
       sp_sistema_marcatura_enum: "A_UOMO" | "A_ZONA" | "MISTA"
       sp_specificazione_punizione_enum: "CENTRALE" | "LATERALE"
       sp_sviluppo_schema_enum:
@@ -1686,6 +1886,19 @@ export const Constants = {
       sp_fase_enum: ["OFFENSIVO", "DIFENSIVO"],
       sp_lato_battuta_enum: ["DESTRO", "SINISTRO", "CENTRALE"],
       sp_piede_battitore_enum: ["DESTRO", "SINISTRO", "DUE_SULLA_PALLA"],
+      sp_ruolo_giocatore_enum: [
+        "BATTITORE",
+        "BERSAGLIO",
+        "BLOCCO",
+        "SECONDO_PALO",
+        "FINALIZZATORE",
+        "MARCATORE",
+        "ZONA",
+        "PALO",
+        "BARRIERA",
+        "UOMO_RIPARTENZA",
+        "ALTRO",
+      ],
       sp_sistema_marcatura_enum: ["A_UOMO", "A_ZONA", "MISTA"],
       sp_specificazione_punizione_enum: ["CENTRALE", "LATERALE"],
       sp_sviluppo_schema_enum: [

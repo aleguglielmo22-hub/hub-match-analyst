@@ -4,6 +4,7 @@ import { getSetPieceForEdit } from "@/app/(app)/set-pieces/actions";
 import { SetPieceForm } from "@/components/set-pieces/set-piece-form";
 import { PageLoadError } from "@/components/app/load-error";
 import { getSharedLookups } from "@/app/(app)/lookups/actions";
+import { getSetPieceLinks } from "@/app/(app)/collegamenti/actions";
 
 export const metadata = {
   title: "Modifica schema · Set Pieces DB",
@@ -30,13 +31,15 @@ export default async function ModificaSetPiecePage({
   // Solo creatore o owner del workspace: in caso contrario torna al dettaglio.
   if (!sp.can_edit) redirect(`/set-pieces/${id}`);
 
-  const lookups = await getSharedLookups();
+  const [lookups, links] = await Promise.all([getSharedLookups(), getSetPieceLinks(id)]);
+  // Senza collegamenti caricati il form li azzererebbe al salvataggio.
+  if (!links) return <PageLoadError />;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-8 sm:py-10">
       <SetPieceForm
         lookups={lookups}
-        existing={{ id: sp.id, values: sp.values, updatedAt: sp.updated_at }}
+        existing={{ id: sp.id, values: sp.values, updatedAt: sp.updated_at, links }}
       />
     </div>
   );

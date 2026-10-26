@@ -406,4 +406,8 @@ export type PlayerListItem = Pick<
   | "voto_potenziale"
   | "ultima_osservazione"
   | "numero_osservazioni"
->;
+  | "team_attuale_id"
+> & {
+  /** Nome attuale della squadra collegata (prevale sul vecchio testo). */
+  team_attuale: { nome: string } | null;
+};

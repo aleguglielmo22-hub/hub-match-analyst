@@ -13,11 +13,14 @@ import {
   countActiveScoutingFilters,
   type ScoutingFilters,
 } from "@/lib/schemas/scouting-filters";
+import type { LookupOption } from "@/app/(app)/archivio/actions";
 
 export function ScoutingFiltersMobileTrigger({
   filters,
+  teams,
 }: {
   filters: ScoutingFilters;
+  teams: LookupOption[];
 }) {
   const [open, setOpen] = useState(false);
   const count = countActiveScoutingFilters(filters);
@@ -35,7 +38,7 @@ export function ScoutingFiltersMobileTrigger({
       </SheetTrigger>
       <SheetContent side="left" className="w-80 overflow-y-auto p-5">
         <SheetTitle className="sr-only">Filtri Scouting DB</SheetTitle>
-        <ScoutingFiltersSidebar filters={filters} />
+        <ScoutingFiltersSidebar filters={filters} teams={teams} />
       </SheetContent>
     </Sheet>
   );

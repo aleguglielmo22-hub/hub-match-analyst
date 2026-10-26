@@ -12,6 +12,8 @@ import {
 } from "@/lib/types/archivio";
 import { ArchiveFilesViewer } from "./archive-files-viewer";
 import { ArchiveLinks } from "./archive-links";
+import { ArchiveLinksSection } from "@/components/links/archive-links-section";
+import type { LinkTarget } from "@/app/(app)/collegamenti/actions";
 import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 import type { ArchiveDetail as ArchiveDetailType } from "@/app/(app)/archivio/types";
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
@@ -33,7 +35,14 @@ function Meta({
   );
 }
 
-export function ArchiveDetail({ item }: { item: ArchiveDetailType }) {
+export function ArchiveDetail({
+  item,
+  links,
+}: {
+  item: ArchiveDetailType;
+  /** Collegamenti con Scouting, Set Pieces e Training (null = errore). */
+  links: { players: LinkTarget[]; setPieces: LinkTarget[]; situational: LinkTarget[] } | null;
+}) {
   const dataFormatted = format(parseISO(item.data_lavoro), "EEEE d MMMM yyyy", {
     locale: it,
   });
@@ -182,6 +191,31 @@ export function ArchiveDetail({ item }: { item: ArchiveDetailType }) {
               </div>
             </section>
           )}
+
+          <ArchiveLinksSection
+            title="Giocatori"
+            emptyText="Nessun giocatore collegato."
+            canEdit={item.can_edit}
+            initial={links?.players ?? null}
+            archiveId={item.id}
+            pick="player"
+          />
+          <ArchiveLinksSection
+            title="Piazzati"
+            emptyText="Nessun piazzato collegato."
+            canEdit={item.can_edit}
+            initial={links?.setPieces ?? null}
+            archiveId={item.id}
+            pick="set_piece"
+          />
+          <ArchiveLinksSection
+            title="Esercitazioni"
+            emptyText="Nessuna esercitazione collegata."
+            canEdit={item.can_edit}
+            initial={links?.situational ?? null}
+            archiveId={item.id}
+            pick="situational"
+          />
 
           <p className="text-[10px] text-muted-foreground/60">
             Aggiornato {updatedFormatted}

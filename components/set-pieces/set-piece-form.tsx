@@ -57,6 +57,12 @@ import {
 import type { SharedLookups } from "@/app/(app)/lookups/actions";
 import { Combobox } from "@/components/archivio/combobox";
 import { teamsForPhase } from "@/lib/set-pieces/defaults";
+import { syncSetPieceLinks, type LinkTarget } from "@/app/(app)/collegamenti/actions";
+import {
+  ArchiveLinksField,
+  SetPiecePlayersField,
+  type FormSetPiecePlayer,
+} from "@/components/links/set-piece-links-field";
 import { todayIso } from "@/lib/schemas/observations";
 import {
   AttachmentsField,
@@ -181,7 +187,13 @@ export function SetPieceForm({
   defaults,
 }: {
   /** Se presente, il form è in modalità modifica (valori precompilati). */
-  existing?: { id: string; values: SetPieceFormValues; updatedAt: string };
+  existing?: {
+    id: string;
+    values: SetPieceFormValues;
+    updatedAt: string;
+    /** Collegamenti attuali (giocatori con ruolo, voci del Cloud). */
+    links: { players: FormSetPiecePlayer[]; archive: LinkTarget[] };
+  };
   /** Squadre, competizioni e stagioni condivise (recenti in cima). */
   lookups: SharedLookups;
   /** Mia squadra dalle preferenze: predefinita in base alla fase (solo nuovi). */
@@ -190,6 +202,10 @@ export function SetPieceForm({
   defaults?: SetPieceFormValues;
 }) {
   const [lookups, setLookups] = useState(initialLookups);
+  // Collegamenti: si salvano dopo il piazzato e fanno parte della bozza.
+  const [links, setLinks] = useState<{ players: FormSetPiecePlayer[]; archive: LinkTarget[] }>(
+    () => existing?.links ?? { players: [], archive: [] },
+  );
   // Squadre scelte a mano: il cambio fase non le sovrascrive.
   const touchedTeams = useRef({ esecutrice: !!existing, avversaria: !!existing });
   const router = useRouter();
@@ -219,6 +235,8 @@ export function SetPieceForm({
     itemUpdatedAt: existing?.updatedAt,
     newItemId: existing ? undefined : newId,
     onRestoreNewItemId: setNewId,
+    extra: links,
+    onRestoreExtra: setLinks,
   });
   const restoreDraft = () => {
     // Le squadre della bozza contano come scelte dall'utente.
@@ -308,6 +326,20 @@ export function SetPieceForm({
       return;
     }
     draft.markSaved();
+
+    try {
+      await syncSetPieceLinks(id, {
+        players: links.players.map((p) => ({ player_id: p.id, ruolo: p.ruolo })),
+        archiveIds: links.archive.map((a) => a.id),
+      });
+    } catch (err) {
+      toast.warning("Schema salvato, ma i collegamenti non sono stati aggiornati", {
+        description: `${err instanceof Error ? err.message : "Errore sconosciuto"} Riprova dalla pagina di modifica.`,
+        duration: 10000,
+      });
+      window.location.assign(`/set-pieces/${id}/modifica`);
+      return;
+    }
 
     const { failed } = await uploadPendingAttachments(
       "set_piece",
@@ -981,6 +1013,27 @@ export function SetPieceForm({
           />
           <FieldError message={form.formState.errors.pdf_url?.message} />
         </div>
+      </FormSection>
+
+      {/* Collegamenti con Scouting e Cloud */}
+      <FormSection
+        title="Giocatori coinvolti"
+        description="Chi batte, chi attacca il pallone, chi marca… con il ruolo nel piazzato."
+      >
+        <SetPiecePlayersField
+          fase={fase}
+          value={links.players}
+          onChange={(players) => setLinks((l) => ({ ...l, players }))}
+        />
+      </FormSection>
+      <FormSection
+        title="Clip e documenti"
+        description="Voci del Cloud collegate a questo piazzato (clip, report, slide)."
+      >
+        <ArchiveLinksField
+          value={links.archive}
+          onChange={(archive) => setLinks((l) => ({ ...l, archive }))}
+        />
       </FormSection>
 
       {/* Allegati (file reali su storage privato) */}

@@ -41,6 +41,8 @@ export type ScoutingFilters = {
   status_osservazione: StatusOsservazioneEnum[];
   voto_potenziale: VotoPotenzialeEnum[];
   scadenza_quick?: ScadenzaQuick;
+  /** Squadra attuale (anagrafica). */
+  team_ids: string[];
   /** Solo giocatori con un'osservazione negli ultimi N giorni. */
   osservati_giorni?: OsservatiGiorni;
   /** Soglia minima per ogni attributo FM (assente = nessun filtro). */
@@ -54,8 +56,11 @@ export const EMPTY_SCOUTING_FILTERS: ScoutingFilters = {
   fascia_ingaggio: [],
   status_osservazione: [],
   voto_potenziale: [],
+  team_ids: [],
   ratings_min: {},
 };
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const SCADENZA_ALLOWED: readonly ScadenzaQuick[] = [
   "ENTRO_6_MESI",
@@ -122,6 +127,10 @@ export function parseScoutingFiltersFromSearchParams(
   return {
     q,
     osservati_giorni,
+    team_ids: (getParam(params, "squadra") ?? "")
+      .split(",")
+      .map((v) => v.trim())
+      .filter((v) => UUID_RE.test(v)),
     eta_min: parseAge(getParam(params, "eta_min")),
     eta_max: parseAge(getParam(params, "eta_max")),
     passaporto: parseList(getParam(params, "pass"), PASSAPORTO_VALUES),
@@ -158,6 +167,7 @@ export function scoutingFiltersToSearchParams(
     "voto",
     "scad",
     "oss",
+    "squadra",
     ...RATING_KEYS.map((k) => ratingUrlKey(k)),
   ];
   for (const k of KEYS_TO_RESET) sp.delete(k);
@@ -177,6 +187,7 @@ export function scoutingFiltersToSearchParams(
     sp.set("voto", filters.voto_potenziale.join(","));
   if (filters.scadenza_quick) sp.set("scad", filters.scadenza_quick);
   if (filters.osservati_giorni) sp.set("oss", String(filters.osservati_giorni));
+  if (filters.team_ids.length) sp.set("squadra", filters.team_ids.join(","));
   for (const k of RATING_KEYS) {
     const v = filters.ratings_min[k];
     if (typeof v === "number" && v >= 1 && v <= 10)
@@ -197,6 +208,7 @@ export function countActiveScoutingFilters(f: ScoutingFilters): number {
   if (f.voto_potenziale.length) n++;
   if (f.scadenza_quick) n++;
   if (f.osservati_giorni) n++;
+  if (f.team_ids.length) n++;
   n += Object.keys(f.ratings_min).length;
   return n;
 }

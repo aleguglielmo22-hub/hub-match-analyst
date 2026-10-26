@@ -8,6 +8,7 @@ import { ScoutingFiltersMobileTrigger } from "@/components/scouting/scouting-fil
 import { SearchInput } from "@/components/archivio/search-input";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { loadPlayersPage } from "./actions";
+import { getSharedLookups } from "@/app/(app)/lookups/actions";
 import {
   countActiveScoutingFilters,
   parseScoutingFiltersFromSearchParams,
@@ -31,11 +32,10 @@ export default async function ScoutingPage({
   // Se il DB non risponde, l'errore lo mostra la lista (con Riprova).
   const workspace = await getCurrentWorkspace().catch(() => null);
 
-  const initialPage = await loadPlayersPage({
-    sort: "recent",
-    page: 0,
-    filters,
-  });
+  const [initialPage, { teams }] = await Promise.all([
+    loadPlayersPage({ sort: "recent", page: 0, filters }),
+    getSharedLookups(),
+  ]);
 
   const activeCount = countActiveScoutingFilters(filters);
   const hasActiveSearchOrFilters = activeCount > 0 || !!filters.q;
@@ -74,6 +74,7 @@ export default async function ScoutingPage({
       <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <ScoutingFiltersSidebar
           filters={filters}
+          teams={teams}
           className="hidden lg:block"
         />
 
@@ -87,7 +88,7 @@ export default async function ScoutingPage({
               />
             </div>
             <div className="lg:hidden">
-              <ScoutingFiltersMobileTrigger filters={filters} />
+              <ScoutingFiltersMobileTrigger filters={filters} teams={teams} />
             </div>
           </div>
 

@@ -57,6 +57,9 @@ export function PlayerCard({
     ? format(parseISO(player.scadenza_contratto), "MMM yyyy", { locale: it })
     : null;
 
+  // Nome attuale della squadra collegata, altrimenti il vecchio testo.
+  const squadra = player.team_attuale?.nome ?? player.squadra_attuale;
+
   return (
     <div className="relative">
       {canEdit && (
@@ -123,11 +126,11 @@ export function PlayerCard({
       </div>
 
       <div className="mt-auto space-y-1.5 border-t border-border/40 px-4 py-3 text-[11px]">
-        {(player.squadra_attuale || player.campionato) && (
+        {(squadra || player.campionato) && (
           <p className="flex items-center gap-1.5 text-foreground/80">
             <MapPin className="h-3 w-3 text-muted-foreground" />
             <span className="truncate font-medium">
-              {player.squadra_attuale ?? "—"}
+              {squadra ?? "—"}
             </span>
             {player.campionato && (
               <>

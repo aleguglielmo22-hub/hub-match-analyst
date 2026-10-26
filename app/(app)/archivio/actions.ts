@@ -88,6 +88,18 @@ async function queryArchivePage(
     if (tagFilteredIds.length === 0) return { items: [], hasMore: false };
   }
 
+  // Giocatore collegato (0014): stesse modalità del filtro per tag.
+  let playerFilteredIds: string[] | null = null;
+  if (filters?.player_ids.length) {
+    const { data: rows, error: plError } = await supabase
+      .from("archive_item_players")
+      .select("archive_item_id")
+      .in("player_id", filters.player_ids);
+    if (plError) throw plError;
+    playerFilteredIds = Array.from(new Set((rows ?? []).map((r) => r.archive_item_id)));
+    if (playerFilteredIds.length === 0) return { items: [], hasMore: false };
+  }
+
   const from = page * PAGE_SIZE;
   const to = from + PAGE_SIZE;
 
@@ -126,6 +138,7 @@ async function queryArchivePage(
   if (filters?.sorgente_video.length)
     q = q.in("sorgente_video", filters.sorgente_video);
   if (tagFilteredIds) q = q.in("id", tagFilteredIds);
+  if (playerFilteredIds) q = q.in("id", playerFilteredIds);
 
   if (query) {
     q = q.textSearch("search_vector", query, {

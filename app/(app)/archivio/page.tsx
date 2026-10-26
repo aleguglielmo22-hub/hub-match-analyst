@@ -5,6 +5,7 @@ import { SectionHeader } from "@/components/app/section-header";
 import { ArchiveList } from "@/components/archivio/archive-list";
 import { FiltersSidebar } from "@/components/archivio/filters-sidebar";
 import { FiltersMobileTrigger } from "@/components/archivio/filters-mobile-trigger";
+import { getPlayerOptions } from "@/app/(app)/lookups/actions";
 import { SearchInput } from "@/components/archivio/search-input";
 import {
   getLookupOptions,
@@ -32,10 +33,12 @@ export default async function ArchivioPage({
   const queryRaw = Array.isArray(sp.q) ? sp.q[0] : sp.q;
   const query = queryRaw?.trim() || undefined;
 
-  const [lookups, initialPage] = await Promise.all([
+  const [baseLookups, players, initialPage] = await Promise.all([
     getLookupOptions(),
+    getPlayerOptions(),
     loadArchivePage({ sort: "recent", page: 0, filters, query }),
   ]);
+  const lookups = { ...baseLookups, players };
 
   const activeCount = countActiveFilters(filters);
   const hasActiveSearchOrFilters = activeCount > 0 || !!query;
