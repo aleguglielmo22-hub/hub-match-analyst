@@ -205,6 +205,19 @@ export const ESITO_FINALE_LABEL: Record<EsitoFinaleEnum, string> = {
 
 // Colori degli esiti (per fase, dal punto di vista della mia squadra): vedi ESITO_TONE in lib/tones.ts.
 
+/**
+ * Etichetta dell'esito secondo la fase: nei piazzati difensivi la
+ * "Transizione subìta" è una ripartenza nostra. Il valore salvato non cambia.
+ * Con fase sconosciuta (es. filtro su entrambe le fasi) mostra entrambi i nomi.
+ */
+export function esitoLabel(esito: EsitoFinaleEnum, fase: FaseEnum | null): string {
+  if (esito === "TRANSIZIONE_SUBITA") {
+    if (fase === "DIFENSIVO") return "Ripartenza nostra";
+    if (fase === null) return "Transizione subìta / Ripartenza nostra";
+  }
+  return ESITO_FINALE_LABEL[esito];
+}
+
 /** Sotto-insieme della Row usato nelle card della lista. */
 export type SetPieceListItem = Pick<
   SetPieceRow,

@@ -18,7 +18,7 @@ import {
   ALTEZZA_LINEA_LABEL,
   ALTEZZA_LINEA_VALUES,
   BEHAVIOR_TAGS_PRESET,
-  ESITO_FINALE_LABEL,
+  esitoLabel,
   ESITO_FINALE_VALUES,
   FASE_LABEL,
   FASE_VALUES,
@@ -39,6 +39,7 @@ import {
   TRAIETTORIA_VALUES,
   UOMINI_SUI_PALI_LABEL,
   UOMINI_SUI_PALI_VALUES,
+  type EsitoFinaleEnum,
   type FaseEnum,
   type TipoPiazzatoEnum,
 } from "@/lib/types/set-pieces";
@@ -47,7 +48,7 @@ import {
   setPieceFormSchema,
   type SetPieceFormValues,
 } from "@/lib/schemas/set-pieces";
-import { createSetPiece } from "@/app/(app)/set-pieces/actions";
+import { createSetPiece, updateSetPiece } from "@/app/(app)/set-pieces/actions";
 import {
   AttachmentsField,
   type PendingAttachment,
@@ -162,8 +163,16 @@ function PresetTagToggle({
  * I reset sono fondamentali sia per la UX (niente valori "fantasma" salvati
  * accidentalmente) sia per i CHECK constraint a DB che enforce la mutua esclusione.
  */
-export function SetPieceForm() {
+export function SetPieceForm({
+  existing,
+}: {
+  /** Se presente, il form è in modalità modifica (valori precompilati). */
+  existing?: { id: string; values: SetPieceFormValues };
+} = {}) {
   const router = useRouter();
+  const isEdit = !!existing;
+  const cancelHref = existing ? `/set-pieces/${existing.id}` : "/set-pieces";
+  const submitLabel = isEdit ? "Salva modifiche" : "Salva schema";
   const [submitting, setSubmitting] = useState(false);
   const [pendingAttachments, setPendingAttachments] = useState<
     PendingAttachment[]
@@ -171,7 +180,7 @@ export function SetPieceForm() {
 
   const form = useForm<SetPieceFormValues>({
     resolver: zodResolver(setPieceFormSchema),
-    defaultValues: emptySetPieceForm(),
+    defaultValues: existing?.values ?? emptySetPieceForm(),
   });
 
   // Osserviamo i due valori che pilotano la reattività condizionale.
@@ -216,7 +225,9 @@ export function SetPieceForm() {
   async function onSubmit(values: SetPieceFormValues) {
     setSubmitting(true);
     try {
-      const { id } = await createSetPiece(values);
+      const { id } = existing
+        ? await updateSetPiece(existing.id, values)
+        : await createSetPiece(values);
       if (pendingAttachments.length > 0) {
         await uploadPendingAttachments(
           "set_piece",
@@ -224,7 +235,7 @@ export function SetPieceForm() {
           pendingAttachments.map((p) => p.file),
         );
       }
-      toast.success("Schema salvato");
+      toast.success(isEdit ? "Modifiche salvate" : "Schema salvato");
       router.push(`/set-pieces/${id}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore sconosciuto";
@@ -242,14 +253,14 @@ export function SetPieceForm() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <Link
-            href="/set-pieces"
+            href={cancelHref}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Torna ai Set Pieces DB
+            {isEdit ? "Torna al dettaglio" : "Torna ai Set Pieces DB"}
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Aggiungi schema
+            {isEdit ? "Modifica schema" : "Aggiungi schema"}
           </h1>
         </div>
         <div className="flex items-center gap-2">
@@ -257,7 +268,7 @@ export function SetPieceForm() {
             type="button"
             variant="ghost"
             disabled={submitting}
-            onClick={() => router.push("/set-pieces")}
+            onClick={() => router.push(cancelHref)}
           >
             <X className="mr-2 h-4 w-4" />
             Annulla
@@ -271,7 +282,7 @@ export function SetPieceForm() {
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Salva schema
+                {submitLabel}
               </>
             )}
           </Button>
@@ -765,12 +776,16 @@ export function SetPieceForm() {
                 onValueChange={(v) => field.onChange(v || null)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="—" />
+                  <SelectValue>
+                    {(v: EsitoFinaleEnum | "" | null) =>
+                      v ? esitoLabel(v, fase) : "—"
+                    }
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {ESITO_FINALE_VALUES.map((v) => (
                     <SelectItem key={v} value={v}>
-                      {ESITO_FINALE_LABEL[v]}
+                      {esitoLabel(v, fase)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -835,20 +850,20 @@ export function SetPieceForm() {
       {/* Allegati (file reali su storage privato) */}
       <FormSection
         title="Allegati"
-        description="Carica file reali (video, PDF, slide, immagini…) oltre ai link."
+        description="File leggeri (PDF, immagini, documenti Office) oltre ai link. Per i video usa un link."
       >
         <AttachmentsField
           entityType="set_piece"
-          entityId={null}
+          entityId={existing?.id ?? null}
           pending={pendingAttachments}
           onPendingChange={setPendingAttachments}
         />
       </FormSection>
 
       <MobileSaveBar
-        label={"Salva schema"}
+        label={submitLabel}
         submitting={submitting}
-        onCancel={() => router.push("/set-pieces")}
+        onCancel={() => router.push(cancelHref)}
       />
 
       <div className="flex items-center justify-end gap-2 pb-8 max-md:hidden">
@@ -856,7 +871,7 @@ export function SetPieceForm() {
           type="button"
           variant="ghost"
           disabled={submitting}
-          onClick={() => router.push("/set-pieces")}
+          onClick={() => router.push(cancelHref)}
         >
           Annulla
         </Button>
@@ -869,7 +884,7 @@ export function SetPieceForm() {
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />
-              Salva schema
+              {submitLabel}
             </>
           )}
         </Button>

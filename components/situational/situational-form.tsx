@@ -24,7 +24,10 @@ import {
   type MacroFaseEnum,
   type SottoFaseEnum,
 } from "@/lib/types/situational";
-import { createSituational } from "@/app/(app)/situational/actions";
+import {
+  createSituational,
+  updateSituational,
+} from "@/app/(app)/situational/actions";
 import {
   AttachmentsField,
   type PendingAttachment,
@@ -173,8 +176,16 @@ function FreeChipInput({
  *     di sicurezza finale: se in qualunque modo passasse una coppia
  *     incompatibile, il submit fallisce con messaggio chiaro.
  */
-export function SituationalForm() {
+export function SituationalForm({
+  existing,
+}: {
+  /** Se presente, il form è in modalità modifica (valori precompilati). */
+  existing?: { id: string; values: SituationalFormValues };
+} = {}) {
   const router = useRouter();
+  const isEdit = !!existing;
+  const cancelHref = existing ? `/situational/${existing.id}` : "/situational";
+  const submitLabel = isEdit ? "Salva modifiche" : "Salva";
   const [submitting, setSubmitting] = useState(false);
   const [pendingAttachments, setPendingAttachments] = useState<
     PendingAttachment[]
@@ -182,7 +193,7 @@ export function SituationalForm() {
 
   const form = useForm<SituationalFormValues>({
     resolver: zodResolver(situationalFormSchema),
-    defaultValues: emptySituationalForm(),
+    defaultValues: existing?.values ?? emptySituationalForm(),
   });
 
   // [1] osservo la macro-fase selezionata
@@ -207,7 +218,9 @@ export function SituationalForm() {
   async function onSubmit(values: SituationalFormValues) {
     setSubmitting(true);
     try {
-      const { id } = await createSituational(values);
+      const { id } = existing
+        ? await updateSituational(existing.id, values)
+        : await createSituational(values);
       if (pendingAttachments.length > 0) {
         await uploadPendingAttachments(
           "situational",
@@ -215,7 +228,7 @@ export function SituationalForm() {
           pendingAttachments.map((p) => p.file),
         );
       }
-      toast.success("Situazione salvata");
+      toast.success(isEdit ? "Modifiche salvate" : "Situazione salvata");
       router.push(`/situational/${id}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore sconosciuto";
@@ -233,14 +246,14 @@ export function SituationalForm() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <Link
-            href="/situational"
+            href={cancelHref}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Torna al Training
+            {isEdit ? "Torna al dettaglio" : "Torna al Training"}
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Nuova situazione / esercizio
+            {isEdit ? "Modifica situazione / esercizio" : "Nuova situazione / esercizio"}
           </h1>
         </div>
         <div className="flex items-center gap-2">
@@ -248,7 +261,7 @@ export function SituationalForm() {
             type="button"
             variant="ghost"
             disabled={submitting}
-            onClick={() => router.push("/situational")}
+            onClick={() => router.push(cancelHref)}
           >
             <X className="mr-2 h-4 w-4" />
             Annulla
@@ -262,7 +275,7 @@ export function SituationalForm() {
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Salva
+                {submitLabel}
               </>
             )}
           </Button>
@@ -510,20 +523,20 @@ export function SituationalForm() {
       {/* Allegati (file reali su storage privato) */}
       <FormSection
         title="Allegati"
-        description="Carica file reali (video, PDF, slide, immagini…) oltre ai link."
+        description="File leggeri (PDF, immagini, documenti Office) oltre ai link. Per i video usa un link."
       >
         <AttachmentsField
           entityType="situational"
-          entityId={null}
+          entityId={existing?.id ?? null}
           pending={pendingAttachments}
           onPendingChange={setPendingAttachments}
         />
       </FormSection>
 
       <MobileSaveBar
-        label={"Salva"}
+        label={submitLabel}
         submitting={submitting}
-        onCancel={() => router.push("/situational")}
+        onCancel={() => router.push(cancelHref)}
       />
 
       <div className="flex items-center justify-end gap-2 pb-8 max-md:hidden">
@@ -531,7 +544,7 @@ export function SituationalForm() {
           type="button"
           variant="ghost"
           disabled={submitting}
-          onClick={() => router.push("/situational")}
+          onClick={() => router.push(cancelHref)}
         >
           Annulla
         </Button>
@@ -544,7 +557,7 @@ export function SituationalForm() {
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />
-              Salva
+              {submitLabel}
             </>
           )}
         </Button>

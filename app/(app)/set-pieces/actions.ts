@@ -4,14 +4,20 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
-import { failedListPage, logLoadError, type ListPage } from "@/lib/load-result";
+import {
+  failedListPage,
+  isUuid,
+  logLoadError,
+  type ListPage,
+  type LoadResult,
+} from "@/lib/load-result";
 import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
 import {
   setPieceFormSchema,
   type SetPieceFormValues,
 } from "@/lib/schemas/set-pieces";
 import type { SetPiecesFilters } from "@/lib/schemas/set-pieces-filters";
-import type { SetPieceListItem } from "@/lib/types/set-pieces";
+import type { SetPieceListItem, SetPieceRow } from "@/lib/types/set-pieces";
 
 const PAGE_SIZE = 24;
 
@@ -97,6 +103,47 @@ async function querySetPiecesPage(
   return { items, hasMore: data.length > PAGE_SIZE };
 }
 
+/** Colonne del piazzato a partire dai valori validati del form. */
+function setPieceColumns(v: SetPieceFormValues) {
+  return {
+    titolo: v.titolo,
+    squadra_esecutrice: v.squadra_esecutrice,
+    squadra_avversaria: v.squadra_avversaria,
+    competizione: v.competizione,
+    stagione: v.stagione,
+    minuto: v.minuto,
+    punteggio: v.punteggio,
+    data_evento: v.data_evento,
+
+    fase: v.fase,
+    tipo_piazzato: v.tipo_piazzato,
+    specificazione_punizione: v.specificazione_punizione,
+    lato_battuta: v.lato_battuta,
+
+    // Offensivo
+    piede_battitore: v.piede_battitore,
+    traiettoria: v.traiettoria,
+    sviluppo_schema: v.sviluppo_schema,
+    landing_zones: v.landing_zones,
+    behavior_tags: v.behavior_tags,
+    giocatori_in_area: v.giocatori_in_area,
+
+    // Difensivo
+    sistema_marcatura: v.sistema_marcatura,
+    uomini_in_barriera: v.uomini_in_barriera,
+    uomini_sui_pali: v.uomini_sui_pali,
+    altezza_linea_difensiva: v.altezza_linea_difensiva,
+    giocatori_in_transizione: v.giocatori_in_transizione,
+
+    esito_finale: v.esito_finale,
+    note_esito: v.note_esito,
+
+    video_url: v.video_url,
+    lavagna_image_url: v.lavagna_image_url,
+    pdf_url: v.pdf_url,
+  };
+}
+
 export async function createSetPiece(
   raw: SetPieceFormValues,
 ): Promise<{ id: string }> {
@@ -112,42 +159,7 @@ export async function createSetPiece(
     .insert({
       workspace_id: workspace.id,
       created_by: workspace.userId,
-
-      titolo: v.titolo,
-      squadra_esecutrice: v.squadra_esecutrice,
-      squadra_avversaria: v.squadra_avversaria,
-      competizione: v.competizione,
-      stagione: v.stagione,
-      minuto: v.minuto,
-      punteggio: v.punteggio,
-      data_evento: v.data_evento,
-
-      fase: v.fase,
-      tipo_piazzato: v.tipo_piazzato,
-      specificazione_punizione: v.specificazione_punizione,
-      lato_battuta: v.lato_battuta,
-
-      // Offensivo
-      piede_battitore: v.piede_battitore,
-      traiettoria: v.traiettoria,
-      sviluppo_schema: v.sviluppo_schema,
-      landing_zones: v.landing_zones,
-      behavior_tags: v.behavior_tags,
-      giocatori_in_area: v.giocatori_in_area,
-
-      // Difensivo
-      sistema_marcatura: v.sistema_marcatura,
-      uomini_in_barriera: v.uomini_in_barriera,
-      uomini_sui_pali: v.uomini_sui_pali,
-      altezza_linea_difensiva: v.altezza_linea_difensiva,
-      giocatori_in_transizione: v.giocatori_in_transizione,
-
-      esito_finale: v.esito_finale,
-      note_esito: v.note_esito,
-
-      video_url: v.video_url,
-      lavagna_image_url: v.lavagna_image_url,
-      pdf_url: v.pdf_url,
+      ...setPieceColumns(v),
     })
     .select("id")
     .single();
@@ -156,5 +168,106 @@ export async function createSetPiece(
     throw new Error(error?.message ?? "Errore creazione schema");
 
   revalidatePath("/set-pieces");
+  return { id: data.id };
+}
+
+type SetPieceForEdit = {
+  id: string;
+  values: SetPieceFormValues;
+  can_edit: boolean;
+};
+
+/**
+ * Carica un piazzato per la pagina di modifica (valori pronti per il form).
+ * `can_edit`: creatore o owner del workspace, coerente con la RLS.
+ */
+export async function getSetPieceForEdit(
+  id: string,
+): Promise<LoadResult<SetPieceForEdit>> {
+  if (!isUuid(id)) return { ok: false, reason: "not_found" };
+  try {
+    const workspace = await getCurrentWorkspace();
+    if (!workspace) return { ok: false, reason: "not_found" };
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("set_pieces")
+      .select("*")
+      .eq("id", id)
+      .eq("workspace_id", workspace.id)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return { ok: false, reason: "not_found" };
+    const r = data as SetPieceRow;
+    return {
+      ok: true,
+      data: {
+        id: r.id,
+        values: {
+          titolo: r.titolo,
+          squadra_esecutrice: r.squadra_esecutrice,
+          squadra_avversaria: r.squadra_avversaria,
+          competizione: r.competizione,
+          stagione: r.stagione,
+          minuto: r.minuto,
+          punteggio: r.punteggio,
+          data_evento: r.data_evento,
+          fase: r.fase,
+          tipo_piazzato: r.tipo_piazzato,
+          specificazione_punizione: r.specificazione_punizione,
+          lato_battuta: r.lato_battuta,
+          piede_battitore: r.piede_battitore,
+          traiettoria: r.traiettoria,
+          sviluppo_schema: r.sviluppo_schema,
+          landing_zones: r.landing_zones ?? [],
+          behavior_tags: r.behavior_tags ?? [],
+          giocatori_in_area: r.giocatori_in_area,
+          sistema_marcatura: r.sistema_marcatura,
+          uomini_in_barriera: r.uomini_in_barriera,
+          uomini_sui_pali: r.uomini_sui_pali,
+          altezza_linea_difensiva: r.altezza_linea_difensiva,
+          giocatori_in_transizione: r.giocatori_in_transizione,
+          esito_finale: r.esito_finale,
+          note_esito: r.note_esito,
+          video_url: r.video_url,
+          lavagna_image_url: r.lavagna_image_url,
+          pdf_url: r.pdf_url,
+        },
+        can_edit: workspace.isOwner || r.created_by === workspace.userId,
+      },
+    };
+  } catch (err) {
+    logLoadError("Set Pieces · modifica", err);
+    return { ok: false, reason: "error" };
+  }
+}
+
+/** Aggiorna un piazzato (RLS: solo creatore o owner). */
+export async function updateSetPiece(
+  id: string,
+  raw: SetPieceFormValues,
+): Promise<{ id: string }> {
+  z.string().uuid().parse(id);
+  const v = setPieceFormSchema.parse(raw);
+
+  const workspace = await getCurrentWorkspace();
+  if (!workspace) throw new Error("Workspace non trovato");
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("set_pieces")
+    .update(setPieceColumns(v))
+    .eq("id", id)
+    .eq("workspace_id", workspace.id)
+    .is("deleted_at", null)
+    .select("id")
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Schema non trovato o non hai i permessi per modificarlo");
+
+  revalidatePath("/set-pieces");
+  revalidatePath(`/set-pieces/${id}`);
+  revalidatePath("/dashboard");
   return { id: data.id };
 }

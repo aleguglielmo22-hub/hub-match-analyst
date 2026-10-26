@@ -26,7 +26,7 @@ export default async function ModificaVocePage({
     return <PageLoadError />;
   }
   const item = res.data;
-  if (item.deleted_at) redirect("/archivio/cestino");
+  if (item.deleted_at) redirect("/cestino?sezione=cloud");
   if (!item.can_edit) redirect(`/archivio/${id}`);
 
   const lookups = await getLookupOptions();

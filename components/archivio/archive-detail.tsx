@@ -12,7 +12,7 @@ import {
 } from "@/lib/types/archivio";
 import { ArchiveFilesViewer } from "./archive-files-viewer";
 import { ArchiveLinks } from "./archive-links";
-import { TrashButton } from "./trash-button";
+import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 import type { ArchiveDetail as ArchiveDetailType } from "@/app/(app)/archivio/types";
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
@@ -87,7 +87,11 @@ export function ArchiveDetail({ item }: { item: ArchiveDetailType }) {
             </LinkPendingIcon>
               Modifica
             </Link>
-            <TrashButton itemId={item.id} />
+            <MoveToTrashButton
+              section="cloud"
+              id={item.id}
+              title={item.titolo_archivio}
+            />
           </div>
         )}
       </header>

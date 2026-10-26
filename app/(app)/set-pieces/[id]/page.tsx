@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   ExternalLink,
   Goal,
+  Pencil,
   Shield,
   Clock,
   Target,
@@ -16,12 +17,15 @@ import { isUuid, logLoadError } from "@/lib/load-result";
 import { PageLoadError } from "@/components/app/load-error";
 import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
+import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 import { ESITO_TONE, FASE_SET_PIECE_TONE, TONE } from "@/lib/tones";
 import { cn } from "@/lib/utils";
 import { videoEmbedUrl } from "@/lib/links/external-links";
 import {
   ALTEZZA_LINEA_LABEL,
-  ESITO_FINALE_LABEL,
+  esitoLabel,
   FASE_LABEL,
   LATO_BATTUTA_LABEL,
   PIEDE_BATTITORE_LABEL,
@@ -71,6 +75,8 @@ export default async function DettaglioSetPiecePage({
   if (!data) notFound();
   const sp = data as SetPieceRow;
 
+  // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
+  const canEdit = workspace.isOwner || sp.created_by === workspace.userId;
   const isOffensive = sp.fase === "OFFENSIVO";
   const dataFmt = sp.data_evento
     ? format(parseISO(sp.data_evento), "EEEE d MMMM yyyy", { locale: it })
@@ -78,13 +84,29 @@ export default async function DettaglioSetPiecePage({
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-8 sm:py-10">
-      <Link
-        href="/set-pieces"
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        Torna ai Set Pieces DB
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          href="/set-pieces"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Torna ai Set Pieces DB
+        </Link>
+        {canEdit && (
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/set-pieces/${sp.id}/modifica`}
+              className={buttonVariants({ variant: "outline", size: "default" })}
+            >
+              <LinkPendingIcon className="mr-2 h-4 w-4">
+                <Pencil className="mr-2 h-4 w-4" />
+              </LinkPendingIcon>
+              Modifica
+            </Link>
+            <MoveToTrashButton section="set-pieces" id={sp.id} title={sp.titolo} />
+          </div>
+        )}
+      </div>
 
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-1.5">
@@ -119,7 +141,7 @@ export default async function DettaglioSetPiecePage({
                 TONE[ESITO_TONE[sp.fase][sp.esito_finale]].badge,
               )}
             >
-              {ESITO_FINALE_LABEL[sp.esito_finale]}
+              {esitoLabel(sp.esito_finale, sp.fase)}
             </Badge>
           )}
         </div>
@@ -302,7 +324,7 @@ export default async function DettaglioSetPiecePage({
             {sp.esito_finale && (
               <Row
                 label="Esito finale"
-                value={ESITO_FINALE_LABEL[sp.esito_finale]}
+                value={esitoLabel(sp.esito_finale, sp.fase)}
               />
             )}
           </dl>

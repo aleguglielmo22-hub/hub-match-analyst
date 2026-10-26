@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ESITO_TONE, FASE_SET_PIECE_TONE, TONE } from "@/lib/tones";
 import {
-  ESITO_FINALE_LABEL,
+  esitoLabel,
   FASE_LABEL,
   TIPO_PIAZZATO_LABEL,
   type SetPieceListItem,
@@ -77,9 +77,9 @@ export function SetPieceCard({ item }: { item: SetPieceListItem }) {
               // Colore = esito per la mia squadra (si inverte nei piazzati difensivi).
               TONE[ESITO_TONE[item.fase][item.esito_finale]].badge,
             )}
-            title={ESITO_FINALE_LABEL[item.esito_finale]}
+            title={esitoLabel(item.esito_finale, item.fase)}
           >
-            {ESITO_FINALE_LABEL[item.esito_finale]}
+            {esitoLabel(item.esito_finale, item.fase)}
           </span>
         )}
         {item.video_url && (

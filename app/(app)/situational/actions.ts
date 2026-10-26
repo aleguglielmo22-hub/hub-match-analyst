@@ -4,14 +4,20 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
-import { failedListPage, logLoadError, type ListPage } from "@/lib/load-result";
+import {
+  failedListPage,
+  isUuid,
+  logLoadError,
+  type ListPage,
+  type LoadResult,
+} from "@/lib/load-result";
 import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
 import {
   situationalFormSchema,
   type SituationalFormValues,
 } from "@/lib/schemas/situational";
 import type { SituationalFilters } from "@/lib/schemas/situational-filters";
-import type { SituationalListItem } from "@/lib/types/situational";
+import type { SituationalListItem, SituationalRow } from "@/lib/types/situational";
 
 const PAGE_SIZE = 24;
 
@@ -92,6 +98,29 @@ async function querySituationalPage(
   return { items, hasMore: data.length > PAGE_SIZE };
 }
 
+/** Colonne dell'esercitazione a partire dai valori validati del form. */
+function situationalColumns(v: SituationalFormValues) {
+  return {
+    titolo: v.titolo,
+    autori: v.autori,
+    numero_giocatori: v.numero_giocatori,
+    spazio_dimensioni: v.spazio_dimensioni,
+
+    macro_fase: v.macro_fase,
+    sotto_fase: v.sotto_fase,
+
+    focus_tags: v.focus_tags,
+
+    descrizione_flusso: v.descrizione_flusso,
+    regole_provocazione: v.regole_provocazione,
+    varianti: v.varianti,
+
+    video_url: v.video_url,
+    lavagna_url: v.lavagna_url,
+    pdf_url: v.pdf_url,
+  };
+}
+
 export async function createSituational(
   raw: SituationalFormValues,
 ): Promise<{ id: string }> {
@@ -106,24 +135,7 @@ export async function createSituational(
     .insert({
       workspace_id: workspace.id,
       created_by: workspace.userId,
-
-      titolo: v.titolo,
-      autori: v.autori,
-      numero_giocatori: v.numero_giocatori,
-      spazio_dimensioni: v.spazio_dimensioni,
-
-      macro_fase: v.macro_fase,
-      sotto_fase: v.sotto_fase,
-
-      focus_tags: v.focus_tags,
-
-      descrizione_flusso: v.descrizione_flusso,
-      regole_provocazione: v.regole_provocazione,
-      varianti: v.varianti,
-
-      video_url: v.video_url,
-      lavagna_url: v.lavagna_url,
-      pdf_url: v.pdf_url,
+      ...situationalColumns(v),
     })
     .select("id")
     .single();
@@ -132,6 +144,91 @@ export async function createSituational(
     throw new Error(error?.message ?? "Errore creazione situazionale");
 
   revalidatePath("/situational");
+  return { id: data.id };
+}
+
+type SituationalForEdit = {
+  id: string;
+  values: SituationalFormValues;
+  can_edit: boolean;
+};
+
+/**
+ * Carica un'esercitazione per la pagina di modifica (valori pronti per il form).
+ * `can_edit`: creatore o owner del workspace, coerente con la RLS.
+ */
+export async function getSituationalForEdit(
+  id: string,
+): Promise<LoadResult<SituationalForEdit>> {
+  if (!isUuid(id)) return { ok: false, reason: "not_found" };
+  try {
+    const workspace = await getCurrentWorkspace();
+    if (!workspace) return { ok: false, reason: "not_found" };
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("situational_tactics")
+      .select("*")
+      .eq("id", id)
+      .eq("workspace_id", workspace.id)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return { ok: false, reason: "not_found" };
+    const r = data as SituationalRow;
+    return {
+      ok: true,
+      data: {
+        id: r.id,
+        values: {
+          titolo: r.titolo,
+          autori: r.autori ?? [],
+          numero_giocatori: r.numero_giocatori ?? [],
+          spazio_dimensioni: r.spazio_dimensioni,
+          macro_fase: r.macro_fase,
+          sotto_fase: r.sotto_fase,
+          focus_tags: r.focus_tags ?? [],
+          descrizione_flusso: r.descrizione_flusso,
+          regole_provocazione: r.regole_provocazione,
+          varianti: r.varianti,
+          video_url: r.video_url,
+          lavagna_url: r.lavagna_url,
+          pdf_url: r.pdf_url,
+        },
+        can_edit: workspace.isOwner || r.created_by === workspace.userId,
+      },
+    };
+  } catch (err) {
+    logLoadError("Training · modifica", err);
+    return { ok: false, reason: "error" };
+  }
+}
+
+/** Aggiorna un'esercitazione (RLS: solo creatore o owner). */
+export async function updateSituational(
+  id: string,
+  raw: SituationalFormValues,
+): Promise<{ id: string }> {
+  z.string().uuid().parse(id);
+  const v = situationalFormSchema.parse(raw);
+
+  const workspace = await getCurrentWorkspace();
+  if (!workspace) throw new Error("Workspace non trovato");
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("situational_tactics")
+    .update(situationalColumns(v))
+    .eq("id", id)
+    .eq("workspace_id", workspace.id)
+    .is("deleted_at", null)
+    .select("id")
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Esercitazione non trovata o non hai i permessi per modificarla");
+
+  revalidatePath("/situational");
+  revalidatePath(`/situational/${id}`);
   return { id: data.id };
 }
 

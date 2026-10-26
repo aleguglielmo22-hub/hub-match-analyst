@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, ExternalLink, FileText, Users } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileText, Pencil, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { isUuid, logLoadError } from "@/lib/load-result";
 import { PageLoadError } from "@/components/app/load-error";
 import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { LinkPendingIcon } from "@/components/app/link-pending-icon";
+import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 import { videoEmbedUrl } from "@/lib/links/external-links";
 import {
   MACRO_FASE_BADGE,
@@ -55,16 +58,34 @@ export default async function DettaglioSituazionalePage({
   const s = data as SituationalRow;
 
   const macro = MACRO_FASE_BADGE[s.macro_fase];
+  // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
+  const canEdit = workspace.isOwner || s.created_by === workspace.userId;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-8 sm:py-10">
-      <Link
-        href="/situational"
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        Torna al Training
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          href="/situational"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground max-md:-ml-2 max-md:min-h-11 max-md:px-2 max-md:text-sm"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Torna al Training
+        </Link>
+        {canEdit && (
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/situational/${s.id}/modifica`}
+              className={buttonVariants({ variant: "outline", size: "default" })}
+            >
+              <LinkPendingIcon className="mr-2 h-4 w-4">
+                <Pencil className="mr-2 h-4 w-4" />
+              </LinkPendingIcon>
+              Modifica
+            </Link>
+            <MoveToTrashButton section="training" id={s.id} title={s.titolo} />
+          </div>
+        )}
+      </div>
 
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">

@@ -1053,7 +1053,7 @@ export function PlayerForm({
       {/* Allegati (file reali su storage privato) */}
       <FormSection
         title="Allegati"
-        description="Carica file reali (video, PDF, slide, immagini…) oltre ai link qui sopra."
+        description="File leggeri (PDF, immagini, documenti Office) oltre ai link qui sopra. Per i video usa un link."
       >
         <AttachmentsField
           entityType="player"

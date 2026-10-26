@@ -40,6 +40,7 @@ import {
   type RatingMacroGroup,
 } from "@/lib/types/scouting";
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
+import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 
 export const dynamic = "force-dynamic";
 
@@ -158,15 +159,22 @@ export default async function DettaglioGiocatorePage({
 
         <div className="flex flex-col items-end gap-3">
           {canEdit && (
-            <Link
-              href={`/scouting/${p.id}/modifica`}
-              className={buttonVariants({ variant: "outline", size: "default" })}
-            >
-              <LinkPendingIcon className="mr-2 h-4 w-4">
-              <Pencil className="mr-2 h-4 w-4" />
-            </LinkPendingIcon>
-              Modifica
-            </Link>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <Link
+                href={`/scouting/${p.id}/modifica`}
+                className={buttonVariants({ variant: "outline", size: "default" })}
+              >
+                <LinkPendingIcon className="mr-2 h-4 w-4">
+                  <Pencil className="mr-2 h-4 w-4" />
+                </LinkPendingIcon>
+                Modifica
+              </Link>
+              <MoveToTrashButton
+                section="scouting"
+                id={p.id}
+                title={[p.nome, p.cognome].filter(Boolean).join(" ")}
+              />
+            </div>
           )}
           <div className="flex flex-wrap justify-end gap-1.5">
             <Badge

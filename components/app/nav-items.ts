@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Settings,
   Target,
+  Trash2,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -28,6 +29,8 @@ export type NavItem = {
  * Navigazione globale. L'IA primaria è:
  *   Dashboard → Scouting DB → Set Pieces DB → Training → Cloud → Impostazioni
  * Cloud resta in nav come repository file ma sotto le verticali operative.
+ * Il Cestino (unico per tutte le sezioni) sta in fondo, prima delle
+ * Impostazioni; su mobile è nel menu ☰, non nella barra in basso.
  * Solo l'OWNER vede Impostazioni.
  * NB: le label sono solo testo; gli slug URL restano invariati.
  */
@@ -37,6 +40,7 @@ export const NAV: NavItem[] = [
   { href: "/set-pieces", label: "Set Pieces DB", shortLabel: "Set Pieces", icon: Target, inBottomNav: true },
   { href: "/situational", label: "Training", shortLabel: "Training", icon: Brain, inBottomNav: true },
   { href: "/archivio", label: "Cloud", shortLabel: "Cloud", icon: Archive, inBottomNav: true },
+  { href: "/cestino", label: "Cestino", icon: Trash2 },
   {
     href: "/impostazioni/collaboratori",
     label: "Impostazioni",

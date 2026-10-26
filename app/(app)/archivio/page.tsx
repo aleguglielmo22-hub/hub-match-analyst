@@ -53,7 +53,7 @@ export default async function ArchivioPage({
         actions={
           <>
             <Link
-              href="/archivio/cestino"
+              href="/cestino?sezione=cloud"
               className="text-xs text-muted-foreground hover:text-foreground"
             >
               Cestino

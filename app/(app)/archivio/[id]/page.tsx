@@ -18,7 +18,7 @@ export default async function DettaglioVocePage({
   }
   const item = res.data;
   // Se è nel cestino, la pagina dettaglio non è il posto giusto: rimanda al cestino.
-  if (item.deleted_at) redirect("/archivio/cestino");
+  if (item.deleted_at) redirect("/cestino?sezione=cloud");
 
   return <ArchiveDetail item={item} />;
 }

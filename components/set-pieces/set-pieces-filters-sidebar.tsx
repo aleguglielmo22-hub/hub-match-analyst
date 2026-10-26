@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/accordion";
 import { ToggleChipGroup } from "@/components/archivio/multi-select-popover";
 import {
-  ESITO_FINALE_LABEL,
+  esitoLabel,
   ESITO_FINALE_VALUES,
   FASE_LABEL,
   FASE_VALUES,
@@ -103,13 +103,15 @@ export function SetPiecesFiltersSidebar({
       })),
     [],
   );
+  // Etichetta dell'esito secondo la fase filtrata (una sola fase → nome di quella fase).
+  const faseFiltrata = local.fase.length === 1 ? local.fase[0] : null;
   const esitoOpts = useMemo(
     () =>
       ESITO_FINALE_VALUES.map((v) => ({
         value: v,
-        label: ESITO_FINALE_LABEL[v],
+        label: esitoLabel(v, faseFiltrata),
       })),
-    [],
+    [faseFiltrata],
   );
 
   return (
