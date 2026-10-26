@@ -62,7 +62,11 @@ export default async function SituationalPage({
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <div className="flex-1">
-              <SearchInput basePath="/situational" initialQuery={filters.q} />
+              <SearchInput
+                basePath="/situational"
+                initialQuery={filters.q}
+                placeholder="Cerca per titolo, descrizione o regole…"
+              />
             </div>
             <div className="lg:hidden">
               <SituationalFiltersMobileTrigger

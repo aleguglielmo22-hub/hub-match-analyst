@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { ESITO_TONE, FASE_SET_PIECE_TONE, TONE } from "@/lib/tones";
 import {
   esitoLabel,
+  setPieceTeamName,
   FASE_LABEL,
   TIPO_PIAZZATO_LABEL,
   type SetPieceListItem,
@@ -33,10 +34,13 @@ export function SetPieceCard({ item }: { item: SetPieceListItem }) {
   const dataFmt = item.data_evento
     ? format(parseISO(item.data_evento), "d MMM yyyy", { locale: it })
     : null;
+  // Nome attuale dell'anagrafica, altrimenti il vecchio testo salvato.
+  const esecutrice = setPieceTeamName(item.team_esecutrice, item.squadra_esecutrice);
+  const avversaria = setPieceTeamName(item.team_avversaria, item.squadra_avversaria);
   const matchup =
-    item.squadra_esecutrice && item.squadra_avversaria
-      ? `${item.squadra_esecutrice} vs ${item.squadra_avversaria}`
-      : (item.squadra_esecutrice ?? item.squadra_avversaria ?? null);
+    esecutrice && avversaria
+      ? `${esecutrice} vs ${avversaria}`
+      : (esecutrice ?? avversaria ?? null);
 
   return (
     <Link

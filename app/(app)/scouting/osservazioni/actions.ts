@@ -14,6 +14,7 @@ import {
 } from "@/lib/schemas/observations";
 import { RUOLO_VALUES, type RuoloEnum } from "@/lib/types/scouting";
 import type { LookupOption } from "@/app/(app)/archivio/actions";
+import { getSharedLookups } from "@/app/(app)/lookups/actions";
 
 async function requireWorkspace() {
   const workspace = await getCurrentWorkspace();
@@ -123,45 +124,15 @@ export async function createQuickPlayer(
 }
 
 /* ============================================================
- * Elenchi squadre e competizioni (condivisi col Cloud), recenti in cima
+ * Elenchi squadre e competizioni (condivisi), recenti in cima
  * ============================================================ */
 
 export async function getObservationLookups(): Promise<{
   teams: LookupOption[];
   competitions: LookupOption[];
 }> {
-  const workspace = await getCurrentWorkspace();
-  if (!workspace) return { teams: [], competitions: [] };
-  const supabase = await createClient();
-  const [teamsRes, compsRes, recentRes] = await Promise.all([
-    supabase.from("teams").select("id, nome").eq("workspace_id", workspace.id).order("nome"),
-    supabase.from("competitions").select("id, nome").eq("workspace_id", workspace.id).order("nome"),
-    supabase
-      .from("player_observations")
-      .select("team_casa_id, team_ospite_id, competition_id")
-      .eq("workspace_id", workspace.id)
-      .order("data_osservazione", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(50),
-  ]);
-  const err = teamsRes.error ?? compsRes.error ?? recentRes.error;
-  if (err) logLoadError("Osservazioni · elenchi squadre/competizioni", err);
-
-  // Ordine di uso recente (prima comparsa nelle ultime osservazioni).
-  const rank = new Map<string, number>();
-  for (const r of recentRes.data ?? []) {
-    for (const id of [r.team_casa_id, r.team_ospite_id, r.competition_id]) {
-      if (id && !rank.has(id)) rank.set(id, rank.size);
-    }
-  }
-  const recentFirst = (list: LookupOption[]) =>
-    [...list].sort(
-      (a, b) => (rank.get(a.id) ?? Infinity) - (rank.get(b.id) ?? Infinity),
-    );
-  return {
-    teams: recentFirst((teamsRes.data ?? []).map((t) => ({ id: t.id, label: t.nome }))),
-    competitions: recentFirst((compsRes.data ?? []).map((c) => ({ id: c.id, label: c.nome }))),
-  };
+  const { teams, competitions } = await getSharedLookups();
+  return { teams, competitions };
 }
 
 /* ============================================================

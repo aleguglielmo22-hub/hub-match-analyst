@@ -80,7 +80,11 @@ export default async function ScoutingPage({
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <div className="flex-1">
-              <SearchInput basePath="/scouting" initialQuery={filters.q} />
+              <SearchInput
+                basePath="/scouting"
+                initialQuery={filters.q}
+                placeholder="Cerca per nome, squadra, campionato, ruolo (es. DC) o stile…"
+              />
             </div>
             <div className="lg:hidden">
               <ScoutingFiltersMobileTrigger filters={filters} />

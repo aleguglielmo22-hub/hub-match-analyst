@@ -65,15 +65,38 @@ async function querySetPiecesPage(
         id, titolo, fase, tipo_piazzato, specificazione_punizione, lato_battuta,
         esito_finale, squadra_esecutrice, squadra_avversaria, competizione,
         stagione, minuto, punteggio, data_evento, video_url, lavagna_image_url,
-        updated_at
+        updated_at, team_esecutrice_id, team_avversaria_id,
+        team_esecutrice:teams!set_pieces_team_esecutrice_id_fkey(nome),
+        team_avversaria:teams!set_pieces_team_avversaria_id_fkey(nome)
       `,
     )
     .eq("workspace_id", workspace.id)
     .is("deleted_at", null);
 
   if (filters?.q) {
-    q = q.or(ilikeAnyFilter(["titolo", "squadra_esecutrice", "squadra_avversaria"], filters.q));
+    // Anche per nome attuale delle squadre collegate (es. dopo una rinomina).
+    const { data: teamHits, error: teamErr } = await supabase
+      .from("teams")
+      .select("id")
+      .eq("workspace_id", workspace.id)
+      .or(ilikeAnyFilter(["nome"], filters.q))
+      .limit(50);
+    if (teamErr) throw teamErr;
+    const ids = (teamHits ?? []).map((t) => t.id);
+    const teamConds = ids.length
+      ? `,team_esecutrice_id.in.(${ids.join(",")}),team_avversaria_id.in.(${ids.join(",")})`
+      : "";
+    q = q.or(
+      ilikeAnyFilter(["titolo", "squadra_esecutrice", "squadra_avversaria", "competizione"], filters.q) +
+        teamConds,
+    );
   }
+  if (filters?.team_ids.length) {
+    const ids = filters.team_ids.join(",");
+    q = q.or(`team_esecutrice_id.in.(${ids}),team_avversaria_id.in.(${ids})`);
+  }
+  if (filters?.competition_ids.length) q = q.in("competition_id", filters.competition_ids);
+  if (filters?.season_ids.length) q = q.in("season_id", filters.season_ids);
 
   if (filters?.fase.length) q = q.in("fase", filters.fase);
   if (filters?.tipo_piazzato.length)
@@ -104,14 +127,40 @@ async function querySetPiecesPage(
   return { items, hasMore: data.length > PAGE_SIZE };
 }
 
-/** Colonne del piazzato a partire dai valori validati del form. */
-function setPieceColumns(v: SetPieceFormValues) {
+type Supabase = Awaited<ReturnType<typeof createClient>>;
+
+/**
+ * Colonne del piazzato a partire dai valori validati del form. I vecchi campi
+ * di testo (squadre, competizione, stagione) restano allineati ai nomi delle
+ * anagrafiche scelte, così card, ricerca e backup restano coerenti.
+ */
+async function setPieceColumns(supabase: Supabase, workspaceId: string, v: SetPieceFormValues) {
+  const teamIds = [v.team_esecutrice_id, v.team_avversaria_id].filter((x): x is string => !!x);
+  const [teams, comp, season] = await Promise.all([
+    teamIds.length
+      ? supabase.from("teams").select("id, nome").eq("workspace_id", workspaceId).in("id", teamIds)
+      : Promise.resolve({ data: [] as { id: string; nome: string }[], error: null }),
+    v.competition_id
+      ? supabase.from("competitions").select("nome").eq("workspace_id", workspaceId).eq("id", v.competition_id).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+    v.season_id
+      ? supabase.from("seasons").select("label").eq("workspace_id", workspaceId).eq("id", v.season_id).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
+  const err = teams.error ?? comp.error ?? season.error;
+  if (err) throw new Error(err.message);
+  const teamName = (id: string | null) => (id ? (teams.data ?? []).find((t) => t.id === id)?.nome ?? null : null);
+
   return {
     titolo: v.titolo,
-    squadra_esecutrice: v.squadra_esecutrice,
-    squadra_avversaria: v.squadra_avversaria,
-    competizione: v.competizione,
-    stagione: v.stagione,
+    team_esecutrice_id: v.team_esecutrice_id,
+    team_avversaria_id: v.team_avversaria_id,
+    competition_id: v.competition_id,
+    season_id: v.season_id,
+    squadra_esecutrice: teamName(v.team_esecutrice_id),
+    squadra_avversaria: teamName(v.team_avversaria_id),
+    competizione: comp.data?.nome ?? null,
+    stagione: season.data?.label ?? null,
     minuto: v.minuto,
     punteggio: v.punteggio,
     data_evento: v.data_evento,
@@ -161,13 +210,14 @@ export async function createSetPiece(
 
   const supabase = await createClient();
 
+  const columns = await setPieceColumns(supabase, workspace.id, v);
   await insertOnce({
     insert: () =>
       supabase.from("set_pieces").insert({
         id,
         workspace_id: workspace.id,
         created_by: workspace.userId,
-        ...setPieceColumns(v),
+        ...columns,
       }),
       exists: async () => {
         const { data } = await supabase
@@ -220,10 +270,10 @@ export async function getSetPieceForEdit(
         id: r.id,
         values: {
           titolo: r.titolo,
-          squadra_esecutrice: r.squadra_esecutrice,
-          squadra_avversaria: r.squadra_avversaria,
-          competizione: r.competizione,
-          stagione: r.stagione,
+          team_esecutrice_id: r.team_esecutrice_id,
+          team_avversaria_id: r.team_avversaria_id,
+          competition_id: r.competition_id,
+          season_id: r.season_id,
           minuto: r.minuto,
           punteggio: r.punteggio,
           data_evento: r.data_evento,
@@ -272,7 +322,7 @@ export async function updateSetPiece(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("set_pieces")
-    .update(setPieceColumns(v))
+    .update(await setPieceColumns(supabase, workspace.id, v))
     .eq("id", id)
     .eq("workspace_id", workspace.id)
     .is("deleted_at", null)

@@ -50,6 +50,15 @@ import {
 } from "@/lib/schemas/set-pieces";
 import { createSetPiece, updateSetPiece } from "@/app/(app)/set-pieces/actions";
 import {
+  createCompetition,
+  createSeason,
+  createTeam,
+} from "@/app/(app)/archivio/actions";
+import type { SharedLookups } from "@/app/(app)/lookups/actions";
+import { Combobox } from "@/components/archivio/combobox";
+import { teamsForPhase } from "@/lib/set-pieces/defaults";
+import { todayIso } from "@/lib/schemas/observations";
+import {
   AttachmentsField,
   type PendingAttachment,
 } from "@/components/attachments/attachments-field";
@@ -167,10 +176,22 @@ function PresetTagToggle({
  */
 export function SetPieceForm({
   existing,
+  lookups: initialLookups,
+  myTeamId = null,
+  defaults,
 }: {
   /** Se presente, il form è in modalità modifica (valori precompilati). */
   existing?: { id: string; values: SetPieceFormValues; updatedAt: string };
-} = {}) {
+  /** Squadre, competizioni e stagioni condivise (recenti in cima). */
+  lookups: SharedLookups;
+  /** Mia squadra dalle preferenze: predefinita in base alla fase (solo nuovi). */
+  myTeamId?: string | null;
+  /** Valori iniziali dei nuovi piazzati (preferenze + data di oggi). */
+  defaults?: SetPieceFormValues;
+}) {
+  const [lookups, setLookups] = useState(initialLookups);
+  // Squadre scelte a mano: il cambio fase non le sovrascrive.
+  const touchedTeams = useRef({ esecutrice: !!existing, avversaria: !!existing });
   const router = useRouter();
   const isEdit = !!existing;
   const cancelHref = existing ? `/set-pieces/${existing.id}` : "/set-pieces";
@@ -182,7 +203,10 @@ export function SetPieceForm({
 
   const form = useForm<SetPieceFormValues>({
     resolver: zodResolver(setPieceFormSchema),
-    defaultValues: existing?.values ?? emptySetPieceForm(),
+    defaultValues:
+      existing?.values ??
+      // Data di oggi calcolata nel browser (fuso orario dell'utente).
+      { ...(defaults ?? emptySetPieceForm()), data_evento: todayIso() },
   });
 
   // Id del nuovo elemento, generato all'apertura: un secondo invio non crea doppioni.
@@ -196,6 +220,11 @@ export function SetPieceForm({
     newItemId: existing ? undefined : newId,
     onRestoreNewItemId: setNewId,
   });
+  const restoreDraft = () => {
+    // Le squadre della bozza contano come scelte dall'utente.
+    touchedTeams.current = { esecutrice: true, avversaria: true };
+    draft.restore();
+  };
   const leave = () => {
     if (draft.confirmLeave()) router.push(cancelHref);
   };
@@ -238,6 +267,27 @@ export function SetPieceForm({
       form.setValue("giocatori_in_area", null, { shouldDirty: false });
     }
   }, [fase, form]);
+
+  /* --------------------------------------------------------------
+   * Mia squadra predefinita: esecutrice in fase offensiva, avversaria in
+   * difensiva. Cambiando fase si spostano solo i campi non toccati.
+   * -------------------------------------------------------------- */
+  const prevFase = useRef(fase);
+  useEffect(() => {
+    if (prevFase.current === fase) return;
+    prevFase.current = fase;
+    const next = teamsForPhase(
+      fase,
+      myTeamId,
+      {
+        esecutrice: form.getValues("team_esecutrice_id"),
+        avversaria: form.getValues("team_avversaria_id"),
+      },
+      touchedTeams.current,
+    );
+    form.setValue("team_esecutrice_id", next.esecutrice);
+    form.setValue("team_avversaria_id", next.avversaria);
+  }, [fase, form, myTeamId]);
 
   async function onSubmit(values: SetPieceFormValues) {
     // Blocca un secondo invio (doppio clic, Invio) mentre il primo è in corso.
@@ -324,7 +374,7 @@ export function SetPieceForm({
 
       <DraftBanner
         draft={draft.pending}
-        onRestore={draft.restore}
+        onRestore={restoreDraft}
         onDiscard={draft.discard}
       />
 
@@ -340,35 +390,82 @@ export function SetPieceForm({
             <FieldError message={form.formState.errors.titolo?.message} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="squadra_esecutrice">Squadra esecutrice</Label>
-            <Input
-              id="squadra_esecutrice"
-              placeholder="Chi batte"
-              {...form.register("squadra_esecutrice")}
+            <Label>Squadra esecutrice</Label>
+            <Controller
+              control={form.control}
+              name="team_esecutrice_id"
+              render={({ field }) => (
+                <Combobox
+                  value={field.value ?? null}
+                  onChange={(v) => {
+                    touchedTeams.current.esecutrice = true;
+                    field.onChange(v);
+                  }}
+                  options={lookups.teams}
+                  placeholder="Chi batte · cerca o crea…"
+                  onCreate={createTeam}
+                  onCreated={(opt) => setLookups((l) => ({ ...l, teams: [opt, ...l.teams] }))}
+                />
+              )}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="squadra_avversaria">Squadra avversaria</Label>
-            <Input
-              id="squadra_avversaria"
-              placeholder="Chi difende"
-              {...form.register("squadra_avversaria")}
+            <Label>Squadra avversaria</Label>
+            <Controller
+              control={form.control}
+              name="team_avversaria_id"
+              render={({ field, fieldState }) => (
+                <>
+                  <Combobox
+                    value={field.value ?? null}
+                    onChange={(v) => {
+                      touchedTeams.current.avversaria = true;
+                      field.onChange(v);
+                    }}
+                    options={lookups.teams}
+                    placeholder="Chi difende · cerca o crea…"
+                    onCreate={createTeam}
+                    onCreated={(opt) => setLookups((l) => ({ ...l, teams: [opt, ...l.teams] }))}
+                  />
+                  <FieldError message={fieldState.error?.message} />
+                </>
+              )}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="competizione">Competizione</Label>
-            <Input
-              id="competizione"
-              placeholder="Es. Serie A"
-              {...form.register("competizione")}
+            <Label>Competizione</Label>
+            <Controller
+              control={form.control}
+              name="competition_id"
+              render={({ field }) => (
+                <Combobox
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                  options={lookups.competitions}
+                  placeholder="Es. Serie A · cerca o crea…"
+                  onCreate={createCompetition}
+                  onCreated={(opt) =>
+                    setLookups((l) => ({ ...l, competitions: [opt, ...l.competitions] }))
+                  }
+                />
+              )}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="stagione">Stagione</Label>
-            <Input
-              id="stagione"
-              placeholder="Es. 2025/2026"
-              {...form.register("stagione")}
+            <Label>Stagione</Label>
+            <Controller
+              control={form.control}
+              name="season_id"
+              render={({ field }) => (
+                <Combobox
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                  options={lookups.seasons}
+                  placeholder="Es. 2025/2026 · cerca o crea…"
+                  onCreate={createSeason}
+                  onCreated={(opt) => setLookups((l) => ({ ...l, seasons: [opt, ...l.seasons] }))}
+                />
+              )}
             />
           </div>
           <div className="space-y-2">

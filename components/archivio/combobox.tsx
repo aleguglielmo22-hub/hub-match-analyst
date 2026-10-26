@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState, useTransition } from "react";
+import { useId, useMemo, useState, useTransition } from "react";
 import { Check, ChevronsUpDown, Plus, X } from "lucide-react";
 import {
   Command,
@@ -15,7 +15,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { findByName } from "@/lib/lookups/names";
 import type { LookupOption } from "@/app/(app)/archivio/actions";
 
 type ComboboxProps = {
@@ -42,14 +44,15 @@ export function Combobox({
   disabled,
 }: ComboboxProps) {
   const id = useId();
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useState(false);
   const [query, setQuery] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  // Reset query quando il popover si chiude
-  useEffect(() => {
-    if (!open) setQuery("");
-  }, [open]);
+  // Alla chiusura del popover la ricerca si azzera.
+  const setOpen = (next: boolean) => {
+    setOpenState(next);
+    if (!next) setQuery("");
+  };
 
   const selected = useMemo(
     () => options.find((o) => o.id === value),
@@ -57,9 +60,8 @@ export function Combobox({
   );
 
   const trimmed = query.trim();
-  const exactMatch = trimmed
-    ? options.find((o) => o.label.toLowerCase() === trimmed.toLowerCase())
-    : null;
+  // Stessa regola del DB: maiuscole e spazi iniziali/finali non contano.
+  const exactMatch = trimmed ? findByName(options, trimmed) : null;
   const showCreate = !!onCreate && trimmed.length > 0 && !exactMatch;
 
   function handleCreate() {
@@ -67,7 +69,13 @@ export function Combobox({
     startTransition(async () => {
       try {
         const created = await onCreate(trimmed);
-        onCreated?.(created);
+        // Nome già esistente: si seleziona quello, senza duplicarlo in elenco.
+        if (created.existing || options.some((o) => o.id === created.id)) {
+          if (!options.some((o) => o.id === created.id)) onCreated?.(created);
+          toast.info(`Esiste già: selezionata «${created.label}»`);
+        } else {
+          onCreated?.(created);
+        }
         onChange(created.id);
         setOpen(false);
       } catch (e) {

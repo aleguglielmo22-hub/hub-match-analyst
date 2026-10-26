@@ -78,7 +78,11 @@ export default async function ArchivioPage({
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <div className="flex-1">
-              <SearchInput basePath="/archivio" initialQuery={query} />
+              <SearchInput
+                basePath="/archivio"
+                initialQuery={query}
+                placeholder="Cerca per titolo, descrizione o etichetta dei link…"
+              />
             </div>
             <div className="lg:hidden">
               <FiltersMobileTrigger filters={filters} lookups={lookups} />

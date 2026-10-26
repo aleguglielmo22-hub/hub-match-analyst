@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
@@ -37,6 +37,8 @@ import type {
   ArchiveLink,
 } from "@/app/(app)/archivio/types";
 import { uploadMimeType } from "@/lib/uploads/limits";
+import { readLastChoice, saveLastChoice } from "@/lib/forms/last-choice";
+import { todayIso } from "@/lib/schemas/observations";
 
 import { Button } from "@/components/ui/button";
 import { MobileSaveBar } from "@/components/app/mobile-save-bar";
@@ -101,6 +103,12 @@ type Props = {
   };
   /** Se presente, il form è in modalità modifica. */
   existing?: ExistingPayload;
+  /** Nuove voci: valori predefiniti dalle preferenze di lavoro. */
+  defaults?: {
+    team_principale_id: string | null;
+    season_id: string | null;
+    competition_id: string | null;
+  };
 };
 
 function FormSection({
@@ -134,7 +142,7 @@ function FieldError({ message }: { message?: string }) {
   );
 }
 
-export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
+export function ArchiveForm({ workspaceId, initialLookups, existing, defaults }: Props) {
   const router = useRouter();
   const isEdit = !!existing;
 
@@ -164,11 +172,11 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
   const defaultValues = useMemo<Partial<ArchiveFormValues>>(() => {
     if (existing) return existing.values;
     return {
-      data_lavoro: new Date().toISOString().slice(0, 10),
-      season_id: null,
-      team_principale_id: null,
+      data_lavoro: todayIso(),
+      season_id: defaults?.season_id ?? null,
+      team_principale_id: defaults?.team_principale_id ?? null,
       team_avversario_id: null,
-      competition_id: null,
+      competition_id: defaults?.competition_id ?? null,
       ambito: undefined,
       categoria_lavoro: undefined,
       tipo_media: [],
@@ -177,7 +185,7 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
       descrizione_estesa: "",
       tag_ids: [],
     };
-  }, [existing]);
+  }, [existing, defaults]);
 
   const form = useForm<ArchiveFormValues>({
     resolver: zodResolver(archiveFormSchema),
@@ -197,6 +205,16 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
     extra: links,
     onRestoreExtra: setLinks,
   });
+
+  // Nuove voci: ambito e categoria = ultima scelta (ricordata nel browser).
+  useEffect(() => {
+    if (existing) return;
+    const ambito = readLastChoice("cloud-ambito", AMBITO_VALUES);
+    const categoria = readLastChoice("cloud-categoria", CATEGORIA_LAVORO_VALUES);
+    if (ambito && !form.getValues("ambito")) form.setValue("ambito", ambito);
+    if (categoria && !form.getValues("categoria_lavoro"))
+      form.setValue("categoria_lavoro", categoria);
+  }, [existing, form]);
 
   const watchTipoMedia = form.watch("tipo_media");
   const needsSorgente =
@@ -313,6 +331,8 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
       window.location.assign(`/archivio/${id}/modifica`);
       return;
     }
+    saveLastChoice("cloud-ambito", values.ambito);
+    saveLastChoice("cloud-categoria", values.categoria_lavoro);
     toast.success(isEdit ? "Modifiche salvate" : "Voce salvata");
     router.push(`/archivio/${id}`);
     if (isEdit) router.refresh();

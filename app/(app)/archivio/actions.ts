@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { insertOnce } from "@/lib/forms/insert-once";
+import { findByName } from "@/lib/lookups/names";
 import {
   failedListPage,
   isUuid,
@@ -160,7 +161,12 @@ async function queryArchivePage(
  * LOOKUPS (teams, competitions, seasons, tags)
  * ============================================================ */
 
-export type LookupOption = { id: string; label: string };
+export type LookupOption = {
+  id: string;
+  label: string;
+  /** Solo dalla creazione al volo: il nome esisteva già ed è stato riusato. */
+  existing?: boolean;
+};
 
 export async function getLookupOptions(): Promise<{
   teams: LookupOption[];
@@ -214,54 +220,62 @@ export async function getLookupOptions(): Promise<{
 
 const lookupNameSchema = z.string().trim().min(1).max(100);
 
-export async function createTeam(nome: string): Promise<LookupOption> {
-  const parsed = lookupNameSchema.parse(nome);
+/**
+ * Crea al volo squadra / competizione / stagione. Se esiste già un'anagrafica
+ * con lo stesso nome (maiuscole e spazi iniziali/finali non contano, come
+ * l'indice univoco del DB) restituisce quella, con `existing: true`.
+ */
+async function createLookup(
+  table: "teams" | "competitions" | "seasons",
+  rawName: string,
+): Promise<LookupOption> {
+  const name = lookupNameSchema.parse(rawName);
   const workspace = await getCurrentWorkspace();
   if (!workspace) throw new Error("Workspace non trovato");
-
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("teams")
-    .insert({ workspace_id: workspace.id, nome: parsed })
-    .select("id, nome")
-    .single();
+  const column = table === "seasons" ? "label" : "nome";
 
-  if (error || !data) throw new Error(error?.message ?? "Errore creazione squadra");
-  return { id: data.id, label: data.nome };
+  const findExisting = async (): Promise<LookupOption | undefined> => {
+    const { data } = await supabase
+      .from(table)
+      .select(`id, ${column}`)
+      .eq("workspace_id", workspace.id);
+    const rows = ((data ?? []) as unknown as Record<string, string>[]).map((r) => ({
+      id: r.id,
+      label: r[column],
+    }));
+    const found = findByName(rows, name);
+    return found ? { ...found, existing: true } : undefined;
+  };
+
+  const existing = await findExisting();
+  if (existing) return existing;
+
+  const { data, error } = await supabase
+    .from(table)
+    .insert({ workspace_id: workspace.id, [column]: name } as never)
+    .select(`id, ${column}`)
+    .single();
+  if (error || !data) {
+    // Creato nel frattempo da qualcun altro: uso quello.
+    const raced = error?.code === "23505" ? await findExisting() : undefined;
+    if (raced) return raced;
+    throw new Error(error?.message ?? "Errore creazione");
+  }
+  const row = data as unknown as Record<string, string>;
+  return { id: row.id, label: row[column] };
+}
+
+export async function createTeam(nome: string): Promise<LookupOption> {
+  return createLookup("teams", nome);
 }
 
 export async function createCompetition(nome: string): Promise<LookupOption> {
-  const parsed = lookupNameSchema.parse(nome);
-  const workspace = await getCurrentWorkspace();
-  if (!workspace) throw new Error("Workspace non trovato");
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("competitions")
-    .insert({ workspace_id: workspace.id, nome: parsed })
-    .select("id, nome")
-    .single();
-
-  if (error || !data)
-    throw new Error(error?.message ?? "Errore creazione competizione");
-  return { id: data.id, label: data.nome };
+  return createLookup("competitions", nome);
 }
 
 export async function createSeason(label: string): Promise<LookupOption> {
-  const parsed = lookupNameSchema.parse(label);
-  const workspace = await getCurrentWorkspace();
-  if (!workspace) throw new Error("Workspace non trovato");
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("seasons")
-    .insert({ workspace_id: workspace.id, label: parsed })
-    .select("id, label")
-    .single();
-
-  if (error || !data)
-    throw new Error(error?.message ?? "Errore creazione stagione");
-  return { id: data.id, label: data.label };
+  return createLookup("seasons", label);
 }
 
 function slugifyTag(name: string): string {

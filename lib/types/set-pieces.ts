@@ -235,7 +235,21 @@ export type SetPieceListItem = Pick<
   | "minuto"
   | "punteggio"
   | "data_evento"
+  | "team_esecutrice_id"
+  | "team_avversaria_id"
   | "video_url"
   | "lavagna_image_url"
   | "updated_at"
->;
+> & {
+  /** Nome attuale dell'anagrafica (prevale sul vecchio testo salvato). */
+  team_esecutrice: { nome: string } | null;
+  team_avversaria: { nome: string } | null;
+};
+
+/** Nome della squadra da mostrare: anagrafica collegata, altrimenti il vecchio testo. */
+export function setPieceTeamName(
+  linked: { nome: string } | null | undefined,
+  legacyText: string | null,
+): string | null {
+  return linked?.nome ?? legacyText;
+}

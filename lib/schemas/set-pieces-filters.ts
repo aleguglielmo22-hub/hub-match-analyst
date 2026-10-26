@@ -21,6 +21,10 @@ export type SetPiecesFilters = {
   specificazione_punizione: SpecificazionePunizioneEnum[];
   lato_battuta: LatoBattutaEnum[];
   esito_finale: EsitoFinaleEnum[];
+  /** Squadra coinvolta (esecutrice o avversaria). */
+  team_ids: string[];
+  competition_ids: string[];
+  season_ids: string[];
 };
 
 export const EMPTY_SET_PIECES_FILTERS: SetPiecesFilters = {
@@ -29,7 +33,18 @@ export const EMPTY_SET_PIECES_FILTERS: SetPiecesFilters = {
   specificazione_punizione: [],
   lato_battuta: [],
   esito_finale: [],
+  team_ids: [],
+  competition_ids: [],
+  season_ids: [],
 };
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Solo id validi: finiscono in un filtro `.or()` di PostgREST. */
+function parseUuidList(value: string | null | undefined): string[] {
+  if (!value) return [];
+  return value.split(",").map((v) => v.trim()).filter((v) => UUID_RE.test(v));
+}
 
 function parseList<T extends string>(
   value: string | null | undefined,
@@ -65,6 +80,9 @@ export function parseSetPiecesFiltersFromSearchParams(
     ),
     lato_battuta: parseList(getParam(params, "lato"), LATO_BATTUTA_VALUES),
     esito_finale: parseList(getParam(params, "esito"), ESITO_FINALE_VALUES),
+    team_ids: parseUuidList(getParam(params, "squadra")),
+    competition_ids: parseUuidList(getParam(params, "comp")),
+    season_ids: parseUuidList(getParam(params, "stag")),
   };
 }
 
@@ -73,7 +91,7 @@ export function setPiecesFiltersToSearchParams(
   base?: URLSearchParams,
 ): URLSearchParams {
   const sp = new URLSearchParams(base);
-  for (const k of ["q", "fase", "tipo", "spec", "lato", "esito"]) sp.delete(k);
+  for (const k of ["q", "fase", "tipo", "spec", "lato", "esito", "squadra", "comp", "stag"]) sp.delete(k);
   if (filters.q) sp.set("q", filters.q);
   if (filters.fase.length) sp.set("fase", filters.fase.join(","));
   if (filters.tipo_piazzato.length)
@@ -84,6 +102,9 @@ export function setPiecesFiltersToSearchParams(
     sp.set("lato", filters.lato_battuta.join(","));
   if (filters.esito_finale.length)
     sp.set("esito", filters.esito_finale.join(","));
+  if (filters.team_ids.length) sp.set("squadra", filters.team_ids.join(","));
+  if (filters.competition_ids.length) sp.set("comp", filters.competition_ids.join(","));
+  if (filters.season_ids.length) sp.set("stag", filters.season_ids.join(","));
   return sp;
 }
 
@@ -95,5 +116,8 @@ export function countActiveSetPiecesFilters(f: SetPiecesFilters): number {
   if (f.specificazione_punizione.length) n++;
   if (f.lato_battuta.length) n++;
   if (f.esito_finale.length) n++;
+  if (f.team_ids.length) n++;
+  if (f.competition_ids.length) n++;
+  if (f.season_ids.length) n++;
   return n;
 }

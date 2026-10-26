@@ -522,6 +522,7 @@ export type Database = {
           scadenza_contratto: string | null
           scout_assegnato: string | null
           scouting_report_url: string | null
+          search_text: string | null
           squadra_attuale: string | null
           status_osservazione: Database["public"]["Enums"]["status_osservazione_enum"]
           stili_gioco: string[]
@@ -626,6 +627,7 @@ export type Database = {
           scadenza_contratto?: string | null
           scout_assegnato?: string | null
           scouting_report_url?: string | null
+          search_text?: string | null
           squadra_attuale?: string | null
           status_osservazione?: Database["public"]["Enums"]["status_osservazione_enum"]
           stili_gioco?: string[]
@@ -730,6 +732,7 @@ export type Database = {
           scadenza_contratto?: string | null
           scout_assegnato?: string | null
           scouting_report_url?: string | null
+          search_text?: string | null
           squadra_attuale?: string | null
           status_osservazione?: Database["public"]["Enums"]["status_osservazione_enum"]
           stili_gioco?: string[]
@@ -838,6 +841,7 @@ export type Database = {
             | Database["public"]["Enums"]["sp_altezza_linea_enum"]
             | null
           behavior_tags: string[]
+          competition_id: string | null
           competizione: string | null
           created_at: string
           created_by: string
@@ -862,6 +866,7 @@ export type Database = {
             | Database["public"]["Enums"]["sp_piede_battitore_enum"]
             | null
           punteggio: string | null
+          season_id: string | null
           sistema_marcatura:
             | Database["public"]["Enums"]["sp_sistema_marcatura_enum"]
             | null
@@ -874,6 +879,8 @@ export type Database = {
           sviluppo_schema:
             | Database["public"]["Enums"]["sp_sviluppo_schema_enum"]
             | null
+          team_avversaria_id: string | null
+          team_esecutrice_id: string | null
           tipo_piazzato: Database["public"]["Enums"]["sp_tipo_piazzato_enum"]
           titolo: string
           traiettoria: Database["public"]["Enums"]["sp_traiettoria_enum"] | null
@@ -890,6 +897,7 @@ export type Database = {
             | Database["public"]["Enums"]["sp_altezza_linea_enum"]
             | null
           behavior_tags?: string[]
+          competition_id?: string | null
           competizione?: string | null
           created_at?: string
           created_by: string
@@ -914,6 +922,7 @@ export type Database = {
             | Database["public"]["Enums"]["sp_piede_battitore_enum"]
             | null
           punteggio?: string | null
+          season_id?: string | null
           sistema_marcatura?:
             | Database["public"]["Enums"]["sp_sistema_marcatura_enum"]
             | null
@@ -926,6 +935,8 @@ export type Database = {
           sviluppo_schema?:
             | Database["public"]["Enums"]["sp_sviluppo_schema_enum"]
             | null
+          team_avversaria_id?: string | null
+          team_esecutrice_id?: string | null
           tipo_piazzato: Database["public"]["Enums"]["sp_tipo_piazzato_enum"]
           titolo: string
           traiettoria?:
@@ -944,6 +955,7 @@ export type Database = {
             | Database["public"]["Enums"]["sp_altezza_linea_enum"]
             | null
           behavior_tags?: string[]
+          competition_id?: string | null
           competizione?: string | null
           created_at?: string
           created_by?: string
@@ -968,6 +980,7 @@ export type Database = {
             | Database["public"]["Enums"]["sp_piede_battitore_enum"]
             | null
           punteggio?: string | null
+          season_id?: string | null
           sistema_marcatura?:
             | Database["public"]["Enums"]["sp_sistema_marcatura_enum"]
             | null
@@ -980,6 +993,8 @@ export type Database = {
           sviluppo_schema?:
             | Database["public"]["Enums"]["sp_sviluppo_schema_enum"]
             | null
+          team_avversaria_id?: string | null
+          team_esecutrice_id?: string | null
           tipo_piazzato?: Database["public"]["Enums"]["sp_tipo_piazzato_enum"]
           titolo?: string
           traiettoria?:
@@ -995,10 +1010,38 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "set_pieces_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "set_pieces_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "set_pieces_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "set_pieces_team_avversaria_id_fkey"
+            columns: ["team_avversaria_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "set_pieces_team_esecutrice_id_fkey"
+            columns: ["team_esecutrice_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
           {
@@ -1161,6 +1204,69 @@ export type Database = {
           },
         ]
       }
+      user_preferences: {
+        Row: {
+          current_season_id: string | null
+          main_competition_id: string | null
+          my_team_id: string | null
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          current_season_id?: string | null
+          main_competition_id?: string | null
+          my_team_id?: string | null
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          current_season_id?: string | null
+          main_competition_id?: string | null
+          my_team_id?: string | null
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_preferences_current_season_id_fkey"
+            columns: ["current_season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_preferences_main_competition_id_fkey"
+            columns: ["main_competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_preferences_my_team_id_fkey"
+            columns: ["my_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_preferences_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_members: {
         Row: {
           accepted_at: string | null
@@ -1245,6 +1351,22 @@ export type Database = {
     Functions: {
       current_user_owned_workspaces: { Args: never; Returns: string[] }
       current_user_workspaces: { Args: never; Returns: string[] }
+      merge_lookup: {
+        Args: { p_kind: string; p_source: string; p_target: string }
+        Returns: Json
+      }
+      players_search_text: {
+        Args: {
+          p_campionato: string
+          p_cognome: string
+          p_nome: string
+          p_ruoli: Database["public"]["Enums"]["ruolo_enum"][]
+          p_ruolo: Database["public"]["Enums"]["ruolo_enum"]
+          p_squadra: string
+          p_stili: string[]
+        }
+        Returns: string
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }

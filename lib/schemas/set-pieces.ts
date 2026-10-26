@@ -57,10 +57,11 @@ export const setPieceFormSchema = z
   .object({
     // § 1 Metadati
     titolo: z.string().trim().min(1, "Titolo obbligatorio").max(200),
-    squadra_esecutrice: optionalText,
-    squadra_avversaria: optionalText,
-    competizione: optionalText,
-    stagione: optionalText,
+    // Anagrafiche condivise (0013); i vecchi campi di testo li scrive il server.
+    team_esecutrice_id: z.string().uuid().nullable(),
+    team_avversaria_id: z.string().uuid().nullable(),
+    competition_id: z.string().uuid().nullable(),
+    season_id: z.string().uuid().nullable(),
     minuto: intInRange(0, 130),
     punteggio: optionalText,
     data_evento: isoDateOrNull,
@@ -101,6 +102,15 @@ export const setPieceFormSchema = z
   })
   // Validazione condizionale: replica i CHECK del DB e dà messaggi utili.
   .superRefine((v, ctx) => {
+    // 0) Esecutrice e avversaria non possono coincidere (CHECK sp_squadre_diverse).
+    if (v.team_esecutrice_id && v.team_esecutrice_id === v.team_avversaria_id) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["team_avversaria_id"],
+        message: "Esecutrice e avversaria non possono coincidere",
+      });
+    }
+
     // 1) Specificazione punizione: solo se tipo_piazzato = PUNIZIONE
     if (v.specificazione_punizione && v.tipo_piazzato !== "PUNIZIONE") {
       ctx.addIssue({
@@ -148,17 +158,26 @@ export const setPieceFormSchema = z
 
 export type SetPieceFormValues = z.infer<typeof setPieceFormSchema>;
 
-/** Valori iniziali del form: tutti null/array vuoti tranne le scelte obbligatorie. */
-export function emptySetPieceForm(): SetPieceFormValues {
+/**
+ * Valori iniziali del form: tutti null/array vuoti tranne le scelte
+ * obbligatorie e i predefiniti dalle preferenze (mia squadra come
+ * esecutrice in fase offensiva, stagione corrente, competizione principale).
+ */
+export function emptySetPieceForm(defaults?: {
+  myTeamId?: string | null;
+  seasonId?: string | null;
+  competitionId?: string | null;
+  today?: string | null;
+}): SetPieceFormValues {
   return {
     titolo: "",
-    squadra_esecutrice: null,
-    squadra_avversaria: null,
-    competizione: null,
-    stagione: null,
+    team_esecutrice_id: defaults?.myTeamId ?? null,
+    team_avversaria_id: null,
+    competition_id: defaults?.competitionId ?? null,
+    season_id: defaults?.seasonId ?? null,
     minuto: null,
     punteggio: null,
-    data_evento: null,
+    data_evento: defaults?.today ?? null,
 
     fase: "OFFENSIVO",
     tipo_piazzato: "ANGOLO",

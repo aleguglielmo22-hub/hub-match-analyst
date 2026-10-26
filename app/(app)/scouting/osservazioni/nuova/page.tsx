@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { ObservationForm } from "@/components/scouting/observation-form";
 import { getObservationLookups, getObservationPlayer } from "../actions";
+import { getMyPreferences } from "@/app/(app)/lookups/actions";
 
 export const metadata = {
   title: "Nuova osservazione · Scouting DB",
@@ -19,14 +20,19 @@ export default async function NuovaOsservazionePage({
 
   const sp = await searchParams;
   const playerId = Array.isArray(sp.giocatore) ? sp.giocatore[0] : sp.giocatore;
-  const [lookups, player] = await Promise.all([
+  const [lookups, player, prefs] = await Promise.all([
     getObservationLookups(),
     playerId ? getObservationPlayer(playerId) : Promise.resolve(null),
+    getMyPreferences(),
   ]);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-8 sm:py-10">
-      <ObservationForm lookups={lookups} initialPlayer={player} />
+      <ObservationForm
+        lookups={lookups}
+        initialPlayer={player}
+        defaultCompetitionId={prefs.main_competition_id}
+      />
     </div>
   );
 }

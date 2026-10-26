@@ -26,6 +26,7 @@ import { videoEmbedUrl } from "@/lib/links/external-links";
 import {
   ALTEZZA_LINEA_LABEL,
   esitoLabel,
+  setPieceTeamName,
   FASE_LABEL,
   LATO_BATTUTA_LABEL,
   PIEDE_BATTITORE_LABEL,
@@ -40,6 +41,13 @@ import {
 
 export const dynamic = "force-dynamic";
 
+type SetPieceDetail = SetPieceRow & {
+  team_esecutrice: { nome: string } | null;
+  team_avversaria: { nome: string } | null;
+  competition: { nome: string } | null;
+  season: { label: string } | null;
+};
+
 export default async function DettaglioSetPiecePage({
   params,
 }: {
@@ -51,20 +59,26 @@ export default async function DettaglioSetPiecePage({
   if (!isUuid(id)) notFound();
 
   let workspace: Awaited<ReturnType<typeof getCurrentWorkspace>> = null;
-  let data: SetPieceRow | null = null;
+  let data: SetPieceDetail | null = null;
   try {
     workspace = await getCurrentWorkspace();
     if (workspace) {
       const supabase = await createClient();
       const res = await supabase
         .from("set_pieces")
-        .select("*")
+        .select(
+          `*,
+          team_esecutrice:teams!set_pieces_team_esecutrice_id_fkey(nome),
+          team_avversaria:teams!set_pieces_team_avversaria_id_fkey(nome),
+          competition:competitions(nome),
+          season:seasons(label)`,
+        )
         .eq("id", id)
         .eq("workspace_id", workspace.id)
         .is("deleted_at", null)
         .maybeSingle();
       if (res.error) throw res.error;
-      data = res.data as SetPieceRow | null;
+      data = res.data as unknown as SetPieceDetail | null;
     }
   } catch (err) {
     logLoadError("Set Pieces · dettaglio", err);
@@ -73,11 +87,16 @@ export default async function DettaglioSetPiecePage({
 
   if (!workspace) redirect("/login");
   if (!data) notFound();
-  const sp = data as SetPieceRow;
+  const sp = data as SetPieceDetail;
 
   // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
   const canEdit = workspace.isOwner || sp.created_by === workspace.userId;
   const isOffensive = sp.fase === "OFFENSIVO";
+  // Nomi attuali delle anagrafiche collegate, altrimenti i vecchi testi.
+  const esecutrice = setPieceTeamName(sp.team_esecutrice, sp.squadra_esecutrice);
+  const avversaria = setPieceTeamName(sp.team_avversaria, sp.squadra_avversaria);
+  const competizione = sp.competition?.nome ?? sp.competizione;
+  const stagione = sp.season?.label ?? sp.stagione;
   const dataFmt = sp.data_evento
     ? format(parseISO(sp.data_evento), "EEEE d MMMM yyyy", { locale: it })
     : null;
@@ -149,22 +168,22 @@ export default async function DettaglioSetPiecePage({
           {sp.titolo}
         </h1>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {sp.squadra_esecutrice && (
+          {esecutrice && (
             <span className="text-foreground/80 font-medium">
-              {sp.squadra_esecutrice}
+              {esecutrice}
             </span>
           )}
-          {sp.squadra_avversaria && (
+          {avversaria && (
             <>
               <span>vs</span>
-              <span>{sp.squadra_avversaria}</span>
+              <span>{avversaria}</span>
             </>
           )}
-          {(sp.competizione || sp.stagione) && (
+          {(competizione || stagione) && (
             <>
               <span className="opacity-30">·</span>
               <span>
-                {[sp.competizione, sp.stagione].filter(Boolean).join(" — ")}
+                {[competizione, stagione].filter(Boolean).join(" — ")}
               </span>
             </>
           )}

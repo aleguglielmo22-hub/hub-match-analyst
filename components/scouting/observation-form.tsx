@@ -74,7 +74,10 @@ export function ObservationForm({
   lookups: initialLookups,
   initialPlayer,
   existing,
+  defaultCompetitionId = null,
 }: {
+  /** Competizione principale dalle preferenze (solo nuove osservazioni). */
+  defaultCompetitionId?: string | null;
   lookups: { teams: LookupOption[]; competitions: LookupOption[] };
   /** Giocatore già scelto (es. arrivando dal suo dettaglio). */
   initialPlayer?: ObservationPlayer | null;
@@ -99,7 +102,7 @@ export function ObservationForm({
   const form = useForm<ObservationFormInput, unknown, ObservationFormValues>({
     resolver: zodResolver(observationFormSchema),
     defaultValues: existing?.values ?? {
-      ...emptyValues(),
+      ...emptyValues({ competition_id: defaultCompetitionId }),
       ruolo_giocato: initialPlayer?.ruolo_principale ?? null,
     },
   });

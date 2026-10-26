@@ -6,6 +6,7 @@ import { SetPiecesList } from "@/components/set-pieces/set-pieces-list";
 import { SetPiecesFiltersSidebar } from "@/components/set-pieces/set-pieces-filters-sidebar";
 import { SetPiecesFiltersMobileTrigger } from "@/components/set-pieces/set-pieces-filters-mobile-trigger";
 import { SearchInput } from "@/components/archivio/search-input";
+import { getSharedLookups } from "@/app/(app)/lookups/actions";
 import { loadSetPiecesPage } from "./actions";
 import {
   countActiveSetPiecesFilters,
@@ -27,11 +28,10 @@ export default async function SetPiecesPage({
   const sp = await searchParams;
   const filters = parseSetPiecesFiltersFromSearchParams(sp);
 
-  const initialPage = await loadSetPiecesPage({
-    sort: "recent",
-    page: 0,
-    filters,
-  });
+  const [initialPage, lookups] = await Promise.all([
+    loadSetPiecesPage({ sort: "recent", page: 0, filters }),
+    getSharedLookups(),
+  ]);
 
   const activeCount = countActiveSetPiecesFilters(filters);
   const hasActiveSearchOrFilters = activeCount > 0 || !!filters.q;
@@ -56,16 +56,21 @@ export default async function SetPiecesPage({
       <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <SetPiecesFiltersSidebar
           filters={filters}
+          lookups={lookups}
           className="hidden lg:block"
         />
 
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <div className="flex-1">
-              <SearchInput basePath="/set-pieces" initialQuery={filters.q} />
+              <SearchInput
+                basePath="/set-pieces"
+                initialQuery={filters.q}
+                placeholder="Cerca per titolo, squadra o competizione…"
+              />
             </div>
             <div className="lg:hidden">
-              <SetPiecesFiltersMobileTrigger filters={filters} />
+              <SetPiecesFiltersMobileTrigger filters={filters} lookups={lookups} />
             </div>
           </div>
 

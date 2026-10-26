@@ -228,7 +228,7 @@ export async function loadTrash(opts: {
         .select("id, nome, cognome, ruolo_principale, squadra_attuale, created_by, deleted_at")
         .eq("workspace_id", workspace.id)
         .not("deleted_at", "is", null);
-      if (q) r = r.or(ilikeAnyFilter(["nome", "cognome", "squadra_attuale"], q));
+      if (q) r = r.or(ilikeAnyFilter(["search_text"], q));
       const { data, error } = await r
         .order("deleted_at", { ascending: false })
         .limit(TRASH_LIMIT + 1);

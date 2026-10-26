@@ -13,11 +13,14 @@ import {
   countActiveSetPiecesFilters,
   type SetPiecesFilters,
 } from "@/lib/schemas/set-pieces-filters";
+import type { SharedLookups } from "@/app/(app)/lookups/actions";
 
 export function SetPiecesFiltersMobileTrigger({
   filters,
+  lookups,
 }: {
   filters: SetPiecesFilters;
+  lookups: SharedLookups;
 }) {
   const [open, setOpen] = useState(false);
   const count = countActiveSetPiecesFilters(filters);
@@ -34,7 +37,7 @@ export function SetPiecesFiltersMobileTrigger({
       </SheetTrigger>
       <SheetContent side="left" className="w-80 overflow-y-auto p-5">
         <SheetTitle className="sr-only">Filtri Set Pieces DB</SheetTitle>
-        <SetPiecesFiltersSidebar filters={filters} />
+        <SetPiecesFiltersSidebar filters={filters} lookups={lookups} />
       </SheetContent>
     </Sheet>
   );

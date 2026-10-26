@@ -87,7 +87,11 @@ export default async function CestinoPage({
           })}
         </nav>
         <div className="sm:w-72">
-          <SearchInput basePath="/cestino" initialQuery={query} />
+          <SearchInput
+            basePath="/cestino"
+            initialQuery={query}
+            placeholder="Cerca per nome o titolo…"
+          />
         </div>
       </div>
 

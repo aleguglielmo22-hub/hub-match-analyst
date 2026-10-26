@@ -9,7 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ToggleChipGroup } from "@/components/archivio/multi-select-popover";
+import { ToggleChipGroup, MultiSelectPopover } from "@/components/archivio/multi-select-popover";
 import {
   esitoLabel,
   ESITO_FINALE_VALUES,
@@ -33,12 +33,16 @@ import {
   setPiecesFiltersToSearchParams,
   type SetPiecesFilters,
 } from "@/lib/schemas/set-pieces-filters";
+import type { SharedLookups } from "@/app/(app)/lookups/actions";
 
 export function SetPiecesFiltersSidebar({
   filters,
+  lookups,
   className,
 }: {
   filters: SetPiecesFilters;
+  /** Squadre, competizioni e stagioni per i filtri di contesto. */
+  lookups: SharedLookups;
   className?: string;
 }) {
   const router = useRouter();
@@ -154,6 +158,34 @@ export function SetPiecesFiltersSidebar({
           options={tipoOpts}
           value={local.tipo_piazzato}
           onChange={(v) => update({ tipo_piazzato: v })}
+        />
+      </section>
+
+      {/* Contesto: anagrafiche condivise */}
+      <section className="mb-4 space-y-3 border-b border-sidebar-border/50 pb-4">
+        <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/50">
+          Contesto
+        </h3>
+        <MultiSelectPopover
+          label="Squadra (esecutrice o avversaria)"
+          options={lookups.teams}
+          value={local.team_ids}
+          onChange={(v) => update({ team_ids: v })}
+          placeholder="Tutte"
+        />
+        <MultiSelectPopover
+          label="Competizione"
+          options={lookups.competitions}
+          value={local.competition_ids}
+          onChange={(v) => update({ competition_ids: v })}
+          placeholder="Tutte"
+        />
+        <MultiSelectPopover
+          label="Stagione"
+          options={lookups.seasons}
+          value={local.season_ids}
+          onChange={(v) => update({ season_ids: v })}
+          placeholder="Tutte"
         />
       </section>
 

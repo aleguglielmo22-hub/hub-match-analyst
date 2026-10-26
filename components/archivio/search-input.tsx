@@ -6,15 +6,18 @@ import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 /**
- * Campo di ricerca testuale per la lista archivio.
+ * Campo di ricerca testuale delle liste (Cloud, Scouting, Set Pieces, Training, Cestino).
  * Aggiorna ?q= nell'URL con debounce 300ms. Combinabile con i filtri sidebar.
  */
 export function SearchInput({
   basePath,
   initialQuery,
+  placeholder,
 }: {
   basePath: string;
   initialQuery?: string;
+  /** Descrive cosa cerca davvero la casella in quella pagina. */
+  placeholder: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -49,7 +52,7 @@ export function SearchInput({
         type="search"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Cerca per titolo o descrizione…"
+        placeholder={placeholder}
         // 16px su mobile: evita lo zoom automatico di iPhone sul campo.
         className="h-9 pl-8 pr-8 text-base md:text-sm"
       />

@@ -1,5 +1,5 @@
 /**
- * Tabelle dati incluse nel backup, ricavate da supabase/migrations/0001–0012.
+ * Tabelle dati incluse nel backup, ricavate da supabase/migrations/0001–0013.
  * Ordine = ordine di ripristino (prima le tabelle referenziate dalle foreign key).
  * `orderBy` = chiave primaria, per una paginazione stabile a blocchi.
  */
@@ -20,6 +20,7 @@ export const BACKUP_TABLES = [
   { name: "set_pieces", orderBy: ["id"] },
   { name: "situational_tactics", orderBy: ["id"] },
   { name: "attachments", orderBy: ["id"] },
+  { name: "user_preferences", orderBy: ["user_id", "workspace_id"] },
 ] as const;
 
 export type BackupTableName = (typeof BACKUP_TABLES)[number]["name"];

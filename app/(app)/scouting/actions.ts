@@ -103,7 +103,8 @@ async function queryPlayersPage(
     .is("deleted_at", null);
 
   if (filters?.q) {
-    q = q.or(ilikeAnyFilter(["nome", "cognome", "squadra_attuale"], filters.q));
+    // search_text (0013): nome, cognome, squadra, campionato, stili e ruoli.
+    q = q.or(ilikeAnyFilter(["search_text"], filters.q));
   }
 
   if (
