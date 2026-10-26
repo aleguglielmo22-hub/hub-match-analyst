@@ -12,6 +12,7 @@ import {
   type LoadResult,
 } from "@/lib/load-result";
 import {
+  archiveLinkSchema,
   createArchiveItemSchema,
   TIPO_MEDIA_VALUES,
   type CreateArchiveItemInput,
@@ -353,6 +354,22 @@ export async function createArchiveItem(
     }
   }
 
+  if (payload.links.length > 0) {
+    const { error: linksError } = await supabase
+      .from("archive_item_links")
+      .insert(
+        payload.links.map((l, i) => ({
+          archive_item_id: payload.id,
+          url: l.url,
+          etichetta: l.etichetta,
+          posizione: i,
+        })),
+      );
+    if (linksError) {
+      console.error("Errore inserimento archive_item_links:", linksError.message);
+    }
+  }
+
   if (payload.tag_ids.length > 0) {
     const { error: tagError } = await supabase
       .from("archive_item_tags")
@@ -426,6 +443,7 @@ async function queryArchiveItem(itemId: string): Promise<ArchiveDetail | null> {
         team_avversario:teams!archive_items_team_avversario_id_fkey(id, nome),
         competition:competitions(id, nome),
         files:archive_files(id, file_name, file_path, file_size_bytes, mime_type, tipo_media, posizione),
+        links:archive_item_links(id, url, etichetta, posizione),
         tag_links:archive_item_tags(tag:tags(id, name))
       `,
     )
@@ -468,6 +486,11 @@ async function queryArchiveItem(itemId: string): Promise<ArchiveDetail | null> {
     signed_url: signedUrls[i],
   }));
 
+  const links = [...(data.links ?? [])].sort(
+    (a, b) =>
+      a.posizione - b.posizione || a.id.localeCompare(b.id),
+  );
+
   const tagLinks = (data.tag_links ?? []) as Array<{
     tag: { id: string; name: string } | { id: string; name: string }[] | null;
   }>;
@@ -500,6 +523,7 @@ async function queryArchiveItem(itemId: string): Promise<ArchiveDetail | null> {
     titolo_archivio: data.titolo_archivio,
     descrizione_estesa: data.descrizione_estesa,
     files,
+    links,
     tag_ids: tags.map((t) => t.id),
     tags,
     can_edit: workspace.isOwner || data.created_by === workspace.userId,
@@ -629,6 +653,7 @@ const updateSchema = z.object({
       posizione: z.number().int().nonnegative(),
     }),
   ),
+  links: z.array(archiveLinkSchema).max(50),
   remove_file_ids: z.array(z.string().uuid()),
   update_file_tipi: z.array(
     z.object({ id: z.string().uuid(), tipo_media: z.enum(TIPO_MEDIA_VALUES) }),
@@ -692,6 +717,45 @@ export async function updateArchiveItem(
       })),
     );
     if (filesErr) throw new Error(filesErr.message);
+  }
+
+  // 3b) Link: aggiorna quelli rimasti (url, etichetta, ordine), inserisce i
+  // nuovi ed elimina quelli tolti dall'elenco.
+  const { data: savedLinks, error: linksFetchErr } = await supabase
+    .from("archive_item_links")
+    .select("id")
+    .eq("archive_item_id", payload.id);
+  if (linksFetchErr) throw new Error(linksFetchErr.message);
+  const savedIds = new Set((savedLinks ?? []).map((l) => l.id));
+  const keptIds = new Set(
+    payload.links.flatMap((l) => (l.id && savedIds.has(l.id) ? [l.id] : [])),
+  );
+  const removedLinkIds = [...savedIds].filter((id) => !keptIds.has(id));
+  if (removedLinkIds.length > 0) {
+    const { error } = await supabase
+      .from("archive_item_links")
+      .delete()
+      .in("id", removedLinkIds);
+    if (error) throw new Error(error.message);
+  }
+  const newLinks: { url: string; etichetta: string | null; posizione: number }[] = [];
+  for (const [posizione, l] of payload.links.entries()) {
+    if (l.id && keptIds.has(l.id)) {
+      const { error } = await supabase
+        .from("archive_item_links")
+        .update({ url: l.url, etichetta: l.etichetta, posizione })
+        .eq("id", l.id)
+        .eq("archive_item_id", payload.id);
+      if (error) throw new Error(error.message);
+    } else {
+      newLinks.push({ url: l.url, etichetta: l.etichetta, posizione });
+    }
+  }
+  if (newLinks.length > 0) {
+    const { error } = await supabase
+      .from("archive_item_links")
+      .insert(newLinks.map((l) => ({ ...l, archive_item_id: payload.id })));
+    if (error) throw new Error(error.message);
   }
 
   // 4) Update voce.

@@ -129,7 +129,7 @@ export function ArchiveFilesViewer({
   if (files.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border/60 bg-card/20 p-6 text-center text-sm text-muted-foreground">
-        Nessun file allegato a questa voce.
+        Nessun link o file collegato a questa voce.
       </div>
     );
   }

@@ -39,6 +39,14 @@ export type ArchiveExistingFile = {
   signed_url: string | null;
 };
 
+/** Link a un file esterno, nell'ordine scelto dall'utente. */
+export type ArchiveLink = {
+  id: string;
+  url: string;
+  etichetta: string | null;
+  posizione: number;
+};
+
 /** Voce archivio nella forma completa per dettaglio + modifica. */
 export type ArchiveDetail = {
   id: string;
@@ -65,6 +73,7 @@ export type ArchiveDetail = {
   descrizione_estesa: string | null;
 
   files: ArchiveExistingFile[];
+  links: ArchiveLink[];
   tag_ids: string[];
   tags: { id: string; name: string }[];
 
@@ -95,6 +104,11 @@ export type UpdateArchiveItemInput = {
     tipo_media: TipoMediaEnum;
     posizione: number;
   }[];
+  /**
+   * Elenco completo dei link, nell'ordine finale. Quelli con `id` esistono già;
+   * quelli salvati e assenti dall'elenco vengono eliminati.
+   */
+  links: { id?: string; url: string; etichetta: string | null }[];
   /** archive_files.id da rimuovere (DB + Storage). */
   remove_file_ids: string[];
   /** Aggiornamenti di tipo_media su file esistenti (id → nuovo tipo_media). */

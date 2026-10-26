@@ -31,7 +31,11 @@ import {
   updateArchiveItem,
   type LookupOption,
 } from "@/app/(app)/archivio/actions";
-import type { ArchiveExistingFile } from "@/app/(app)/archivio/types";
+import type {
+  ArchiveExistingFile,
+  ArchiveLink,
+} from "@/app/(app)/archivio/types";
+import { uploadMimeType } from "@/lib/uploads/limits";
 
 import { Button } from "@/components/ui/button";
 import { MobileSaveBar } from "@/components/app/mobile-save-bar";
@@ -58,6 +62,11 @@ import {
   ExistingFilesList,
   type ExistingFileState,
 } from "@/components/archivio/existing-files-list";
+import {
+  LinksEditor,
+  validateLinkDrafts,
+  type LinkDraft,
+} from "@/components/archivio/links-editor";
 
 function slugifyFilename(name: string): string {
   const dot = name.lastIndexOf(".");
@@ -75,6 +84,7 @@ type ExistingPayload = {
   id: string;
   values: ArchiveFormValues;
   files: ArchiveExistingFile[];
+  links: ArchiveLink[];
 };
 
 type Props = {
@@ -136,6 +146,14 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
       removed: false,
     })),
   );
+  const [links, setLinks] = useState<LinkDraft[]>(() =>
+    (existing?.links ?? []).map((l) => ({
+      uid: l.id,
+      id: l.id,
+      url: l.url,
+      etichetta: l.etichetta ?? "",
+    })),
+  );
   const [submitting, setSubmitting] = useState(false);
   const [lookups, setLookups] = useState(initialLookups);
 
@@ -181,7 +199,7 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
           .from("archivio")
           .upload(path, pf.file, {
             cacheControl: "3600",
-            contentType: pf.file.type || undefined,
+            contentType: uploadMimeType(pf.file) ?? undefined,
             upsert: false,
           });
         if (uploadError) {
@@ -193,7 +211,7 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
           file_name: pf.file.name,
           file_path: path,
           file_size_bytes: pf.file.size,
-          mime_type: pf.file.type || null,
+          mime_type: uploadMimeType(pf.file),
           tipo_media: pf.tipo_media,
           posizione: startPosition + i,
         };
@@ -202,6 +220,14 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
   }
 
   async function onSubmit(values: ArchiveFormValues) {
+    const checkedLinks = validateLinkDrafts(links);
+    if (!checkedLinks.ok) {
+      setLinks(checkedLinks.drafts);
+      toast.error("Controlla i link", {
+        description: "Uno o più indirizzi non sono validi.",
+      });
+      return;
+    }
     setSubmitting(true);
 
     try {
@@ -236,6 +262,7 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
           descrizione_estesa: values.descrizione_estesa?.trim() || null,
           tag_ids: values.tag_ids,
           new_files,
+          links: checkedLinks.links,
           remove_file_ids,
           update_file_tipi,
         });
@@ -263,6 +290,7 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
           titolo_archivio: values.titolo_archivio.trim(),
           descrizione_estesa: values.descrizione_estesa?.trim() || null,
           files: uploaded,
+          links: checkedLinks.links,
           tag_ids: values.tag_ids,
         });
 
@@ -583,13 +611,21 @@ export function ArchiveForm({ workspaceId, initialLookups, existing }: Props) {
         </div>
       </FormSection>
 
+      {/* LINK (prima dei file: l'hub cataloga, non custodisce) */}
+      <FormSection
+        title="Link"
+        description="Collega partite, clip e documenti dai tuoi archivi (Google Drive, Dropbox, OneDrive, YouTube, Vimeo, Wyscout…)."
+      >
+        <LinksEditor links={links} onChange={setLinks} />
+      </FormSection>
+
       {/* FILE */}
       <FormSection
         title="File"
         description={
           isEdit
-            ? "Gestisci gli allegati esistenti e aggiungine di nuovi."
-            : "Trascina o seleziona i file da allegare. Verranno caricati al salvataggio."
+            ? "Gestisci gli allegati esistenti e aggiungine di nuovi. Solo file leggeri: per video e file pesanti usa un link."
+            : "Solo file leggeri (PDF, immagini, documenti Office). Per video e file pesanti usa un link. Verranno caricati al salvataggio."
         }
       >
         {isEdit && (

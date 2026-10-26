@@ -49,7 +49,7 @@ export default async function ArchivioPage({
       <SectionHeader
         icon={Archive}
         title="Cloud"
-        subtitle="Archivio video e documenti del workspace"
+        subtitle="Catalogo di partite, clip e documenti, con link ai tuoi archivi"
         actions={
           <>
             <Link

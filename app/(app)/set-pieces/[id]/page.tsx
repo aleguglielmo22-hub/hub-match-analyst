@@ -18,6 +18,7 @@ import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import { Badge } from "@/components/ui/badge";
 import { ESITO_TONE, FASE_SET_PIECE_TONE, TONE } from "@/lib/tones";
 import { cn } from "@/lib/utils";
+import { videoEmbedUrl } from "@/lib/links/external-links";
 import {
   ALTEZZA_LINEA_LABEL,
   ESITO_FINALE_LABEL,
@@ -356,10 +357,8 @@ function Row({
  * Embed video. Per file MP4 diretti usa <video>; per URL YouTube/Vimeo usa iframe.
  */
 function VideoEmbed({ url }: { url: string }) {
-  const isYouTube = /youtube\.com|youtu\.be/.test(url);
-  const isVimeo = /vimeo\.com/.test(url);
-  if (isYouTube || isVimeo) {
-    const embedUrl = toEmbedUrl(url, isYouTube ? "youtube" : "vimeo");
+  const embedUrl = videoEmbedUrl(url);
+  if (embedUrl) {
     return (
       <iframe
         src={embedUrl}
@@ -395,21 +394,4 @@ function VideoEmbed({ url }: { url: string }) {
       </a>
     </div>
   );
-}
-
-function toEmbedUrl(url: string, provider: "youtube" | "vimeo"): string {
-  try {
-    const u = new URL(url);
-    if (provider === "youtube") {
-      const id =
-        u.searchParams.get("v") ||
-        u.pathname.replace("/embed/", "").replace(/^\//, "");
-      return `https://www.youtube.com/embed/${id}`;
-    }
-    // Vimeo: pathname tipo "/123456789"
-    const id = u.pathname.replace(/^\//, "").split("/")[0];
-    return `https://player.vimeo.com/video/${id}`;
-  } catch {
-    return url;
-  }
 }

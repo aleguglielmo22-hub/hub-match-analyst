@@ -4,6 +4,10 @@
  * Lo schema "server" è quello che le Server Action accettano (con id risolti).
  */
 import { z } from "zod";
+import {
+  LINK_LABEL_MAX,
+  normalizeExternalUrl,
+} from "@/lib/links/external-links";
 
 export const AMBITO_VALUES = [
   "PRIMA_SQUADRA",
@@ -54,6 +58,29 @@ export const archiveFileMetaSchema = z.object({
 });
 export type ArchiveFileMeta = z.infer<typeof archiveFileMetaSchema>;
 
+/** Link a un file esterno (Drive, Dropbox, YouTube…). L'URL viene normalizzato. */
+export const archiveLinkSchema = z.object({
+  /** Presente solo per i link già salvati (modifica). */
+  id: z.string().uuid().optional(),
+  url: z
+    .string()
+    .transform((v, ctx) => {
+      const url = normalizeExternalUrl(v);
+      if (!url) {
+        ctx.addIssue({ code: "custom", message: "Indirizzo non valido" });
+        return z.NEVER;
+      }
+      return url;
+    }),
+  etichetta: z
+    .string()
+    .trim()
+    .max(LINK_LABEL_MAX)
+    .nullable()
+    .transform((v) => v || null),
+});
+export type ArchiveLinkInput = z.input<typeof archiveLinkSchema>;
+
 /**
  * Payload completo del form di creazione, dopo che gli upload sono andati
  * a buon fine e i lookup (teams/comp/season) sono stati creati o selezionati.
@@ -75,6 +102,7 @@ export const createArchiveItemSchema = z.object({
     .max(200, "Massimo 200 caratteri"),
   descrizione_estesa: z.string().max(5000).nullable().optional(),
   files: z.array(archiveFileMetaSchema).default([]),
+  links: z.array(archiveLinkSchema).max(50).default([]),
   tag_ids: z.array(z.string().uuid()).default([]),
 });
 export type CreateArchiveItemInput = z.infer<typeof createArchiveItemSchema>;

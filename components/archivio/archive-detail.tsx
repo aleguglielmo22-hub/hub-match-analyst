@@ -11,6 +11,7 @@ import {
   SORGENTE_VIDEO_LABEL,
 } from "@/lib/types/archivio";
 import { ArchiveFilesViewer } from "./archive-files-viewer";
+import { ArchiveLinks } from "./archive-links";
 import { TrashButton } from "./trash-button";
 import type { ArchiveDetail as ArchiveDetailType } from "@/app/(app)/archivio/types";
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
@@ -183,13 +184,25 @@ export function ArchiveDetail({ item }: { item: ArchiveDetailType }) {
           </p>
         </aside>
 
-        {/* Colonna destra: file */}
-        <section className="space-y-3">
-          <h2 className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            File allegati ({item.files.length})
-          </h2>
-          <ArchiveFilesViewer files={item.files} />
-        </section>
+        {/* Colonna destra: link esterni, poi file caricati */}
+        <div className="space-y-6">
+          {item.links.length > 0 && (
+            <section className="space-y-3">
+              <h2 className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                Link ({item.links.length})
+              </h2>
+              <ArchiveLinks links={item.links} />
+            </section>
+          )}
+          {(item.files.length > 0 || item.links.length === 0) && (
+            <section className="space-y-3">
+              <h2 className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                File allegati ({item.files.length})
+              </h2>
+              <ArchiveFilesViewer files={item.files} />
+            </section>
+          )}
+        </div>
       </div>
     </div>
   );

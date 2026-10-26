@@ -9,7 +9,7 @@ export const ATTACHMENT_ENTITIES = [
 export type AttachmentEntity = (typeof ATTACHMENT_ENTITIES)[number];
 
 export const ATTACHMENTS_BUCKET = "media";
-export const ATTACHMENT_MAX_BYTES = 500 * 1024 * 1024; // 500 MB
+// Limiti di peso e tipo dei file: vedi lib/uploads/limits.ts.
 
 export type AttachmentItem = {
   id: string;

@@ -7,6 +7,7 @@ import { isUuid, logLoadError } from "@/lib/load-result";
 import { PageLoadError } from "@/components/app/load-error";
 import { AttachmentsViewer } from "@/components/attachments/attachments-viewer";
 import { cn } from "@/lib/utils";
+import { videoEmbedUrl } from "@/lib/links/external-links";
 import {
   MACRO_FASE_BADGE,
   MACRO_FASE_DESC,
@@ -259,10 +260,8 @@ export default async function DettaglioSituazionalePage({
 
 /** Embed video smart (YouTube/Vimeo iframe vs MP4 nativo vs link). */
 function VideoEmbed({ url }: { url: string }) {
-  const isYouTube = /youtube\.com|youtu\.be/.test(url);
-  const isVimeo = /vimeo\.com/.test(url);
-  if (isYouTube || isVimeo) {
-    const embedUrl = toEmbedUrl(url, isYouTube ? "youtube" : "vimeo");
+  const embedUrl = videoEmbedUrl(url);
+  if (embedUrl) {
     return (
       <iframe
         src={embedUrl}
@@ -296,20 +295,4 @@ function VideoEmbed({ url }: { url: string }) {
       </a>
     </div>
   );
-}
-
-function toEmbedUrl(url: string, provider: "youtube" | "vimeo"): string {
-  try {
-    const u = new URL(url);
-    if (provider === "youtube") {
-      const id =
-        u.searchParams.get("v") ||
-        u.pathname.replace("/embed/", "").replace(/^\//, "");
-      return `https://www.youtube.com/embed/${id}`;
-    }
-    const id = u.pathname.replace(/^\//, "").split("/")[0];
-    return `https://player.vimeo.com/video/${id}`;
-  } catch {
-    return url;
-  }
 }

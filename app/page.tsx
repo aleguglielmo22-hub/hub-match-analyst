@@ -18,7 +18,7 @@ import { Logo } from "@/components/brand/logo";
 export const metadata = {
   title: "AG Workspace — Scouting & Analisi per Match Analyst",
   description:
-    "Database scouting e palle inattive, training e cloud video in un unico hub per il match analyst.",
+    "Database scouting e palle inattive, training e catalogo di partite, clip e documenti in un unico hub per il match analyst.",
 };
 
 // La home è pubblica: la rendiamo dinamica perché controlliamo la sessione.
@@ -44,7 +44,7 @@ const FEATURES = [
   {
     icon: Archive,
     title: "Cloud",
-    desc: "Archivio cloud per video e documenti. Tag, stagioni e ricerca per ritrovare ogni file in pochi secondi.",
+    desc: "Catalogo di partite, clip e documenti, con link ai tuoi archivi. Tag, stagioni e ricerca per ritrovare tutto in pochi secondi.",
   },
 ];
 
@@ -58,7 +58,7 @@ const SHOTS = [
   { caption: "Dashboard — centro di controllo" },
   { caption: "Scheda giocatore — Scouting DB" },
   { caption: "Analisi palle inattive — Set Pieces DB" },
-  { caption: "Cloud — video & documenti" },
+  { caption: "Cloud — catalogo di partite, clip e documenti" },
 ];
 
 export default async function LandingPage() {
@@ -103,8 +103,9 @@ export default async function LandingPage() {
               AG Workspace
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Database scouting e palle inattive, catalogo training e cloud
-              video: tutto in un&apos;unica piattaforma per il match analyst.
+              Database scouting e palle inattive, training e un catalogo di
+              partite, clip e documenti con link ai tuoi archivi: tutto in
+              un&apos;unica piattaforma per il match analyst.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link

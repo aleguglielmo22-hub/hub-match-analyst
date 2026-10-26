@@ -25,6 +25,12 @@ import {
   type TipoMediaEnum,
 } from "@/lib/types/archivio";
 import { TIPO_MEDIA_VALUES } from "@/lib/schemas/archivio";
+import {
+  checkUploadFile,
+  UPLOAD_ACCEPT,
+  UPLOAD_HINT,
+  uploadMimeType,
+} from "@/lib/uploads/limits";
 
 export type PendingFile = {
   /** id locale, usato solo per la react key. */
@@ -41,14 +47,8 @@ const ICON: Record<TipoMediaEnum, LucideIcon> = {
   EXCEL_DATI: FileSpreadsheet,
 };
 
-const MAX_BYTES = 500 * 1024 * 1024; // 500 MB
-
 function suggestTipoMedia(file: File): TipoMediaEnum {
-  const mime = file.type;
-  if (mime.startsWith("video/")) {
-    // Heuristica: oltre 200 MB consideriamo "intera partita".
-    return file.size > 200 * 1024 * 1024 ? "INTERA_PARTITA" : "VIDEO_CLIP";
-  }
+  const mime = uploadMimeType(file) ?? "";
   if (mime === "application/pdf") return "PDF_REPORT";
   if (mime.includes("presentation")) return "SLIDE_PRESENTAZIONE";
   if (mime.includes("spreadsheet") || mime.includes("excel"))
@@ -80,8 +80,9 @@ export function FileDropzone({
       const errs: string[] = [];
 
       Array.from(newFiles).forEach((file) => {
-        if (file.size > MAX_BYTES) {
-          errs.push(`${file.name} supera 500 MB.`);
+        const error = checkUploadFile(file);
+        if (error) {
+          errs.push(`${file.name}: ${error}`);
           return;
         }
         accepted.push({
@@ -134,7 +135,7 @@ export function FileDropzone({
             Trascina i file qui, oppure clicca per sceglierli
           </p>
           <p className="text-xs text-muted-foreground">
-            Video · PDF · Slide · Excel · immagini · max 500 MB per file
+            {UPLOAD_HINT}
           </p>
         </div>
         <input
@@ -142,6 +143,7 @@ export function FileDropzone({
           id="file-input"
           type="file"
           multiple
+          accept={UPLOAD_ACCEPT}
           className="sr-only"
           onChange={(e) => {
             if (e.target.files) addFiles(e.target.files);

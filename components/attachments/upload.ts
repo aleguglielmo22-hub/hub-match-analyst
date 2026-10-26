@@ -9,6 +9,7 @@ import {
   ATTACHMENTS_BUCKET,
   type AttachmentEntity,
 } from "@/lib/attachments/shared";
+import { uploadMimeType } from "@/lib/uploads/limits";
 
 function slugifyFilename(name: string): string {
   const dot = name.lastIndexOf(".");
@@ -46,7 +47,7 @@ export async function uploadPendingAttachments(
         .from(ATTACHMENTS_BUCKET)
         .upload(path, file, {
           cacheControl: "3600",
-          contentType: file.type || undefined,
+          contentType: uploadMimeType(file) ?? undefined,
           upsert: false,
         });
       if (error) {
@@ -56,7 +57,7 @@ export async function uploadPendingAttachments(
         file_name: file.name,
         file_path: path,
         file_size_bytes: file.size,
-        mime_type: file.type || null,
+        mime_type: uploadMimeType(file),
       };
     }),
   );

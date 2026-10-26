@@ -55,6 +55,7 @@ export default async function ModificaVocePage({
           id: item.id,
           values: initialValues,
           files: item.files,
+          links: item.links,
         }}
       />
     </div>

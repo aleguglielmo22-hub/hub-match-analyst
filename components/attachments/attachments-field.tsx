@@ -15,8 +15,8 @@ import {
   listAttachments,
   deleteAttachment,
 } from "@/app/(app)/attachments/actions";
+import { checkUploadFile, UPLOAD_ACCEPT, UPLOAD_HINT } from "@/lib/uploads/limits";
 import {
-  ATTACHMENT_MAX_BYTES,
   humanFileSize,
   type AttachmentEntity,
   type AttachmentItem,
@@ -65,8 +65,9 @@ export function AttachmentsField({
       const accepted: PendingAttachment[] = [];
       const errs: string[] = [];
       Array.from(incoming).forEach((file) => {
-        if (file.size > ATTACHMENT_MAX_BYTES) {
-          errs.push(`${file.name} supera 500 MB.`);
+        const error = checkUploadFile(file);
+        if (error) {
+          errs.push(`${file.name}: ${error}`);
           return;
         }
         accepted.push({ uid: crypto.randomUUID(), file });
@@ -172,7 +173,7 @@ export function AttachmentsField({
             Trascina i file qui, oppure clicca per sceglierli
           </p>
           <p className="text-xs text-muted-foreground">
-            Video · PDF · Slide · Excel · immagini · max 500 MB per file
+            {UPLOAD_HINT}
           </p>
         </div>
         <input
@@ -180,6 +181,7 @@ export function AttachmentsField({
           id={`att-input-${entityType}`}
           type="file"
           multiple
+          accept={UPLOAD_ACCEPT}
           className="sr-only"
           onChange={(e) => {
             if (e.target.files) addFiles(e.target.files);
