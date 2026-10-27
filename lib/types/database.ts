@@ -1555,6 +1555,21 @@ export type Database = {
         }
         Returns: string
       }
+      search_all: {
+        Args: { p_query: string; p_workspace: string }
+        Returns: {
+          apri_id: string
+          collegato_a: string
+          data: string
+          id: string
+          punteggio: number
+          sezione: string
+          sottotitolo: string
+          tipo: string
+          titolo: string
+        }[]
+      }
+      search_norm: { Args: { t: string }; Returns: string }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }

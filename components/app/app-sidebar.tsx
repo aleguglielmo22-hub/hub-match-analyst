@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { SidebarBrand } from "./sidebar-brand";
 import { SidebarNav } from "./sidebar-nav";
 import { SidebarUser } from "./sidebar-user";
+import { SidebarSearchTrigger } from "@/components/search/global-search";
 
 /**
  * Sidebar persistente da desktop. Su mobile viene incartata in <Sheet> da MobileHeader.
@@ -26,6 +27,7 @@ export function AppSidebar({
       )}
     >
       <SidebarBrand />
+      <SidebarSearchTrigger />
       <div className="flex-1 overflow-y-auto py-1">
         <SidebarNav isOwner={isOwner} onNavigate={onNavigate} />
       </div>

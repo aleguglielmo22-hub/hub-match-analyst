@@ -12,6 +12,7 @@ import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 import { ArchiveLinksSection } from "@/components/links/archive-links-section";
 import { getSituationalLinks } from "@/app/(app)/collegamenti/actions";
+import { RecordVisit } from "@/components/search/record-visit";
 import { videoEmbedUrl } from "@/lib/links/external-links";
 import {
   MACRO_FASE_BADGE,
@@ -277,6 +278,13 @@ export default async function DettaglioSituazionalePage({
         </section>
       )}
 
+      <RecordVisit
+        kind="situational"
+        id={s.id}
+        title={s.titolo}
+        subtitle={MACRO_FASE_LABEL[s.macro_fase]}
+        href={`/situational/${s.id}`}
+      />
       <ArchiveLinksSection
         title="Clip e documenti"
         emptyText="Nessuna voce del Cloud collegata."

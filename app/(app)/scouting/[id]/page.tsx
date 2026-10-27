@@ -42,6 +42,7 @@ import {
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 import { ObservationsSection } from "@/components/scouting/observations-section";
+import { RecordVisit } from "@/components/search/record-visit";
 import { ArchiveLinksSection } from "@/components/links/archive-links-section";
 import { PlayerSetPiecesList } from "@/components/links/linked-lists";
 import { getPlayerLinks } from "@/app/(app)/collegamenti/actions";
@@ -226,6 +227,13 @@ export default async function DettaglioGiocatorePage({
         </div>
       </header>
 
+      <RecordVisit
+        kind="player"
+        id={p.id}
+        title={[p.nome, p.cognome].filter(Boolean).join(" ")}
+        subtitle={[p.ruolo_principale, squadra].filter(Boolean).join(" · ") || null}
+        href={`/scouting/${p.id}`}
+      />
       <ObservationsSection playerId={p.id} observations={observations} />
 
       <div className="grid gap-6 lg:grid-cols-2">

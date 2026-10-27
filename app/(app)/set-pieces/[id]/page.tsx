@@ -22,6 +22,7 @@ import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 import { ArchiveLinksSection } from "@/components/links/archive-links-section";
 import { SetPiecePlayersList } from "@/components/links/linked-lists";
+import { RecordVisit } from "@/components/search/record-visit";
 import { getSetPieceLinks } from "@/app/(app)/collegamenti/actions";
 import { ESITO_TONE, FASE_SET_PIECE_TONE, TONE } from "@/lib/tones";
 import { cn } from "@/lib/utils";
@@ -376,6 +377,13 @@ export default async function DettaglioSetPiecePage({
         </section>
       )}
 
+      <RecordVisit
+        kind="set_piece"
+        id={sp.id}
+        title={sp.titolo}
+        subtitle={`${FASE_LABEL[sp.fase]} · ${TIPO_PIAZZATO_LABEL[sp.tipo_piazzato]}`}
+        href={`/set-pieces/${sp.id}`}
+      />
       <div className="grid gap-6 lg:grid-cols-2">
         <SetPiecePlayersList
           players={links?.players ?? null}

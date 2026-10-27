@@ -12,6 +12,7 @@ import {
 import { AppSidebar } from "./app-sidebar";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/brand/logo";
+import { MobileSearchButton } from "@/components/search/global-search";
 
 /**
  * Barra in alto visibile solo su mobile (<md). Apre la sidebar in un drawer laterale.
@@ -56,6 +57,7 @@ export function MobileHeader({
       </Sheet>
 
       <Logo size={28} />
+      <MobileSearchButton />
     </header>
   );
 }

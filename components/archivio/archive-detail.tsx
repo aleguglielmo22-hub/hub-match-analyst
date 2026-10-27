@@ -13,6 +13,7 @@ import {
 import { ArchiveFilesViewer } from "./archive-files-viewer";
 import { ArchiveLinks } from "./archive-links";
 import { ArchiveLinksSection } from "@/components/links/archive-links-section";
+import { RecordVisit } from "@/components/search/record-visit";
 import type { LinkTarget } from "@/app/(app)/collegamenti/actions";
 import { MoveToTrashButton } from "@/components/app/move-to-trash-button";
 import type { ArchiveDetail as ArchiveDetailType } from "@/app/(app)/archivio/types";
@@ -192,6 +193,13 @@ export function ArchiveDetail({
             </section>
           )}
 
+          <RecordVisit
+            kind="archive"
+            id={item.id}
+            title={item.titolo_archivio}
+            subtitle={CATEGORIA_LAVORO_LABEL[item.categoria_lavoro]}
+            href={`/archivio/${item.id}`}
+          />
           <ArchiveLinksSection
             title="Giocatori"
             emptyText="Nessun giocatore collegato."

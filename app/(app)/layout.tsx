@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app/app-sidebar";
 import { MobileHeader } from "@/components/app/mobile-header";
 import { MobileBottomNav } from "@/components/app/mobile-bottom-nav";
 import { DraftsCleanup } from "@/components/forms/drafts-cleanup";
+import { GlobalSearchProvider } from "@/components/search/global-search";
 import { MissingConfigNotice } from "@/components/app/missing-config-notice";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { ACCESS_DENIED_PARAM, isEmailAllowed } from "@/lib/auth/allowlist";
@@ -38,25 +39,27 @@ export default async function AppLayout({
   const isOwner = workspace?.isOwner ?? false;
 
   return (
-    <div className="flex flex-1 min-h-0">
-      <AppSidebar
-        email={email}
-        isOwner={isOwner}
-        className="hidden md:flex"
-      />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <MobileHeader
+    <GlobalSearchProvider>
+      <div className="flex flex-1 min-h-0">
+        <AppSidebar
           email={email}
           isOwner={isOwner}
-          className="md:hidden"
+          className="hidden md:flex"
         />
-        {/* Su mobile spazio in fondo per la barra di navigazione (o la barra Salva). */}
-        <main className="flex-1 overflow-y-auto max-md:pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
-          {children}
-        </main>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <MobileHeader
+            email={email}
+            isOwner={isOwner}
+            className="md:hidden"
+          />
+          {/* Su mobile spazio in fondo per la barra di navigazione (o la barra Salva). */}
+          <main className="flex-1 overflow-y-auto max-md:pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
+            {children}
+          </main>
+        </div>
+        <MobileBottomNav />
+        <DraftsCleanup />
       </div>
-      <MobileBottomNav />
-      <DraftsCleanup />
-    </div>
+    </GlobalSearchProvider>
   );
 }

@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:types": "supabase gen types typescript --linked 2>/dev/null > lib/types/database.ts",
-    "test": "node --no-warnings --test lib/backup/csv.test.mjs lib/search/ilike-filter.test.mjs lib/auth/login-errors.test.mjs lib/auth/allowlist.test.mjs lib/set-pieces/efficacy.test.mjs lib/uploads/limits.test.mjs lib/links/external-links.test.mjs lib/types/esito-label.test.mjs lib/forms/draft.test.mjs lib/forms/insert-once.test.mjs lib/scouting/observations.test.mjs lib/lookups/names.test.mjs lib/set-pieces/defaults.test.mjs lib/set-pieces/player-roles.test.mjs"
+    "test": "node --no-warnings --test lib/backup/csv.test.mjs lib/search/ilike-filter.test.mjs lib/auth/login-errors.test.mjs lib/auth/allowlist.test.mjs lib/set-pieces/efficacy.test.mjs lib/uploads/limits.test.mjs lib/links/external-links.test.mjs lib/types/esito-label.test.mjs lib/forms/draft.test.mjs lib/forms/insert-once.test.mjs lib/scouting/observations.test.mjs lib/lookups/names.test.mjs lib/set-pieces/defaults.test.mjs lib/set-pieces/player-roles.test.mjs lib/search/global-results.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
