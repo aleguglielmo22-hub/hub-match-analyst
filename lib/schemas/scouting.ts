@@ -14,6 +14,8 @@ import {
   VOTO_POTENZIALE_VALUES,
   type RatingKey,
 } from "@/lib/types/scouting";
+import { normalizeExternalUrl } from "@/lib/links/external-links";
+import { isFutureDate, todayIso } from "@/lib/scouting/player-form-sections";
 
 /* ============================================================
  * Helper Zod
@@ -25,9 +27,29 @@ const isoDateOrNull = z
   .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal(""), z.null()])
   .transform((v) => (v === "" || v == null ? null : (v as string)));
 
+// Accetta anche indirizzi senza "https://" (stessa regola dei link del Cloud).
 const httpUrlOrNull = z
-  .union([z.string().url("URL non valido"), z.literal(""), z.null()])
-  .transform((v) => (v === "" || v == null ? null : (v as string)));
+  .union([z.string(), z.null()])
+  .transform((v, ctx) => {
+    if (v == null || !v.trim()) return null;
+    const url = normalizeExternalUrl(v);
+    if (!url) ctx.addIssue({ code: "custom", message: "URL non valido" });
+    return url;
+  });
+
+const httpUrl = z.string().transform((v, ctx) => {
+  const url = normalizeExternalUrl(v);
+  if (!url) {
+    ctx.addIssue({ code: "custom", message: "URL non valido" });
+    return v;
+  }
+  return url;
+});
+
+const birthDateOrNull = isoDateOrNull.refine(
+  (v) => !isFutureDate(v, todayIso()),
+  "La data di nascita non può essere nel futuro",
+);
 
 const optionalText = z
   .union([z.string().max(1000), z.null()])
@@ -77,7 +99,7 @@ export const playerFormSchema = z.object({
   nome: z.string().trim().min(1, "Nome obbligatorio").max(100),
   cognome: z.string().trim().min(1, "Cognome obbligatorio").max(100),
   foto_url: httpUrlOrNull,
-  data_nascita: isoDateOrNull,
+  data_nascita: birthDateOrNull,
   nazionalita: optionalText,
   passaporto: z.enum(PASSAPORTO_VALUES).nullable(),
   piede: z.enum(PIEDE_VALUES).nullable(),
@@ -111,7 +133,7 @@ export const playerFormSchema = z.object({
   // A. Influenze negative (boolean)
   ...influenzaShape,
 
-  // Valutazioni 1-10 (71)
+  // Valutazioni 1-10 (47)
   ...ratingShape,
 
   // Workflow
@@ -123,7 +145,7 @@ export const playerFormSchema = z.object({
   scouting_report_url: httpUrlOrNull,
   // Le vecchie "note rapide" non si modificano più dal form: ora ci sono le
   // osservazioni datate (la colonna resta nel DB, mostrata come "Note storiche").
-  clip_video_urls: z.array(z.string().url("URL non valido")),
+  clip_video_urls: z.array(httpUrl),
 });
 
 export type PlayerFormValues = z.infer<typeof playerFormSchema>;

@@ -15,6 +15,7 @@ import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
 import { insertOnce } from "@/lib/forms/insert-once";
 import { playerFormSchema, type PlayerFormValues } from "@/lib/schemas/scouting";
 import type { ScoutingFilters } from "@/lib/schemas/scouting-filters";
+import { samePerson } from "@/lib/scouting/player-form-sections";
 import {
   INFLUENZE_NEG,
   RATING_KEYS,
@@ -490,4 +491,54 @@ export async function updatePlayer(
   revalidatePath("/scouting");
   revalidatePath(`/scouting/${playerId}`);
   return { id: data.id };
+}
+
+/* ============================================================
+ * Possibili doppioni
+ * ============================================================ */
+
+export type PossibleDuplicate = { id: string; nome: string; cognome: string; inTrash: boolean };
+
+/**
+ * Giocatori con stessi nome, cognome (maiuscole e accenti esclusi) e data di
+ * nascita, anche nel cestino. Solo un avviso: il salvataggio resta possibile.
+ * In caso di errore nessun avviso (non deve bloccare l'inserimento).
+ */
+export async function findPossibleDuplicates(input: {
+  nome: string;
+  cognome: string;
+  data_nascita: string;
+  excludeId?: string | null;
+}): Promise<PossibleDuplicate[]> {
+  const parsed = z
+    .object({
+      nome: z.string().trim().min(1).max(100),
+      cognome: z.string().trim().min(1).max(100),
+      data_nascita: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      excludeId: z.string().uuid().nullish(),
+    })
+    .safeParse(input);
+  if (!parsed.success) return [];
+  const v = parsed.data;
+
+  try {
+    const workspace = await getCurrentWorkspace();
+    if (!workspace) return [];
+    const supabase = await createClient();
+    let query = supabase
+      .from("players")
+      .select("id, nome, cognome, deleted_at")
+      .eq("workspace_id", workspace.id)
+      .eq("data_nascita", v.data_nascita)
+      .limit(50);
+    if (v.excludeId) query = query.neq("id", v.excludeId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data ?? [])
+      .filter((p) => samePerson(p, v))
+      .map((p) => ({ id: p.id, nome: p.nome, cognome: p.cognome, inTrash: p.deleted_at !== null }));
+  } catch (err) {
+    logLoadError("Scouting · possibili doppioni", err);
+    return [];
+  }
 }

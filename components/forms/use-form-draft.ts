@@ -23,8 +23,11 @@ const SAVE_DELAY_MS = 800;
 const LEAVE_MESSAGE =
   "Hai modifiche non salvate. Uscire comunque? La bozza resta salvata in questo browser.";
 
-/** Contenuto della bozza: valori del form, stato extra (es. link) e id del nuovo elemento. */
-type DraftData<V, X> = { values: V; extra?: X; itemId?: string };
+/**
+ * Contenuto della bozza: valori del form, stato extra (es. link), id del nuovo
+ * elemento e punto del form aperto (`view`, es. sezione: non rende la bozza "modificata").
+ */
+type DraftData<V, X> = { values: V; extra?: X; itemId?: string; view?: unknown };
 
 /**
  * Data della bozza trovata all'apertura del form, letta una sola volta per
@@ -58,6 +61,8 @@ export function useFormDraft<V extends FieldValues, X = undefined>({
   onRestoreNewItemId,
   extra,
   onRestoreExtra,
+  view,
+  onRestoreView,
 }: {
   section: DraftSection;
   itemId: string | null;
@@ -67,6 +72,8 @@ export function useFormDraft<V extends FieldValues, X = undefined>({
   onRestoreNewItemId?: (id: string) => void;
   extra?: X;
   onRestoreExtra?: (extra: X) => void;
+  view?: unknown;
+  onRestoreView?: (view: unknown) => void;
 }) {
   const key = draftKey(section, itemId);
   const openKey = `${useId()}|${key}`;
@@ -99,10 +106,10 @@ export function useFormDraft<V extends FieldValues, X = undefined>({
   const dirtyRef = useRef(false);
   const doneRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const latest = useRef({ extra, newItemId });
+  const latest = useRef({ extra, newItemId, view });
   useEffect(() => {
-    latest.current = { extra, newItemId };
-  }, [extra, newItemId]);
+    latest.current = { extra, newItemId, view };
+  }, [extra, newItemId, view]);
 
   const scheduleSave = useCallback(() => {
     if (doneRef.current) return;
@@ -114,6 +121,7 @@ export function useFormDraft<V extends FieldValues, X = undefined>({
         values: form.getValues(),
         extra: latest.current.extra,
         itemId: latest.current.newItemId,
+        view: latest.current.view,
       };
       saveDraft(browserStorage(), key, data);
     }, SAVE_DELAY_MS);
@@ -185,8 +193,9 @@ export function useFormDraft<V extends FieldValues, X = undefined>({
     form.reset(draft.data.values);
     if (draft.data.extra !== undefined) onRestoreExtra?.(draft.data.extra);
     if (draft.data.itemId) onRestoreNewItemId?.(draft.data.itemId);
+    if (draft.data.view !== undefined) onRestoreView?.(draft.data.view);
     dirtyRef.current = true;
-  }, [form, key, onRestoreExtra, onRestoreNewItemId]);
+  }, [form, key, onRestoreExtra, onRestoreNewItemId, onRestoreView]);
 
   const discard = useCallback(() => {
     clearDraft(browserStorage(), key);
