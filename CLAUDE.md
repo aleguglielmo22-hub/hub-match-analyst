@@ -7,6 +7,10 @@
 - Push su GitHub: usare SSH.
   `git push git@github.com:aleguglielmo22-hub/hub-match-analyst.git main`
   (il push via HTTPS non ha credenziali configurate).
+- Verifica dopo il deploy: attendi almeno 2 minuti dal push, poi al massimo 3 tentativi
+  distanziati di almeno 1 minuto, con un'unica richiesta per indirizzo. Se il sito
+  risponde con un controllo di sicurezza, fermati e avvisa l'utente: non riprovare
+  e non tentare di aggirarlo.
 
 ## Ogni modifica
 - `npm run build`, `npm test` e lint sui file toccati senza errori.
