@@ -4,8 +4,10 @@ import {
   Archive,
   ArrowRight,
   Brain,
-  ImageIcon,
+  Link2,
   Mail,
+  Search,
+  Smartphone,
   Target,
   Users,
 } from "lucide-react";
@@ -14,6 +16,12 @@ import { getSupabaseConfig } from "@/lib/supabase/config";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/brand/logo";
+import {
+  DashboardPreview,
+  PlayerPreview,
+  SearchPreview,
+  SetPiecesPreview,
+} from "@/components/landing/previews";
 
 export const metadata = {
   title: "AG Workspace — Scouting & Analisi per Match Analyst",
@@ -29,12 +37,12 @@ const FEATURES = [
   {
     icon: Users,
     title: "Scouting DB",
-    desc: "Database di giocatori osservati con schede complete e valutazioni dettagliate. Filtri avanzati per ruolo, scadenza e potenziale.",
+    desc: "Schede giocatore con 47 voti e osservazioni datate: lo storico mostra come cresce ogni profilo. Filtri per ruolo, scadenza e potenziale.",
   },
   {
     icon: Target,
     title: "Set Pieces DB",
-    desc: "Database delle palle inattive: angoli, punizioni e rimesse. Schemi, esecutori ed efficacia misurata nel tempo.",
+    desc: "Angoli, punizioni, rimesse e rigori, offensivi e difensivi. Giocatori coinvolti, esito ed efficacia separata per fase.",
   },
   {
     icon: Brain,
@@ -44,21 +52,35 @@ const FEATURES = [
   {
     icon: Archive,
     title: "Cloud",
-    desc: "Catalogo di partite, clip e documenti, con link ai tuoi archivi. Tag, stagioni e ricerca per ritrovare tutto in pochi secondi.",
+    desc: "Catalogo di partite, clip e documenti con link ai tuoi archivi esterni. Tag, stagioni e collegamenti a giocatori, piazzati ed esercitazioni.",
   },
 ];
 
-/**
- * Segnaposto screenshot.
- * Per sostituirli: metti le immagini in /public/landing/ (es. dashboard.png)
- * e rimpiazza il <div> segnaposto con:
- *   <img src="/landing/dashboard.png" alt="Dashboard" className="h-full w-full object-cover" />
- */
+/** Cosa tiene insieme le quattro aree. */
+const HIGHLIGHTS = [
+  {
+    icon: Link2,
+    title: "Sezioni collegate",
+    desc: "Un giocatore porta ai suoi piazzati e ai materiali del Cloud, e viceversa.",
+  },
+  {
+    icon: Search,
+    title: "Ricerca globale",
+    desc: "Una sola barra (⌘K / Ctrl+K) cerca in tutte le sezioni, anche senza accenti.",
+  },
+  {
+    icon: Smartphone,
+    title: "App installabile",
+    desc: "Si aggiunge alla schermata Home del telefono e si apre come un'app.",
+  },
+];
+
+/** Anteprime fatte con i componenti dell'app e dati di esempio inventati. */
 const SHOTS = [
-  { caption: "Dashboard — centro di controllo" },
-  { caption: "Scheda giocatore — Scouting DB" },
-  { caption: "Analisi palle inattive — Set Pieces DB" },
-  { caption: "Cloud — catalogo di partite, clip e documenti" },
+  { caption: "Dashboard — numeri e azioni rapide", Preview: DashboardPreview },
+  { caption: "Scheda giocatore — voti e osservazioni nel tempo", Preview: PlayerPreview },
+  { caption: "Set Pieces DB — efficacia per fase", Preview: SetPiecesPreview },
+  { caption: "Ricerca globale — risultati da tutte le sezioni", Preview: SearchPreview },
 ];
 
 export default async function LandingPage() {
@@ -104,8 +126,9 @@ export default async function LandingPage() {
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground sm:text-lg">
               Database scouting e palle inattive, training e un catalogo di
-              partite, clip e documenti con link ai tuoi archivi: tutto in
-              un&apos;unica piattaforma per il match analyst.
+              partite, clip e documenti con link ai tuoi archivi: sezioni
+              collegate tra loro, una ricerca unica e un&apos;app da installare
+              anche sul telefono.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
@@ -162,35 +185,48 @@ export default async function LandingPage() {
               );
             })}
           </div>
+          <ul className="mt-6 grid gap-4 sm:grid-cols-3">
+            {HIGHLIGHTS.map((h) => {
+              const Icon = h.icon;
+              return (
+                <li
+                  key={h.title}
+                  className="flex gap-3 rounded-2xl border border-border/60 bg-card/20 p-4"
+                >
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <div>
+                    <p className="text-sm font-semibold tracking-tight">{h.title}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {h.desc}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </section>
 
-        {/* Screenshot (segnaposto) */}
+        {/* Anteprime con dati di esempio */}
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
           <div className="mb-10 text-center">
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
               Uno sguardo all&apos;interno
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Anteprime delle schermate principali.
+              Anteprime delle schermate principali, con dati di esempio.
             </p>
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
-            {SHOTS.map((s) => (
+            {SHOTS.map(({ caption, Preview }) => (
               <figure
-                key={s.caption}
-                className="overflow-hidden rounded-2xl border border-border/60 bg-card/40"
+                key={caption}
+                className="flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/40"
               >
-                {/* SEGNAPOSTO — sostituire con <img src="/landing/..."> reale */}
-                <div className="relative flex aspect-video items-center justify-center bg-gradient-to-br from-primary/10 via-card/30 to-background">
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground/70">
-                    <ImageIcon className="h-8 w-8" />
-                    <span className="text-[11px] uppercase tracking-[0.2em]">
-                      Segnaposto
-                    </span>
-                  </div>
+                <div className="flex-1 bg-gradient-to-br from-primary/10 via-card/30 to-background">
+                  <Preview />
                 </div>
                 <figcaption className="border-t border-border/40 px-4 py-3 text-xs text-muted-foreground">
-                  {s.caption}
+                  {caption}
                 </figcaption>
               </figure>
             ))}

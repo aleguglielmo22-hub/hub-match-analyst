@@ -49,16 +49,19 @@ export async function SetPiecesEfficacyWidget() {
   );
 }
 
-function PhaseBlock({
+/** Blocco di una fase. `linkToList = false` nelle anteprime con dati di esempio (landing). */
+export function PhaseBlock({
   data,
   title,
   riuscitiLabel,
   golLabel,
+  linkToList = true,
 }: {
   data: PhaseEfficacy;
   title: string;
   riuscitiLabel: string;
   golLabel: string;
+  linkToList?: boolean;
 }) {
   const fase = TONE[FASE_SET_PIECE_TONE[data.fase]];
   // Gol fatti = positivo, gol subiti = negativo (come in ESITO_TONE).
@@ -74,7 +77,7 @@ function PhaseBlock({
             {title}
           </h3>
         </div>
-        {data.total > 0 && (
+        {linkToList && data.total > 0 && (
           <Link
             href={`/set-pieces?fase=${data.fase}`}
             className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground"

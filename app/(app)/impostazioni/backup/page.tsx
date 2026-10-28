@@ -14,7 +14,7 @@ export default async function BackupPage() {
   const workspace = await getCurrentWorkspace();
   if (!workspace) redirect("/login");
   // Solo l'OWNER vede questa pagina.
-  if (!workspace.isOwner) redirect("/archivio");
+  if (!workspace.isOwner) redirect("/dashboard");
 
   // Commit pubblicato, fornito automaticamente da Vercel (variabile di sistema).
   const sha = process.env.VERCEL_GIT_COMMIT_SHA;

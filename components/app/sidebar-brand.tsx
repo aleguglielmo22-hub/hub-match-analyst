@@ -3,7 +3,6 @@ import { Logo } from "@/components/brand/logo";
 
 /**
  * Lockup brand della sidebar: logo AG Workspace + sottotitolo.
- * In futuro qui sotto può comparire un selettore di workspace.
  */
 export function SidebarBrand() {
   return (

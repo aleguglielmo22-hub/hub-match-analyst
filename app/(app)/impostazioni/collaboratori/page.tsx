@@ -16,7 +16,7 @@ export default async function CollaboratoriPage() {
   const workspace = await getCurrentWorkspace();
   if (!workspace) redirect("/login");
   // Solo l'OWNER vede questa pagina.
-  if (!workspace.isOwner) redirect("/archivio");
+  if (!workspace.isOwner) redirect("/dashboard");
 
   const members = await listMembers();
 

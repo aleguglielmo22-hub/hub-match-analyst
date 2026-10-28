@@ -16,7 +16,7 @@ export default async function AnagrafichePage() {
   const workspace = await getCurrentWorkspace();
   if (!workspace) redirect("/login");
   // Solo l'OWNER vede le Impostazioni.
-  if (!workspace.isOwner) redirect("/archivio");
+  if (!workspace.isOwner) redirect("/dashboard");
 
   const data = await listLookupsWithUsage();
 

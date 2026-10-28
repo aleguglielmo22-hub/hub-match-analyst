@@ -88,7 +88,6 @@ export const playerFormSchema = z.object({
   stili_gioco: z.array(z.string().trim().min(1).max(60)),
 
   // Contratto
-  transfermarkt_url: httpUrlOrNull,
   // Anagrafica condivisa (0014); il vecchio testo lo scrive il server.
   team_attuale_id: z.string().uuid().nullable(),
   campionato: optionalText,
@@ -143,7 +142,6 @@ export function emptyPlayerForm(): PlayerFormValues {
     ruoli_secondari: [],
     stili_gioco: [],
 
-    transfermarkt_url: null,
     team_attuale_id: null,
     campionato: null,
     scadenza_contratto: null,

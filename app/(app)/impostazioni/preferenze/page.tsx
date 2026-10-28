@@ -15,7 +15,7 @@ export default async function PreferenzePage() {
   const workspace = await getCurrentWorkspace();
   if (!workspace) redirect("/login");
   // Solo l'OWNER vede le Impostazioni.
-  if (!workspace.isOwner) redirect("/archivio");
+  if (!workspace.isOwner) redirect("/dashboard");
 
   const [prefs, lookups] = await Promise.all([getMyPreferences(), getSharedLookups()]);
 

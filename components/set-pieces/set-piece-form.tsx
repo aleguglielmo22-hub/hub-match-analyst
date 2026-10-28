@@ -40,8 +40,6 @@ import {
   UOMINI_SUI_PALI_LABEL,
   UOMINI_SUI_PALI_VALUES,
   type EsitoFinaleEnum,
-  type FaseEnum,
-  type TipoPiazzatoEnum,
 } from "@/lib/types/set-pieces";
 import {
   emptySetPieceForm,
@@ -996,8 +994,7 @@ export function SetPieceForm({
             {...form.register("lavagna_image_url")}
           />
           <p className="text-[10px] text-muted-foreground">
-            {/* TODO upload: in futuro upload diretto su bucket "set-pieces" */}
-            L&apos;upload diretto sarà aggiunto in seguito.
+            Incolla il link pubblico di un&apos;immagine dello schema.
           </p>
           <FieldError
             message={form.formState.errors.lavagna_image_url?.message}

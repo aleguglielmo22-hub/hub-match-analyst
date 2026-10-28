@@ -31,13 +31,13 @@ export function QuickActions() {
           href="/scouting/nuovo"
           icon={UserPlus}
           title="Inserisci nuovo giocatore"
-          subtitle="Scheda valutazione completa, 71 metriche"
+          subtitle="Scheda valutazione completa, 47 voti"
           tone="emerald"
         />
         <ActionCard
           href="/set-pieces/nuovo"
           icon={Target}
-          title="Disegna nuovo piazzato"
+          title="Nuovo piazzato"
           subtitle="Form condizionale offensivo / difensivo"
           tone="sky"
         />

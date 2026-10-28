@@ -260,7 +260,6 @@ export async function createPlayer(
         ruoli_secondari: v.ruoli_secondari,
         stili_gioco: v.stili_gioco,
 
-        transfermarkt_url: v.transfermarkt_url,
         team_attuale_id: v.team_attuale_id,
         squadra_attuale: teamName,
         campionato: v.campionato,
@@ -323,7 +322,6 @@ function playerRowToFormValues(p: PlayerRow): PlayerFormValues {
     ruoli_secondari: p.ruoli_secondari ?? [],
     stili_gioco: p.stili_gioco ?? [],
 
-    transfermarkt_url: p.transfermarkt_url,
     team_attuale_id: p.team_attuale_id,
     campionato: p.campionato,
     scadenza_contratto: p.scadenza_contratto,
@@ -452,7 +450,6 @@ export async function updatePlayer(
       ruoli_secondari: v.ruoli_secondari,
       stili_gioco: v.stili_gioco,
 
-      transfermarkt_url: v.transfermarkt_url,
       team_attuale_id: v.team_attuale_id,
       squadra_attuale: await teamNameFor(supabase, workspace.id, v.team_attuale_id),
       campionato: v.campionato,
@@ -493,19 +490,4 @@ export async function updatePlayer(
   revalidatePath("/scouting");
   revalidatePath(`/scouting/${playerId}`);
   return { id: data.id };
-}
-
-/* ============================================================
- * Placeholder Transfermarkt auto-fetch
- * (vedi commento esteso nella precedente versione di questo file)
- * ============================================================ */
-export async function syncFromTransfermarkt(
-  _playerId: string,
-): Promise<{ ok: true; message: string }> {
-  void _playerId;
-  return {
-    ok: true,
-    message:
-      "Integrazione Transfermarkt non ancora implementata. Vedi commenti in actions.ts.",
-  };
 }

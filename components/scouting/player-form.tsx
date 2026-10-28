@@ -38,7 +38,6 @@ import {
   RATINGS,
   RUOLO_GRUPPI,
   RUOLO_LABEL,
-  RUOLO_VALUES,
   SI_NO_AVOLTE_LABEL,
   SI_NO_AVOLTE_VALUES,
   STATUS_OSSERVAZIONE_LABEL,
@@ -327,11 +326,6 @@ function RatingNumberInput({
 
 /**
  * Form di inserimento giocatore.
- * NOTE — Transfermarkt:
- * Il campo `transfermarkt_url` è solo testuale per ora; un futuro bottone
- * "Importa da TM" chiamerà syncFromTransfermarkt in
- * app/(app)/scouting/actions.ts per popolare automaticamente squadra,
- * valore, scadenza e nazionalità.
  */
 export function PlayerForm({
   existing,
@@ -497,8 +491,7 @@ export function PlayerForm({
               {...form.register("foto_url")}
             />
             <p className="text-[10px] text-muted-foreground">
-              {/* TODO upload: in futuro caricamento diretto su bucket "scouting" */}
-              Per ora incolla un URL pubblico. L&apos;upload diretto arriverà.
+              Incolla il link pubblico di un&apos;immagine.
             </p>
           </div>
           <div className="space-y-2">
@@ -652,24 +645,8 @@ export function PlayerForm({
       {/* §3 Contratto */}
       <FormSection
         title="Situazione contrattuale"
-        description="Squadra, contratto, valore di mercato e Transfermarkt."
+        description="Squadra, contratto e valore di mercato."
       >
-        <div className="space-y-2">
-          <Label htmlFor="transfermarkt_url">URL profilo Transfermarkt</Label>
-          <Input
-            id="transfermarkt_url"
-            type="url"
-            placeholder="https://www.transfermarkt.com/…"
-            autoComplete="off"
-            {...form.register("transfermarkt_url")}
-          />
-          <p className="text-[10px] text-muted-foreground">
-            {/* TODO Transfermarkt auto-fetch */}
-            In futuro un click qui aggiornerà automaticamente squadra, valore e
-            scadenza partendo da Transfermarkt.
-          </p>
-          <FieldError message={form.formState.errors.transfermarkt_url?.message} />
-        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>Squadra attuale</Label>

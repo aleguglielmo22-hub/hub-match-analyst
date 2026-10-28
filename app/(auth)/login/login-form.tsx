@@ -11,6 +11,7 @@ import {
   MISSING_SUPABASE_CONFIG_MESSAGE,
 } from "@/lib/supabase/config";
 import { loginErrorMessage } from "@/lib/auth/login-errors";
+import { safeNextPath } from "@/lib/auth/next-path";
 import { focusNextFieldOnEnter } from "@/lib/forms/enter-key";
 import {
   ACCESS_DENIED_MESSAGE,
@@ -33,7 +34,7 @@ const configMissing = getSupabaseConfig() === null;
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/dashboard";
+  const nextPath = safeNextPath(searchParams.get("next"));
   const accessDenied = searchParams.get("errore") === ACCESS_DENIED_PARAM;
 
   const [email, setEmail] = useState("");
@@ -70,7 +71,7 @@ export function LoginForm() {
 
       // Successo: router.refresh per propagare la nuova sessione + push alla
       // pagina richiesta (di default "/dashboard").
-      router.replace(nextPath.startsWith("/") ? nextPath : "/dashboard");
+      router.replace(nextPath);
       router.refresh();
     } catch (err) {
       const msg = loginErrorMessage(err);

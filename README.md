@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AG Workspace
 
-## Getting Started
+Hub personale per il match analyst: scouting dei giocatori con osservazioni
+datate, database dei calci piazzati, catalogo di esercitazioni e un Cloud che
+cataloga partite, clip e documenti tramite link esterni. Le sezioni sono
+collegate tra loro e c'è una ricerca globale (⌘K / Ctrl+K). L'app si può
+installare sul telefono (PWA).
 
-First, run the development server:
+## Stack
+
+- [Next.js](https://nextjs.org) 16 (App Router, server actions) con React e TypeScript
+- [Supabase](https://supabase.com): database Postgres con regole di accesso (RLS),
+  login con email e password, Storage solo per i file leggeri
+- Tailwind CSS 4, componenti Base UI / shadcn, React Hook Form + Zod
+- Deploy su Vercel
+
+## Comandi
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install          # dipendenze
+npm run dev          # sviluppo su http://localhost:3000
+npm run build        # build di produzione
+npm test             # test (runner integrato di Node, file *.test.mjs in lib/)
+npm run lint         # lint
+npm run db:types     # rigenera lib/types/database.ts dal progetto Supabase collegato
+node scripts/generate-icons.mjs   # rigenera le icone della PWA in public/icons/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Le variabili d'ambiente vanno in `.env.local` (escluso da git): vedi
+`.env.local.example`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Struttura
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/` — landing, `(auth)/login` e le sezioni protette in `(app)/`
+- `components/` — componenti dell'interfaccia, divisi per sezione
+- `lib/` — logica condivisa, schemi, tipi e relativi test
+- `supabase/migrations/` — migrazioni del database, applicate con la Supabase CLI
+- `proxy.ts` — sessione, accesso alle pagine protette e ritorno dopo il login
 
-## Learn More
+## Regole del progetto
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Le regole di lavoro (git, database, migrazioni, backup, file) sono in
+[CLAUDE.md](CLAUDE.md).

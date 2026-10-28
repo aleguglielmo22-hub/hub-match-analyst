@@ -21,7 +21,6 @@ import {
   SOTTO_FASE_DESC,
   SOTTO_FASE_LABEL,
   SOTTO_FASI_BY_MACRO,
-  type MacroFaseEnum,
   type SottoFaseEnum,
 } from "@/lib/types/situational";
 import {

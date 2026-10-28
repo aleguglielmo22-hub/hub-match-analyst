@@ -14,7 +14,7 @@ export default async function AspettoPage() {
   const workspace = await getCurrentWorkspace();
   if (!workspace) redirect("/login");
   // Solo l'OWNER vede le Impostazioni.
-  if (!workspace.isOwner) redirect("/archivio");
+  if (!workspace.isOwner) redirect("/dashboard");
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 sm:px-8 sm:py-10">

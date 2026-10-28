@@ -314,22 +314,6 @@ export default async function DettaglioGiocatorePage({
                 value={FASCIA_INGAGGIO_LABEL[p.fascia_ingaggio]}
               />
             )}
-            {p.transfermarkt_url && (
-              <Row
-                label="Transfermarkt"
-                value={
-                  <a
-                    href={p.transfermarkt_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-primary hover:underline"
-                  >
-                    Apri scheda
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                }
-              />
-            )}
           </dl>
         </section>
 
