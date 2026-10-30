@@ -5,7 +5,6 @@ import {
   ArrowRight,
   Brain,
   Link2,
-  Mail,
   Search,
   Smartphone,
   Target,
@@ -234,7 +233,7 @@ export default async function LandingPage() {
         </section>
       </main>
 
-      {/* Footer minimale con contatti */}
+      {/* Footer minimale */}
       <footer className="border-t border-border/60 bg-card/20">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-4 py-8 text-sm sm:flex-row sm:items-center sm:px-8">
           <div className="space-y-1">
@@ -244,13 +243,6 @@ export default async function LandingPage() {
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:items-end">
-            <a
-              href="mailto:aleguglielmo22@gmail.com"
-              className="inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary"
-            >
-              <Mail className="h-4 w-4" />
-              aleguglielmo22@gmail.com
-            </a>
             <p className="text-xs text-muted-foreground/70">
               Alessandro Guglielmo · Match Analyst
             </p>
