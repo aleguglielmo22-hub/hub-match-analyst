@@ -212,4 +212,7 @@ export type SituationalListItem = Pick<
   | "lavagna_url"
   | "pdf_url"
   | "updated_at"
->;
+> & {
+  /** Link temporaneo all'anteprima della lavagna disegnata (0017), se presente. */
+  lavagna_preview_url?: string | null;
+};

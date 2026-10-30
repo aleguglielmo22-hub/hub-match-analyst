@@ -39,7 +39,13 @@ export default async function ModificaSetPiecePage({
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-8 sm:py-10">
       <SetPieceForm
         lookups={lookups}
-        existing={{ id: sp.id, values: sp.values, updatedAt: sp.updated_at, links }}
+        existing={{
+          id: sp.id,
+          values: sp.values,
+          updatedAt: sp.updated_at,
+          links,
+          boardPreviewMissing: sp.boardPreviewMissing,
+        }}
       />
     </div>
   );

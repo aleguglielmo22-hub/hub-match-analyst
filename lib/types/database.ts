@@ -1046,6 +1046,8 @@ export type Database = {
           lato_battuta:
             | Database["public"]["Enums"]["sp_lato_battuta_enum"]
             | null
+          lavagna_anteprima: string | null
+          lavagna_dati: Json | null
           lavagna_image_url: string | null
           minuto: number | null
           note_esito: string | null
@@ -1102,6 +1104,8 @@ export type Database = {
           lato_battuta?:
             | Database["public"]["Enums"]["sp_lato_battuta_enum"]
             | null
+          lavagna_anteprima?: string | null
+          lavagna_dati?: Json | null
           lavagna_image_url?: string | null
           minuto?: number | null
           note_esito?: string | null
@@ -1160,6 +1164,8 @@ export type Database = {
           lato_battuta?:
             | Database["public"]["Enums"]["sp_lato_battuta_enum"]
             | null
+          lavagna_anteprima?: string | null
+          lavagna_dati?: Json | null
           lavagna_image_url?: string | null
           minuto?: number | null
           note_esito?: string | null
@@ -1250,6 +1256,8 @@ export type Database = {
           descrizione_flusso: string | null
           focus_tags: string[]
           id: string
+          lavagna_anteprima: string | null
+          lavagna_dati: Json | null
           lavagna_url: string | null
           macro_fase: Database["public"]["Enums"]["st_macro_fase_enum"]
           numero_giocatori: string[]
@@ -1271,6 +1279,8 @@ export type Database = {
           descrizione_flusso?: string | null
           focus_tags?: string[]
           id?: string
+          lavagna_anteprima?: string | null
+          lavagna_dati?: Json | null
           lavagna_url?: string | null
           macro_fase: Database["public"]["Enums"]["st_macro_fase_enum"]
           numero_giocatori?: string[]
@@ -1292,6 +1302,8 @@ export type Database = {
           descrizione_flusso?: string | null
           focus_tags?: string[]
           id?: string
+          lavagna_anteprima?: string | null
+          lavagna_dati?: Json | null
           lavagna_url?: string | null
           macro_fase?: Database["public"]["Enums"]["st_macro_fase_enum"]
           numero_giocatori?: string[]
@@ -1570,6 +1582,10 @@ export type Database = {
         }[]
       }
       search_norm: { Args: { t: string }; Returns: string }
+      set_board_preview: {
+        Args: { p_entity: string; p_id: string; p_path: string }
+        Returns: string
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }

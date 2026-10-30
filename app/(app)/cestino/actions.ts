@@ -154,6 +154,18 @@ export async function deleteForever(
     if (error) throw new Error(error.message);
     await removeStorageFiles(supabase, "archivio", (files ?? []).map((f) => f.file_path));
   } else if (cfg.attachmentEntity) {
+    // Anteprima della lavagna disegnata (0017): un file in più nel bucket "media".
+    let boardPreview: string | null = null;
+    if (cfg.table === "set_pieces" || cfg.table === "situational_tactics") {
+      const { data: boardRow, error: boardError } = await supabase
+        .from(cfg.table)
+        .select("lavagna_anteprima")
+        .eq("id", id)
+        .eq("workspace_id", workspace.id)
+        .maybeSingle();
+      if (boardError) throw new Error(boardError.message);
+      boardPreview = (boardRow as { lavagna_anteprima: string | null } | null)?.lavagna_anteprima ?? null;
+    }
     const { data: files, error } = await supabase
       .from("attachments")
       .select("id, file_path")
@@ -161,11 +173,11 @@ export async function deleteForever(
       .eq("entity_type", cfg.attachmentEntity)
       .eq("entity_id", id);
     if (error) throw new Error(error.message);
-    await removeStorageFiles(
-      supabase,
-      ATTACHMENTS_BUCKET,
-      (files ?? []).map((f) => f.file_path),
-    );
+    // Prima i file (allegati e anteprima della lavagna), poi le voci.
+    await removeStorageFiles(supabase, ATTACHMENTS_BUCKET, [
+      ...(files ?? []).map((f) => f.file_path),
+      ...(boardPreview ? [boardPreview] : []),
+    ]);
     if (files && files.length > 0) {
       const { error: rowsError } = await supabase
         .from("attachments")

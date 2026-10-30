@@ -16,7 +16,7 @@ import {
 
 /**
  * Card del catalogo Situazionali.
- * Anteprima: lavagna (immagine) > video > fallback con icona.
+ * Anteprima: lavagna disegnata nell'app > lavagna (link) > video > icona.
  * Badge macro-fase colorato (verde/rosso/blu/giallo come da specs).
  */
 export function SituationalCard({ item }: { item: SituationalListItem }) {
@@ -29,10 +29,10 @@ export function SituationalCard({ item }: { item: SituationalListItem }) {
     >
       {/* Anteprima media */}
       <div className="relative h-36 overflow-hidden bg-gradient-to-br from-primary-soft to-muted">
-        {item.lavagna_url ? (
+        {item.lavagna_preview_url || item.lavagna_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={item.lavagna_url}
+            src={(item.lavagna_preview_url || item.lavagna_url)!}
             alt=""
             loading="lazy"
             className="h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"

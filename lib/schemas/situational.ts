@@ -5,6 +5,7 @@
  * scelta, replicando il CHECK constraint del DB.
  */
 import { z } from "zod";
+import { boardDataOrNull } from "@/lib/board/schema";
 import {
   MACRO_FASE_VALUES,
   SOTTO_FASE_VALUES,
@@ -50,6 +51,8 @@ export const situationalFormSchema = z
     video_url: httpUrlOrNull,
     lavagna_url: httpUrlOrNull,
     pdf_url: httpUrlOrNull,
+    // Lavagna tattica disegnata nell'app (0017).
+    lavagna_dati: boardDataOrNull,
   })
   .superRefine((v, ctx) => {
     // La sotto-fase deve appartenere alla macro-fase. Stesso pattern del DB CHECK.
@@ -80,5 +83,6 @@ export function emptySituationalForm(): SituationalFormValues {
     video_url: null,
     lavagna_url: null,
     pdf_url: null,
+    lavagna_dati: null,
   };
 }

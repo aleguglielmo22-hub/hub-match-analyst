@@ -19,6 +19,13 @@ import {
 } from "@/lib/schemas/set-pieces";
 import type { SetPiecesFilters } from "@/lib/schemas/set-pieces-filters";
 import type { SetPieceListItem, SetPieceRow } from "@/lib/types/set-pieces";
+import { parseBoardData } from "@/lib/board/schema";
+import {
+  boardColumnsForUpdate,
+  boardNeedsPreview,
+  removeStaleBoardPreview,
+  signBoardPreviews,
+} from "@/lib/board/persist";
 
 const PAGE_SIZE = 24;
 
@@ -65,7 +72,7 @@ async function querySetPiecesPage(
         id, titolo, fase, tipo_piazzato, specificazione_punizione, lato_battuta,
         esito_finale, squadra_esecutrice, squadra_avversaria, competizione,
         stagione, minuto, punteggio, data_evento, video_url, lavagna_image_url,
-        updated_at, team_esecutrice_id, team_avversaria_id,
+        lavagna_anteprima, updated_at, team_esecutrice_id, team_avversaria_id,
         team_esecutrice:teams!set_pieces_team_esecutrice_id_fkey(nome),
         team_avversaria:teams!set_pieces_team_avversaria_id_fkey(nome)
       `,
@@ -134,7 +141,12 @@ async function querySetPiecesPage(
   const { data, error } = await q;
   if (error || !data) throw error ?? new Error("Risposta vuota");
 
-  const items = data.slice(0, PAGE_SIZE) as unknown as SetPieceListItem[];
+  const rows = data.slice(0, PAGE_SIZE) as unknown as (SetPieceListItem & { lavagna_anteprima: string | null })[];
+  const previews = await signBoardPreviews(supabase, rows.map((r) => r.lavagna_anteprima));
+  const items = rows.map(({ lavagna_anteprima: _path, ...r }, i) => {
+    void _path;
+    return { ...r, lavagna_preview_url: previews[i] };
+  });
   return { items, hasMore: data.length > PAGE_SIZE };
 }
 
@@ -212,7 +224,7 @@ async function setPieceColumns(supabase: Supabase, workspaceId: string, v: SetPi
 export async function createSetPiece(
   id: string,
   raw: SetPieceFormValues,
-): Promise<{ id: string }> {
+): Promise<{ id: string; needsPreview: boolean }> {
   z.string().uuid().parse(id);
   const v = setPieceFormSchema.parse(raw);
 
@@ -229,6 +241,7 @@ export async function createSetPiece(
         workspace_id: workspace.id,
         created_by: workspace.userId,
         ...columns,
+        lavagna_dati: v.lavagna_dati,
       }),
       exists: async () => {
         const { data } = await supabase
@@ -243,12 +256,14 @@ export async function createSetPiece(
 
   revalidatePath("/set-pieces");
   revalidatePath("/dashboard");
-  return { id };
+  return { id, needsPreview: await boardNeedsPreview(supabase, "set_piece", workspace.id, id) };
 }
 
 type SetPieceForEdit = {
   id: string;
   values: SetPieceFormValues;
+  /** Lavagna salvata ma senza anteprima (caricamento non riuscito): si può rigenerare. */
+  boardPreviewMissing: boolean;
   updated_at: string;
   can_edit: boolean;
 };
@@ -308,7 +323,9 @@ export async function getSetPieceForEdit(
           video_url: r.video_url,
           lavagna_image_url: r.lavagna_image_url,
           pdf_url: r.pdf_url,
+          lavagna_dati: parseBoardData(r.lavagna_dati),
         },
+        boardPreviewMissing: !!r.lavagna_dati && !r.lavagna_anteprima,
         updated_at: r.updated_at,
         can_edit: workspace.isOwner || r.created_by === workspace.userId,
       },
@@ -323,7 +340,7 @@ export async function getSetPieceForEdit(
 export async function updateSetPiece(
   id: string,
   raw: SetPieceFormValues,
-): Promise<{ id: string }> {
+): Promise<{ id: string; needsPreview: boolean }> {
   z.string().uuid().parse(id);
   const v = setPieceFormSchema.parse(raw);
 
@@ -331,9 +348,10 @@ export async function updateSetPiece(
   if (!workspace) throw new Error("Workspace non trovato");
 
   const supabase = await createClient();
+  const board = await boardColumnsForUpdate(supabase, "set_piece", workspace.id, id, v.lavagna_dati);
   const { data, error } = await supabase
     .from("set_pieces")
-    .update(await setPieceColumns(supabase, workspace.id, v))
+    .update({ ...(await setPieceColumns(supabase, workspace.id, v)), ...board.columns })
     .eq("id", id)
     .eq("workspace_id", workspace.id)
     .is("deleted_at", null)
@@ -342,9 +360,11 @@ export async function updateSetPiece(
 
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Schema non trovato o non hai i permessi per modificarlo");
+  // Anteprima della lavagna precedente: tolta solo dopo l'aggiornamento riuscito.
+  await removeStaleBoardPreview(supabase, board.staleFile);
 
   revalidatePath("/set-pieces");
   revalidatePath(`/set-pieces/${id}`);
   revalidatePath("/dashboard");
-  return { id: data.id };
+  return { id: data.id, needsPreview: await boardNeedsPreview(supabase, "set_piece", workspace.id, id) };
 }

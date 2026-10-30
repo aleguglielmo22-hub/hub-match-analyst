@@ -27,6 +27,9 @@ import { getSetPieceLinks } from "@/app/(app)/collegamenti/actions";
 import { ESITO_TONE, FASE_SET_PIECE_TONE, TONE } from "@/lib/tones";
 import { cn } from "@/lib/utils";
 import { videoEmbedUrl } from "@/lib/links/external-links";
+import { parseBoardData } from "@/lib/board/schema";
+import { signBoardPreviews } from "@/lib/board/persist";
+import { BoardViewer } from "@/components/board/board-viewer";
 import {
   ALTEZZA_LINEA_LABEL,
   esitoLabel,
@@ -95,7 +98,11 @@ export default async function DettaglioSetPiecePage({
 
   // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
   const canEdit = workspace.isOwner || sp.created_by === workspace.userId;
-  const links = await getSetPieceLinks(sp.id);
+  const board = parseBoardData(sp.lavagna_dati);
+  const [links, [boardPreviewUrl]] = await Promise.all([
+    getSetPieceLinks(sp.id),
+    board ? createClient().then((sb) => signBoardPreviews(sb, [sp.lavagna_anteprima])) : Promise.resolve([null]),
+  ]);
   const isOffensive = sp.fase === "OFFENSIVO";
   // Nomi attuali delle anagrafiche collegate, altrimenti i vecchi testi.
   const esecutrice = setPieceTeamName(sp.team_esecutrice, sp.squadra_esecutrice);
@@ -207,7 +214,7 @@ export default async function DettaglioSetPiecePage({
         </div>
       </header>
 
-      {/* Media: video player + lavagna immagine */}
+      {/* Media: video player + lavagna (disegnata nell'app, altrimenti il vecchio link) */}
       <div className="grid gap-4 lg:grid-cols-2">
         {sp.video_url ? (
           <article className="overflow-hidden rounded-2xl border border-border/60 bg-card/40">
@@ -227,6 +234,17 @@ export default async function DettaglioSetPiecePage({
           </article>
         )}
 
+        {board ? (
+          <article className="overflow-hidden rounded-2xl border border-border/60 bg-card/40">
+            <header className="border-b border-border/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Lavagna tattica
+            </header>
+            <div className="p-2">
+              <BoardViewer board={board} previewUrl={boardPreviewUrl} title={sp.titolo} />
+            </div>
+          </article>
+        ) : null}
+        {/* Vecchio link all'immagine: resta visibile se valorizzato. */}
         {sp.lavagna_image_url ? (
           <article className="overflow-hidden rounded-2xl border border-border/60 bg-card/40">
             <header className="border-b border-border/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
@@ -239,13 +257,13 @@ export default async function DettaglioSetPiecePage({
               className="block w-full max-h-[480px] object-contain bg-overlay/40"
             />
           </article>
-        ) : (
+        ) : !board ? (
           <article className="grid place-items-center rounded-2xl border border-dashed border-border/40 bg-card/20 p-10 text-center">
             <p className="text-xs text-muted-foreground">
-              Nessuna immagine della lavagna.
+              Nessuna lavagna.
             </p>
           </article>
-        )}
+        ) : null}
       </div>
 
       {/* Dettagli per fase */}

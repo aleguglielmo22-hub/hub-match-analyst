@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:types": "supabase gen types typescript --linked 2>/dev/null > lib/types/database.ts",
-    "test": "node --no-warnings --test lib/backup/csv.test.mjs lib/search/ilike-filter.test.mjs lib/auth/login-errors.test.mjs lib/auth/allowlist.test.mjs lib/set-pieces/efficacy.test.mjs lib/uploads/limits.test.mjs lib/links/external-links.test.mjs lib/types/esito-label.test.mjs lib/forms/draft.test.mjs lib/forms/insert-once.test.mjs lib/scouting/observations.test.mjs lib/lookups/names.test.mjs lib/set-pieces/defaults.test.mjs lib/set-pieces/player-roles.test.mjs lib/search/global-results.test.mjs lib/auth/next-path.test.mjs lib/geo/countries.test.mjs lib/scouting/player-form-sections.test.mjs"
+    "test": "node --no-warnings --test lib/backup/csv.test.mjs lib/search/ilike-filter.test.mjs lib/auth/login-errors.test.mjs lib/auth/allowlist.test.mjs lib/set-pieces/efficacy.test.mjs lib/uploads/limits.test.mjs lib/links/external-links.test.mjs lib/types/esito-label.test.mjs lib/forms/draft.test.mjs lib/forms/insert-once.test.mjs lib/scouting/observations.test.mjs lib/lookups/names.test.mjs lib/set-pieces/defaults.test.mjs lib/set-pieces/player-roles.test.mjs lib/search/global-results.test.mjs lib/auth/next-path.test.mjs lib/geo/countries.test.mjs lib/scouting/player-form-sections.test.mjs lib/board/board.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -20,11 +20,13 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.2.1",
     "fflate": "^0.8.2",
+    "konva": "10.7.1",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.76.0",
+    "react-konva": "19.2.7",
     "shadcn": "^4.7.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",

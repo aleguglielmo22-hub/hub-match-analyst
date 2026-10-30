@@ -48,6 +48,8 @@ import {
 import { cn } from "@/lib/utils";
 import { MobileSaveBar } from "@/components/app/mobile-save-bar";
 import { focusNextFieldOnEnter } from "@/lib/forms/enter-key";
+import { BoardField } from "@/components/board/board-field";
+import { uploadBoardPreview } from "@/components/board/upload-preview";
 
 function FormSection({
   title,
@@ -181,7 +183,13 @@ export function SituationalForm({
   existing,
 }: {
   /** Se presente, il form è in modalità modifica (valori precompilati). */
-  existing?: { id: string; values: SituationalFormValues; updatedAt: string };
+  existing?: {
+    id: string;
+    values: SituationalFormValues;
+    updatedAt: string;
+    /** Lavagna salvata ma anteprima non generata. */
+    boardPreviewMissing?: boolean;
+  };
 } = {}) {
   const router = useRouter();
   const isEdit = !!existing;
@@ -238,10 +246,11 @@ export function SituationalForm({
     setSubmitting(true);
 
     let id: string;
+    let needsPreview: boolean;
     try {
-      id = existing
-        ? (await updateSituational(existing.id, values)).id
-        : (await createSituational(newId, values)).id;
+      ({ id, needsPreview } = existing
+        ? await updateSituational(existing.id, values)
+        : await createSituational(newId, values));
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore sconosciuto";
       toast.error("Salvataggio fallito", { description: message });
@@ -262,6 +271,16 @@ export function SituationalForm({
         duration: 10000,
       });
       // Pagina di modifica ricaricata da capo, con gli allegati aggiornati.
+      window.location.assign(`/situational/${id}/modifica`);
+      return;
+    }
+
+    // Anteprima della lavagna: i dati sono già salvati anche se questo passo fallisce.
+    if (needsPreview && values.lavagna_dati && !(await uploadBoardPreview("situational", id, values.lavagna_dati))) {
+      toast.warning("Lavagna salvata, anteprima non generata", {
+        description: "Puoi rigenerarla dalla pagina di modifica.",
+        duration: 10000,
+      });
       window.location.assign(`/situational/${id}/modifica`);
       return;
     }
@@ -521,10 +540,32 @@ export function SituationalForm({
         </div>
       </FormSection>
 
+      {/* Lavagna tattica disegnata nell'app */}
+      <FormSection
+        title="Lavagna"
+        description="Disegna l'esercitazione: giocatori, frecce, zone e materiale (coni, cinesini, porticine)."
+      >
+        <Controller
+          control={form.control}
+          name="lavagna_dati"
+          render={({ field }) => (
+            <BoardField
+              value={field.value}
+              onChange={field.onChange}
+              title={form.getValues("titolo") || "Nuova esercitazione"}
+              entity="situational"
+              itemId={existing?.id ?? null}
+              savedBoard={existing?.values.lavagna_dati ?? null}
+              previewMissing={existing?.boardPreviewMissing}
+            />
+          )}
+        />
+      </FormSection>
+
       {/* § 6 Media */}
       <FormSection
         title="Materiale multimediale"
-        description="Link al video, alla lavagna grafica e al PDF della scheda."
+        description="Link al video, a una lavagna esterna e al PDF della scheda."
       >
         <div className="space-y-2">
           <Label htmlFor="video_url">Video clip reale (URL)</Label>
@@ -537,7 +578,7 @@ export function SituationalForm({
           <FieldError message={form.formState.errors.video_url?.message} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="lavagna_url">Lavagna grafica / animazione (URL)</Label>
+          <Label htmlFor="lavagna_url">Lavagna esterna / animazione (URL, facoltativo)</Label>
           <Input
             id="lavagna_url"
             type="url"

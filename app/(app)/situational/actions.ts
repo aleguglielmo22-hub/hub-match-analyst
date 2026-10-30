@@ -19,6 +19,13 @@ import {
 } from "@/lib/schemas/situational";
 import type { SituationalFilters } from "@/lib/schemas/situational-filters";
 import type { SituationalListItem, SituationalRow } from "@/lib/types/situational";
+import { parseBoardData } from "@/lib/board/schema";
+import {
+  boardColumnsForUpdate,
+  boardNeedsPreview,
+  removeStaleBoardPreview,
+  signBoardPreviews,
+} from "@/lib/board/persist";
 
 const PAGE_SIZE = 24;
 
@@ -63,7 +70,7 @@ async function querySituationalPage(
     .select(
       `
         id, titolo, macro_fase, sotto_fase, autori, numero_giocatori,
-        focus_tags, video_url, lavagna_url, pdf_url, updated_at
+        focus_tags, video_url, lavagna_url, pdf_url, lavagna_anteprima, updated_at
       `,
     )
     .eq("workspace_id", workspace.id)
@@ -95,7 +102,12 @@ async function querySituationalPage(
   const { data, error } = await q;
   if (error || !data) throw error ?? new Error("Risposta vuota");
 
-  const items = data.slice(0, PAGE_SIZE) as unknown as SituationalListItem[];
+  const rows = data.slice(0, PAGE_SIZE) as unknown as (SituationalListItem & { lavagna_anteprima: string | null })[];
+  const previews = await signBoardPreviews(supabase, rows.map((r) => r.lavagna_anteprima));
+  const items = rows.map(({ lavagna_anteprima: _path, ...r }, i) => {
+    void _path;
+    return { ...r, lavagna_preview_url: previews[i] };
+  });
   return { items, hasMore: data.length > PAGE_SIZE };
 }
 
@@ -129,7 +141,7 @@ function situationalColumns(v: SituationalFormValues) {
 export async function createSituational(
   id: string,
   raw: SituationalFormValues,
-): Promise<{ id: string }> {
+): Promise<{ id: string; needsPreview: boolean }> {
   z.string().uuid().parse(id);
   const v = situationalFormSchema.parse(raw);
 
@@ -144,6 +156,7 @@ export async function createSituational(
         workspace_id: workspace.id,
         created_by: workspace.userId,
         ...situationalColumns(v),
+        lavagna_dati: v.lavagna_dati,
       }),
       exists: async () => {
         const { data } = await supabase
@@ -158,12 +171,14 @@ export async function createSituational(
 
   revalidatePath("/situational");
   revalidatePath("/dashboard");
-  return { id };
+  return { id, needsPreview: await boardNeedsPreview(supabase, "situational", workspace.id, id) };
 }
 
 type SituationalForEdit = {
   id: string;
   values: SituationalFormValues;
+  /** Lavagna salvata ma senza anteprima (caricamento non riuscito): si può rigenerare. */
+  boardPreviewMissing: boolean;
   updated_at: string;
   can_edit: boolean;
 };
@@ -208,7 +223,9 @@ export async function getSituationalForEdit(
           video_url: r.video_url,
           lavagna_url: r.lavagna_url,
           pdf_url: r.pdf_url,
+          lavagna_dati: parseBoardData(r.lavagna_dati),
         },
+        boardPreviewMissing: !!r.lavagna_dati && !r.lavagna_anteprima,
         updated_at: r.updated_at,
         can_edit: workspace.isOwner || r.created_by === workspace.userId,
       },
@@ -223,7 +240,7 @@ export async function getSituationalForEdit(
 export async function updateSituational(
   id: string,
   raw: SituationalFormValues,
-): Promise<{ id: string }> {
+): Promise<{ id: string; needsPreview: boolean }> {
   z.string().uuid().parse(id);
   const v = situationalFormSchema.parse(raw);
 
@@ -231,9 +248,10 @@ export async function updateSituational(
   if (!workspace) throw new Error("Workspace non trovato");
 
   const supabase = await createClient();
+  const board = await boardColumnsForUpdate(supabase, "situational", workspace.id, id, v.lavagna_dati);
   const { data, error } = await supabase
     .from("situational_tactics")
-    .update(situationalColumns(v))
+    .update({ ...situationalColumns(v), ...board.columns })
     .eq("id", id)
     .eq("workspace_id", workspace.id)
     .is("deleted_at", null)
@@ -242,10 +260,12 @@ export async function updateSituational(
 
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Esercitazione non trovata o non hai i permessi per modificarla");
+  // Anteprima della lavagna precedente: tolta solo dopo l'aggiornamento riuscito.
+  await removeStaleBoardPreview(supabase, board.staleFile);
 
   revalidatePath("/situational");
   revalidatePath(`/situational/${id}`);
-  return { id: data.id };
+  return { id: data.id, needsPreview: await boardNeedsPreview(supabase, "situational", workspace.id, id) };
 }
 
 /** Lista dei tag focus distinti del workspace, per autocomplete nei filtri. */

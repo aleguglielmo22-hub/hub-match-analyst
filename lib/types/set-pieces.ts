@@ -244,6 +244,8 @@ export type SetPieceListItem = Pick<
   /** Nome attuale dell'anagrafica (prevale sul vecchio testo salvato). */
   team_esecutrice: { nome: string } | null;
   team_avversaria: { nome: string } | null;
+  /** Link temporaneo all'anteprima della lavagna disegnata (0017), se presente. */
+  lavagna_preview_url?: string | null;
 };
 
 /** Nome della squadra da mostrare: anagrafica collegata, altrimenti il vecchio testo. */

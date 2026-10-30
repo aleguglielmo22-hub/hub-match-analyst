@@ -49,10 +49,11 @@ export function SetPieceCard({ item }: { item: SetPieceListItem }) {
     >
       {/* Anteprima lavagna tattica, se presente; altrimenti banda colorata. */}
       <div className="relative h-32 overflow-hidden bg-gradient-to-br from-primary-soft to-muted">
-        {item.lavagna_image_url ? (
+        {item.lavagna_preview_url || item.lavagna_image_url ? (
+          // Lavagna disegnata nell'app (anteprima), altrimenti il vecchio link.
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={item.lavagna_image_url}
+            src={(item.lavagna_preview_url || item.lavagna_image_url)!}
             alt={`Lavagna tattica: ${item.titolo}`}
             loading="lazy"
             className="h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"

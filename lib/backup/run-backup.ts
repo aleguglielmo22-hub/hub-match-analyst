@@ -145,12 +145,18 @@ export async function prepareBackup(): Promise<BackupPlan> {
   );
   const rowCounts = Object.fromEntries(counts) as BackupPlan["rowCounts"];
 
-  // File registrati: Cloud → bucket "archivio", allegati → bucket "media".
-  const [archiveFiles, attachments, workspaces] = await Promise.all([
+  // File registrati: Cloud → bucket "archivio"; allegati e anteprime delle
+  // lavagne (0017) → bucket "media".
+  const [archiveFiles, attachments, setPieceBoards, situationalBoards, workspaces] = await Promise.all([
     fetchAllRows(supabase, tableByName("archive_files"), "id, file_path, file_size_bytes"),
     fetchAllRows(supabase, tableByName("attachments"), "id, file_path, file_size_bytes"),
+    fetchAllRows(supabase, tableByName("set_pieces"), "id, lavagna_anteprima"),
+    fetchAllRows(supabase, tableByName("situational_tactics"), "id, lavagna_anteprima"),
     fetchAllRows(supabase, tableByName("workspaces"), "id"),
   ]);
+  const boardPreviews = [...setPieceBoards, ...situationalBoards]
+    .filter((r) => typeof r.lavagna_anteprima === "string" && r.lavagna_anteprima)
+    .map((r) => ({ file_path: r.lavagna_anteprima, file_size_bytes: null }));
 
   const files: BackupFileEntry[] = [];
   const known: Record<BackupBucket, Set<string>> = {
@@ -172,6 +178,7 @@ export async function prepareBackup(): Promise<BackupPlan> {
   };
   addRegistered("archivio", archiveFiles);
   addRegistered("media", attachments);
+  addRegistered("media", boardPreviews);
 
   // File non registrati: elenco dei bucket per ogni workspace accessibile.
   const listing = {} as BackupPlan["listing"];
@@ -182,7 +189,12 @@ export async function prepareBackup(): Promise<BackupPlan> {
         const listed = await listBucketRecursive(supabase, bucket, String(w.id));
         objects += listed.length;
         for (const obj of listed) {
-          if (known[bucket].has(obj.path)) continue;
+          if (known[bucket].has(obj.path)) {
+            // File registrato senza dimensione in tabella (anteprime): la prende dall'elenco.
+            const entry = files.find((f) => f.bucket === bucket && f.path === obj.path);
+            if (entry && entry.size === null) entry.size = obj.size;
+            continue;
+          }
           known[bucket].add(obj.path);
           files.push({ bucket, path: obj.path, size: obj.size, registered: false });
         }

@@ -7,6 +7,7 @@
  * ai CHECK constraint del DB.
  */
 import { z } from "zod";
+import { boardDataOrNull } from "@/lib/board/schema";
 import {
   ALTEZZA_LINEA_VALUES,
   ESITO_FINALE_VALUES,
@@ -99,6 +100,8 @@ export const setPieceFormSchema = z
     video_url: httpUrlOrNull,
     lavagna_image_url: httpUrlOrNull,
     pdf_url: httpUrlOrNull,
+    // Lavagna tattica disegnata nell'app (0017).
+    lavagna_dati: boardDataOrNull,
   })
   // Validazione condizionale: replica i CHECK del DB e dà messaggi utili.
   .superRefine((v, ctx) => {
@@ -203,5 +206,6 @@ export function emptySetPieceForm(defaults?: {
     video_url: null,
     lavagna_image_url: null,
     pdf_url: null,
+    lavagna_dati: null,
   };
 }

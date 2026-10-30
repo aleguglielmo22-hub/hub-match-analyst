@@ -83,6 +83,8 @@ import {
 import { cn } from "@/lib/utils";
 import { MobileSaveBar } from "@/components/app/mobile-save-bar";
 import { focusNextFieldOnEnter } from "@/lib/forms/enter-key";
+import { BoardField } from "@/components/board/board-field";
+import { uploadBoardPreview } from "@/components/board/upload-preview";
 
 function FormSection({
   title,
@@ -191,6 +193,8 @@ export function SetPieceForm({
     updatedAt: string;
     /** Collegamenti attuali (giocatori con ruolo, voci del Cloud). */
     links: { players: FormSetPiecePlayer[]; archive: LinkTarget[] };
+    /** Lavagna salvata ma anteprima non generata. */
+    boardPreviewMissing?: boolean;
   };
   /** Squadre, competizioni e stagioni condivise (recenti in cima). */
   lookups: SharedLookups;
@@ -312,10 +316,11 @@ export function SetPieceForm({
     setSubmitting(true);
 
     let id: string;
+    let needsPreview: boolean;
     try {
-      id = existing
-        ? (await updateSetPiece(existing.id, values)).id
-        : (await createSetPiece(newId, values)).id;
+      ({ id, needsPreview } = existing
+        ? await updateSetPiece(existing.id, values)
+        : await createSetPiece(newId, values));
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore sconosciuto";
       toast.error("Salvataggio fallito", { description: message });
@@ -350,6 +355,16 @@ export function SetPieceForm({
         duration: 10000,
       });
       // Pagina di modifica ricaricata da capo, con gli allegati aggiornati.
+      window.location.assign(`/set-pieces/${id}/modifica`);
+      return;
+    }
+
+    // Anteprima della lavagna: i dati sono già salvati anche se questo passo fallisce.
+    if (needsPreview && values.lavagna_dati && !(await uploadBoardPreview("set_piece", id, values.lavagna_dati))) {
+      toast.warning("Lavagna salvata, anteprima non generata", {
+        description: "Puoi rigenerarla dalla pagina di modifica.",
+        duration: 10000,
+      });
       window.location.assign(`/set-pieces/${id}/modifica`);
       return;
     }
@@ -970,10 +985,32 @@ export function SetPieceForm({
         </div>
       </FormSection>
 
+      {/* Lavagna tattica disegnata nell'app */}
+      <FormSection
+        title="Lavagna"
+        description="Disegna lo schema: giocatori, pallone, frecce, zone e materiale."
+      >
+        <Controller
+          control={form.control}
+          name="lavagna_dati"
+          render={({ field }) => (
+            <BoardField
+              value={field.value}
+              onChange={field.onChange}
+              title={form.getValues("titolo") || "Nuovo piazzato"}
+              entity="set_piece"
+              itemId={existing?.id ?? null}
+              savedBoard={existing?.values.lavagna_dati ?? null}
+              previewMissing={existing?.boardPreviewMissing}
+            />
+          )}
+        />
+      </FormSection>
+
       {/* § 6 Media */}
       <FormSection
         title="Materiale multimediale"
-        description="URL del video clip, dell'immagine della lavagna e del PDF di analisi."
+        description="URL del video clip, di un'immagine della lavagna e del PDF di analisi."
       >
         <div className="space-y-2">
           <Label htmlFor="video_url">Video clip (URL)</Label>
@@ -986,7 +1023,7 @@ export function SetPieceForm({
           <FieldError message={form.formState.errors.video_url?.message} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="lavagna_image_url">Lavagna tattica (URL immagine)</Label>
+          <Label htmlFor="lavagna_image_url">Immagine della lavagna (URL, facoltativo)</Label>
           <Input
             id="lavagna_image_url"
             type="url"

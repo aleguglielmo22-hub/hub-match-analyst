@@ -138,6 +138,24 @@
   --primary: #0b5fd9;
   --primary-foreground: #ffffff;
   --primary-soft: #e3edfc; /* primario tenue */
+
+  /* Lavagna tattica (lib/board/colors.ts): campo e simboli uguali in entrambi
+     i temi, così l'anteprima PNG non cambia. Nostri = primario; contrasti
+     verificati in lib/board/board.test.mjs. */
+  --board-pitch: #25662e;
+  --board-pitch-stripe: #22602b;
+  --board-lines: #ffffff;
+  --board-home: #0b5fd9;
+  --board-home-text: #ffffff;
+  --board-home-stroke: #ffffff;
+  --board-away: #fbbf24;
+  --board-away-text: #111827;
+  --board-away-stroke: #111827;
+  --board-ball: #ffffff;
+  --board-ink: #111827;
+  --board-equipment: #f97316;
+  --board-equipment-stroke: #ffffff;
+  --board-arrow: #ffffff;
   --secondary: var(--primary-soft);
   --secondary-foreground: #13203a;
   --muted: color-mix(in oklab, #dde3ec 40%, #f4f6fa);

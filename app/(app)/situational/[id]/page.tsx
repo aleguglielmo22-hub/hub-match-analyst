@@ -22,6 +22,9 @@ import {
   SOTTO_FASE_LABEL,
   type SituationalRow,
 } from "@/lib/types/situational";
+import { parseBoardData } from "@/lib/board/schema";
+import { signBoardPreviews } from "@/lib/board/persist";
+import { BoardViewer } from "@/components/board/board-viewer";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +66,11 @@ export default async function DettaglioSituazionalePage({
   const macro = MACRO_FASE_BADGE[s.macro_fase];
   // Solo il creatore o l'owner del workspace possono modificare (vedi RLS).
   const canEdit = workspace.isOwner || s.created_by === workspace.userId;
-  const archiveLinks = await getSituationalLinks(s.id);
+  const board = parseBoardData(s.lavagna_dati);
+  const [archiveLinks, [boardPreviewUrl]] = await Promise.all([
+    getSituationalLinks(s.id),
+    board ? createClient().then((sb) => signBoardPreviews(sb, [s.lavagna_anteprima])) : Promise.resolve([null]),
+  ]);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-8 sm:py-10">
@@ -129,6 +136,17 @@ export default async function DettaglioSituazionalePage({
             <VideoEmbed url={s.video_url} />
           </article>
         ) : null}
+        {board ? (
+          <article className="overflow-hidden rounded-2xl border border-border/60 bg-card/40">
+            <header className="border-b border-border/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Lavagna tattica
+            </header>
+            <div className="p-2">
+              <BoardViewer board={board} previewUrl={boardPreviewUrl} title={s.titolo} />
+            </div>
+          </article>
+        ) : null}
+        {/* Vecchio link alla lavagna: resta visibile se valorizzato. */}
         {s.lavagna_url ? (
           <article className="overflow-hidden rounded-2xl border border-border/60 bg-card/40">
             <header className="border-b border-border/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
