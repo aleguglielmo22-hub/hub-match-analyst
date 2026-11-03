@@ -18,6 +18,8 @@ export type LookupUsage = {
   osservazioni: number;
   /** Giocatori con questa squadra attuale (solo squadre). */
   giocatori: number;
+  /** Partite di AG Tag (programma desktop, 0018). */
+  ag_tag: number;
 };
 
 export type LookupsWithUsage = Record<LookupKind, LookupUsage[]>;
@@ -49,7 +51,7 @@ async function fetchAll<T>(
 }
 
 async function loadReferences(supabase: Supabase, ws: string) {
-  const [cloud, sp, obs, players] = await Promise.all([
+  const [cloud, sp, obs, players, tagMatches] = await Promise.all([
     fetchAll((a, b) =>
       supabase
         .from("archive_items")
@@ -77,8 +79,16 @@ async function loadReferences(supabase: Supabase, ws: string) {
     fetchAll((a, b) =>
       supabase.from("players").select("team_attuale_id").eq("workspace_id", ws).order("id").range(a, b),
     ),
+    fetchAll((a, b) =>
+      supabase
+        .from("tag_matches")
+        .select("home_team_id, away_team_id, competition_id, season_id")
+        .eq("workspace_id", ws)
+        .order("id")
+        .range(a, b),
+    ),
   ]);
-  return { cloud, sp, obs, players };
+  return { cloud, sp, obs, players, tagMatches };
 }
 
 /** Squadre, competizioni e stagioni con il numero di utilizzi per sezione. */
@@ -97,12 +107,13 @@ export async function listLookupsWithUsage(): Promise<LookupsWithUsage | null> {
     if (err) throw err;
 
     const counter = () =>
-      new Map<string, { cloud: number; set_pieces: number; osservazioni: number; giocatori: number }>();
+      new Map<string, Omit<LookupUsage, "id" | "label">>();
     const counts = { team: counter(), competition: counter(), season: counter() };
-    const add = (kind: LookupKind, id: string | null, section: "cloud" | "set_pieces" | "osservazioni" | "giocatori") => {
+    const empty = () => ({ cloud: 0, set_pieces: 0, osservazioni: 0, giocatori: 0, ag_tag: 0 });
+    const add = (kind: LookupKind, id: string | null, section: keyof Omit<LookupUsage, "id" | "label">) => {
       if (!id) return;
       const m = counts[kind];
-      const c = m.get(id) ?? { cloud: 0, set_pieces: 0, osservazioni: 0, giocatori: 0 };
+      const c = m.get(id) ?? empty();
       c[section]++;
       m.set(id, c);
     };
@@ -124,8 +135,14 @@ export async function listLookupsWithUsage(): Promise<LookupsWithUsage | null> {
       add("team", r.team_ospite_id, "osservazioni");
       add("competition", r.competition_id, "osservazioni");
     }
+    for (const r of refs.tagMatches) {
+      add("team", r.home_team_id, "ag_tag");
+      add("team", r.away_team_id, "ag_tag");
+      add("competition", r.competition_id, "ag_tag");
+      add("season", r.season_id, "ag_tag");
+    }
     const withUsage = (kind: LookupKind, list: { id: string; label: string }[]): LookupUsage[] =>
-      list.map((o) => ({ ...o, ...(counts[kind].get(o.id) ?? { cloud: 0, set_pieces: 0, osservazioni: 0, giocatori: 0 }) }));
+      list.map((o) => ({ ...o, ...(counts[kind].get(o.id) ?? empty()) }));
 
     return {
       team: withUsage("team", (teams.data ?? []).map((t) => ({ id: t.id, label: t.nome }))),
@@ -178,6 +195,8 @@ export async function renameLookup(kind: LookupKind, id: string, rawName: string
   return { ok: true };
 }
 
+export type MergeResult = Omit<LookupUsage, "id" | "label"> & { preferenze: number };
+
 /**
  * Unisce `sourceId` dentro `targetId` (stesso tipo): tutti i riferimenti
  * passano all'anagrafica che resta, poi il doppione viene eliminato.
@@ -187,7 +206,7 @@ export async function mergeLookups(
   kind: LookupKind,
   sourceId: string,
   targetId: string,
-): Promise<{ cloud: number; set_pieces: number; osservazioni: number; giocatori: number; preferenze: number }> {
+): Promise<MergeResult> {
   kindSchema.parse(kind);
   z.string().uuid().parse(sourceId);
   z.string().uuid().parse(targetId);
@@ -200,5 +219,5 @@ export async function mergeLookups(
   });
   if (error) throw new Error(error.message);
   revalidateAll();
-  return data as { cloud: number; set_pieces: number; osservazioni: number; giocatori: number; preferenze: number };
+  return data as MergeResult;
 }

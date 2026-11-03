@@ -1,0 +1,7 @@
+node_modules/
+out/
+dist/
+# Binari FFmpeg: si scaricano con "npm run ffmpeg" (impronta verificata).
+resources/bin/
+# Chiavi di Supabase (pubbliche, ma fuori da git come .env.local di AG Workspace).
+.env

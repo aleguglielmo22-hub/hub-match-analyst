@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // AG Tag (programma desktop) ha la sua configurazione in apps/ag-tag.
+    "apps/**",
   ]),
 ]);
 

@@ -1,0 +1,25 @@
+appId: com.alessandroguglielmo.agtag
+productName: AG Tag
+# Usa l'Electron già installato in node_modules (nessun nuovo download).
+electronDist: node_modules/electron/dist
+directories:
+  buildResources: build
+  output: dist
+files:
+  - out/**
+  - package.json
+extraResources:
+  # FFmpeg e FFprobe (GPL v3) con licenza e README della build.
+  - from: resources/bin
+    to: bin
+    filter: ["ffmpeg", "ffprobe", "FFMPEG-LICENSE.txt", "FFMPEG-README.txt"]
+mac:
+  target:
+    - target: dir
+      arch: arm64
+  category: public.app-category.sports
+  icon: build/icon.png
+  # Non firmata: al primo avvio si apre con clic destro → Apri.
+  identity: null
+  hardenedRuntime: false
+  darkModeSupport: true

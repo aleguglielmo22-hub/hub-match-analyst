@@ -31,14 +31,15 @@ const KINDS: { key: LookupKind; label: string; singular: string }[] = [
   { key: "season", label: "Stagioni", singular: "stagione" },
 ];
 
-const total = (u: LookupUsage) => u.cloud + u.set_pieces + u.osservazioni + u.giocatori;
+const total = (u: LookupUsage) => u.cloud + u.set_pieces + u.osservazioni + u.giocatori + u.ag_tag;
 
-function usageParts(u: Pick<LookupUsage, "cloud" | "set_pieces" | "osservazioni" | "giocatori">): string {
+function usageParts(u: Pick<LookupUsage, "cloud" | "set_pieces" | "osservazioni" | "giocatori" | "ag_tag">): string {
   const parts = [
     u.giocatori && `${u.giocatori} ${u.giocatori === 1 ? "giocatore" : "giocatori"}`,
     u.cloud && `${u.cloud} nel Cloud`,
     u.set_pieces && `${u.set_pieces} ${u.set_pieces === 1 ? "piazzato" : "piazzati"}`,
     u.osservazioni && `${u.osservazioni} ${u.osservazioni === 1 ? "osservazione" : "osservazioni"}`,
+    u.ag_tag && `${u.ag_tag} ${u.ag_tag === 1 ? "partita" : "partite"} in AG Tag`,
   ].filter(Boolean);
   return parts.length ? parts.join(", ") : "nessun utilizzo";
 }

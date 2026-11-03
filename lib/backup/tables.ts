@@ -1,5 +1,5 @@
 /**
- * Tabelle dati incluse nel backup, ricavate da supabase/migrations/0001–0014.
+ * Tabelle dati incluse nel backup, ricavate da supabase/migrations/0001–0018.
  * Ordine = ordine di ripristino (prima le tabelle referenziate dalle foreign key).
  * `orderBy` = chiave primaria, per una paginazione stabile a blocchi.
  */
@@ -25,6 +25,13 @@ export const BACKUP_TABLES = [
   { name: "archive_item_situational", orderBy: ["archive_item_id", "situational_id"] },
   { name: "attachments", orderBy: ["id"] },
   { name: "user_preferences", orderBy: ["user_id", "workspace_id"] },
+  // AG Tag (0018): definizioni dei codici, partite, eventi e loro collegamenti.
+  { name: "tag_codes", orderBy: ["id"] },
+  { name: "tag_label_codes", orderBy: ["id"] },
+  { name: "tag_matches", orderBy: ["id"] },
+  { name: "tag_events", orderBy: ["id"] },
+  { name: "tag_event_labels", orderBy: ["event_id", "label_code"] },
+  { name: "tag_event_players", orderBy: ["event_id", "player_id"] },
 ] as const;
 
 export type BackupTableName = (typeof BACKUP_TABLES)[number]["name"];

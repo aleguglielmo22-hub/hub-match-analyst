@@ -1,0 +1,40 @@
+{
+  "name": "ag-tag",
+  "productName": "AG Tag",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AG Tag — video analisi calcistica (programma desktop per Mac)",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "test": "node --no-warnings --test src/shared/*.test.mjs src/main/*.test.mjs scripts/*.test.mjs",
+    "ffmpeg": "node scripts/fetch-ffmpeg.mjs",
+    "icon": "node scripts/make-icon.mjs",
+    "env": "node scripts/make-env.mjs",
+    "dist": "npm run build && electron-builder --mac --arm64"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.106.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.0",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@vitejs/plugin-react": "6.1.2",
+    "electron": "44.9.0",
+    "electron-builder": "26.18.0",
+    "electron-vite": "6.0.0",
+    "lucide-react": "1.16.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "sharp": "0.34.5",
+    "tailwindcss": "4.3.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.4"
+  },
+  "author": "Alessandro Guglielmo"
+}

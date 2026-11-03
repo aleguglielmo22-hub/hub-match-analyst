@@ -1334,6 +1334,373 @@ export type Database = {
           },
         ]
       }
+      tag_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          id: string
+          mirror_code: string | null
+          nome: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          mirror_code?: string | null
+          nome: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          mirror_code?: string | null
+          nome?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_codes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_codes_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_codes_workspace_id_mirror_code_fkey"
+            columns: ["workspace_id", "mirror_code"]
+            isOneToOne: false
+            referencedRelation: "tag_codes"
+            referencedColumns: ["workspace_id", "code"]
+          },
+        ]
+      }
+      tag_event_labels: {
+        Row: {
+          event_id: string
+          label_code: string
+          workspace_id: string
+        }
+        Insert: {
+          event_id: string
+          label_code: string
+          workspace_id: string
+        }
+        Update: {
+          event_id?: string
+          label_code?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_event_labels_event_id_workspace_id_fkey"
+            columns: ["event_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "tag_events"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "tag_event_labels_workspace_id_label_code_fkey"
+            columns: ["workspace_id", "label_code"]
+            isOneToOne: false
+            referencedRelation: "tag_label_codes"
+            referencedColumns: ["workspace_id", "code"]
+          },
+        ]
+      }
+      tag_event_players: {
+        Row: {
+          event_id: string
+          player_id: string
+          workspace_id: string
+        }
+        Insert: {
+          event_id: string
+          player_id: string
+          workspace_id: string
+        }
+        Update: {
+          event_id?: string
+          player_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_event_players_event_id_workspace_id_fkey"
+            columns: ["event_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "tag_events"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "tag_event_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tag_events: {
+        Row: {
+          created_at: string
+          created_by: string
+          end_ms: number
+          id: string
+          match_id: string
+          nota: string | null
+          side: string
+          start_ms: number
+          stella: boolean
+          tag_code: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          end_ms: number
+          id?: string
+          match_id: string
+          nota?: string | null
+          side: string
+          start_ms: number
+          stella?: boolean
+          tag_code: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          end_ms?: number
+          id?: string
+          match_id?: string
+          nota?: string | null
+          side?: string
+          start_ms?: number
+          stella?: boolean
+          tag_code?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_events_match_id_workspace_id_fkey"
+            columns: ["match_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "tag_matches"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "tag_events_workspace_id_tag_code_fkey"
+            columns: ["workspace_id", "tag_code"]
+            isOneToOne: false
+            referencedRelation: "tag_codes"
+            referencedColumns: ["workspace_id", "code"]
+          },
+        ]
+      }
+      tag_label_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          gruppo: string
+          id: string
+          nome: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string
+          gruppo: string
+          id?: string
+          nome: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          gruppo?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_label_codes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_label_codes_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tag_matches: {
+        Row: {
+          audio_codec: string | null
+          away_team_id: string | null
+          competition_id: string | null
+          container: string | null
+          created_at: string
+          created_by: string
+          data_partita: string | null
+          deleted_at: string | null
+          duration_ms: number | null
+          fps: number | null
+          height: number | null
+          home_team_id: string | null
+          id: string
+          preferred_team_id: string | null
+          season_id: string | null
+          titolo: string | null
+          updated_at: string
+          video_codec: string | null
+          video_file_name: string
+          video_fingerprint: string
+          video_path: string | null
+          video_size_bytes: number
+          width: number | null
+          workspace_id: string
+        }
+        Insert: {
+          audio_codec?: string | null
+          away_team_id?: string | null
+          competition_id?: string | null
+          container?: string | null
+          created_at?: string
+          created_by?: string
+          data_partita?: string | null
+          deleted_at?: string | null
+          duration_ms?: number | null
+          fps?: number | null
+          height?: number | null
+          home_team_id?: string | null
+          id?: string
+          preferred_team_id?: string | null
+          season_id?: string | null
+          titolo?: string | null
+          updated_at?: string
+          video_codec?: string | null
+          video_file_name: string
+          video_fingerprint: string
+          video_path?: string | null
+          video_size_bytes: number
+          width?: number | null
+          workspace_id: string
+        }
+        Update: {
+          audio_codec?: string | null
+          away_team_id?: string | null
+          competition_id?: string | null
+          container?: string | null
+          created_at?: string
+          created_by?: string
+          data_partita?: string | null
+          deleted_at?: string | null
+          duration_ms?: number | null
+          fps?: number | null
+          height?: number | null
+          home_team_id?: string | null
+          id?: string
+          preferred_team_id?: string | null
+          season_id?: string | null
+          titolo?: string | null
+          updated_at?: string
+          video_codec?: string | null
+          video_file_name?: string
+          video_fingerprint?: string
+          video_path?: string | null
+          video_size_bytes?: number
+          width?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tag_matches_away_team_id_fkey"
+            columns: ["away_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_matches_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_matches_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_matches_home_team_id_fkey"
+            columns: ["home_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_matches_preferred_team_id_fkey"
+            columns: ["preferred_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tag_matches_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tags: {
         Row: {
           created_at: string
@@ -1546,7 +1913,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      tag_events_view: {
+        Row: {
+          created_by: string | null
+          end_ms: number | null
+          event_id: string | null
+          is_mirror: boolean | null
+          match_id: string | null
+          nota: string | null
+          side: string | null
+          start_ms: number | null
+          stella: boolean | null
+          tag_code: string | null
+          workspace_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       current_user_owned_workspaces: { Args: never; Returns: string[] }

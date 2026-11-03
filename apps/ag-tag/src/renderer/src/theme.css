@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Palette di AG Workspace (app/globals.css): "Carta" (:root) e "Grafite" (.dark).
+ * Stessi valori: un test (scripts/theme.test.mjs) segnala ogni differenza.
+ * In AG Tag il tema predefinito è Grafite (si lavora sul video).
+ */
+:root {
+  --brand-orange: #ff6b00;
+  --brand-ink: #141414;
+  --brand-ink-on-dark: #ffffff;
+  --background: #f9f7f4;
+  --foreground: #141414;
+  --card: #ffffff;
+  --card-foreground: #141414;
+  --popover: #ffffff;
+  --popover-foreground: #141414;
+  --primary: var(--brand-orange);
+  --primary-foreground: #141414;
+  --primary-text: #c2410c;
+  --primary-soft: color-mix(in oklab, var(--brand-orange) 14%, var(--card));
+  --muted: color-mix(in oklab, #e6e3dc 45%, #f9f7f4);
+  --muted-foreground: #66645e;
+  --destructive: #c92a2a;
+  --border: #e6e3dc;
+  --input: #e6e3dc;
+  --ring: var(--primary-text);
+  --radius: 0.625rem;
+  --sidebar: #141414;
+  --sidebar-foreground: #f9f7f4;
+  --sidebar-primary: var(--brand-orange);
+  --sidebar-primary-foreground: #141414;
+  --sidebar-accent: color-mix(in oklab, #ffffff 10%, #141414);
+  --sidebar-border: color-mix(in oklab, #ffffff 14%, #141414);
+  /* Solo AG Tag: fondo del riquadro video */
+  --stage: #0b0b0b;
+}
+
+.dark {
+  --brand-ink: #ffffff;
+  --background: #141414;
+  --foreground: #f2f1ec;
+  --card: #1c1c1c;
+  --card-foreground: #f2f1ec;
+  --popover: #1c1c1c;
+  --popover-foreground: #f2f1ec;
+  --primary-text: #ff8a33;
+  --primary-soft: color-mix(in oklab, var(--brand-orange) 22%, var(--card));
+  --muted: color-mix(in oklab, #2c2c2a 70%, #1c1c1c);
+  --muted-foreground: #a3a29c;
+  --destructive: #ff6b6b;
+  --border: #2c2c2a;
+  --input: #2c2c2a;
+  --sidebar: #0e0e0e;
+  --sidebar-foreground: #f2f1ec;
+  --sidebar-accent: color-mix(in oklab, #ffffff 9%, #0e0e0e);
+  --sidebar-border: #2c2c2a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-text: var(--primary-text);
+  --color-primary-soft: var(--primary-soft);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-stage: var(--stage);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased select-none;
+  }
+  input,
+  textarea {
+    @apply select-text;
+  }
+}
+
+/* Barra del titolo: si trascina la finestra; i controlli restano cliccabili. */
+.drag {
+  -webkit-app-region: drag;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
+}
