@@ -37,7 +37,7 @@ export function ArchiveLinks({ links }: { links: ArchiveLink[] }) {
                 rel="noopener noreferrer"
                 className="inline-flex min-h-11 max-w-full items-center gap-2.5 rounded-lg border border-border/60 bg-card/40 px-3 py-2 text-sm transition-colors hover:border-primary/40 hover:bg-card/70"
               >
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-primary/10 text-primary-text">
                   <LinkSourceIcon source={source} className="h-4 w-4" />
                 </span>
                 <span className="min-w-0">

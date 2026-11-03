@@ -355,7 +355,8 @@ function ElementNode({
                 x={el.points[i * 2]}
                 y={el.points[i * 2 + 1]}
                 radius={0.7}
-                fill="rgba(255,255,255,0.35)"
+                fill={c.lines}
+                opacity={0.6}
                 stroke={c.ink}
                 strokeWidth={0.1}
                 draggable
@@ -571,10 +572,10 @@ export function BoardStage({
             flipEnabled={false}
             anchorSize={22}
             rotateAnchorOffset={28}
-            borderStroke="#ffffff"
+            borderStroke={colors.lines}
             borderDash={[4, 4]}
-            anchorStroke="#111827"
-            anchorFill="#ffffff"
+            anchorStroke={colors.ink}
+            anchorFill={colors.lines}
             ignoreStroke
           />
         )}

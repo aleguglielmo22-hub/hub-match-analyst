@@ -134,7 +134,7 @@ function ScadenzaQuickPicker({
               className={
                 "rounded-md border px-2 py-1 text-[11px] font-medium transition-colors max-md:min-h-11 " +
                 (active
-                  ? "border-primary/60 bg-primary/10 text-primary"
+                  ? "border-primary/60 bg-primary/10 text-primary-text"
                   : "border-border bg-transparent text-muted-foreground hover:border-border/80 hover:text-foreground")
               }
             >
@@ -171,7 +171,7 @@ function OsservatiPicker({
               className={
                 "rounded-md border px-2 py-1 text-[11px] font-medium transition-colors max-md:min-h-11 " +
                 (active
-                  ? "border-primary/60 bg-primary/10 text-primary"
+                  ? "border-primary/60 bg-primary/10 text-primary-text"
                   : "border-border bg-transparent text-muted-foreground hover:border-border/80 hover:text-foreground")
               }
             >
@@ -281,10 +281,10 @@ export function ScoutingFiltersSidebar({
     <aside className={className}>
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
+          <SlidersHorizontal className="h-3.5 w-3.5 text-primary-text" />
           <h2 className="text-sm font-semibold tracking-tight">Filtri</h2>
           {activeCount > 0 && (
-            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary-text">
               {activeCount}
             </span>
           )}
@@ -366,7 +366,7 @@ export function ScoutingFiltersSidebar({
                           className={
                             "rounded-md border px-2 py-1 text-[11px] font-mono font-semibold transition-colors " +
                             (active
-                              ? "border-primary/60 bg-primary/10 text-primary"
+                              ? "border-primary/60 bg-primary/10 text-primary-text"
                               : "border-border bg-transparent text-muted-foreground hover:border-border/80 hover:text-foreground")
                           }
                         >
@@ -451,7 +451,7 @@ export function ScoutingFiltersSidebar({
                 <span className="flex items-center gap-2">
                   Valutazioni · {RATING_MACRO_LABEL[macro]}
                   {activeInGroup > 0 && (
-                    <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                    <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary-text">
                       {activeInGroup}
                     </span>
                   )}

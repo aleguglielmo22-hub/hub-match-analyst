@@ -25,7 +25,7 @@ export function SettingsTabs({ active }: { active: (typeof TABS)[number]["key"] 
             className={cn(
               "inline-flex min-h-11 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors",
               isActive
-                ? "border-primary/60 bg-primary/10 text-primary"
+                ? "border-primary/60 bg-primary/10 text-primary-text"
                 : "border-border/60 text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >

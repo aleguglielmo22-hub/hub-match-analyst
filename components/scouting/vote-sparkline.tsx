@@ -37,15 +37,15 @@ export function VoteSparkline({ points }: { points: { date: string; voto: number
       >
         {/* Riferimento al 6 (sufficienza), recessivo. */}
         <line x1={PAD} x2={W - PAD} y1={y(6)} y2={y(6)} className="stroke-border" strokeDasharray="2 3" strokeWidth={1} />
-        <path d={path} fill="none" className="stroke-primary" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        <path d={path} fill="none" className="stroke-primary-text" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
         {points.map((p, i) => (
           <g key={`${p.date}-${i}`}>
             <circle
               cx={x(i)}
               cy={y(p.voto)}
               r={4}
-              className={cn("stroke-background", votoFill(p.voto))}
-              strokeWidth={2}
+              className={cn("stroke-foreground/45", votoFill(p.voto))}
+              strokeWidth={1}
             />
             <circle cx={x(i)} cy={y(p.voto)} r={10} fill="transparent">
               <title>{`${format(parseISO(p.date), "d MMM yyyy", { locale: it })}: voto ${p.voto}`}</title>

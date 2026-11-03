@@ -107,7 +107,7 @@ function FreeChipInput({
         {value.map((t) => (
           <span
             key={t}
-            className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+            className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary-text"
           >
             {t}
             <button
@@ -147,7 +147,7 @@ function FreeChipInput({
                 key={s}
                 type="button"
                 onClick={() => commit(s)}
-                className="rounded-md border border-dashed border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary/40 hover:text-primary max-md:min-h-11 max-md:px-3 max-md:text-xs"
+                className="rounded-md border border-dashed border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:border-primary/40 hover:text-primary-text max-md:min-h-11 max-md:px-3 max-md:text-xs"
               >
                 + {s}
               </button>

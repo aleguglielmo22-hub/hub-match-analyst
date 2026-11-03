@@ -108,7 +108,7 @@ export function AttachmentsField({
                   key={f.id}
                   className="flex items-center gap-3 rounded-lg border border-border/60 bg-card/40 p-3"
                 >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary-text">
                     <Paperclip className="h-4 w-4" />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -206,7 +206,7 @@ export function AttachmentsField({
               key={pf.uid}
               className="flex items-center gap-3 rounded-lg border border-border/60 bg-card/40 p-3"
             >
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary-text">
                 <Paperclip className="h-4 w-4" />
               </span>
               <div className="min-w-0 flex-1">

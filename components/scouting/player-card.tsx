@@ -12,6 +12,7 @@ import {
   calcolaEta,
   type PlayerListItem,
 } from "@/lib/types/scouting";
+import { StatusIcon } from "@/components/scouting/status-icon";
 
 function PhotoAvatar({
   src,
@@ -32,7 +33,7 @@ function PhotoAvatar({
     );
   }
   return (
-    <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/25 via-primary/10 to-transparent ring-1 ring-primary/30 text-lg font-bold uppercase tracking-tight text-primary">
+    <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/25 via-primary/10 to-transparent ring-1 ring-primary/30 text-lg font-bold uppercase tracking-tight text-primary-text">
       {initials}
     </span>
   );
@@ -67,7 +68,7 @@ export function PlayerCard({
           href={`/scouting/${player.id}/modifica`}
           aria-label={`Modifica ${player.nome} ${player.cognome}`}
           title="Modifica rapida"
-          className="absolute bottom-2.5 right-2.5 z-10 grid h-8 w-8 place-items-center rounded-lg border border-border/60 bg-background/80 text-muted-foreground opacity-70 backdrop-blur transition-all hover:border-primary/50 hover:bg-background hover:text-primary hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="absolute bottom-2.5 right-2.5 z-10 grid h-8 w-8 place-items-center rounded-lg border border-border/60 bg-background/80 text-muted-foreground opacity-70 backdrop-blur transition-all hover:border-primary/50 hover:bg-background hover:text-primary-text hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Pencil className="h-3.5 w-3.5" />
         </Link>
@@ -83,7 +84,7 @@ export function PlayerCard({
             {player.nome}
           </p>
           <p
-            className="truncate text-lg font-semibold tracking-tight uppercase text-foreground group-hover:text-primary"
+            className="truncate text-lg font-semibold tracking-tight uppercase text-foreground group-hover:text-primary-text"
             title={player.cognome}
           >
             {player.cognome}
@@ -170,7 +171,7 @@ export function PlayerCard({
             status.text,
           )}
         >
-          <span className={cn("h-1.5 w-1.5 rounded-full", status.solid)} />
+          <StatusIcon status={player.status_osservazione} />
           {STATUS_OSSERVAZIONE_LABEL[player.status_osservazione]}
         </p>
       </div>

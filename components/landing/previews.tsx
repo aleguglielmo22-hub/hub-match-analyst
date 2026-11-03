@@ -6,6 +6,7 @@ import { highlightParts, SECTION_LABEL } from "@/lib/search/global-results";
 import { STATUS_OSSERVAZIONE_LABEL } from "@/lib/types/scouting";
 import { PhaseBlock } from "@/components/dashboard/set-pieces-efficacy";
 import { VoteSparkline } from "@/components/scouting/vote-sparkline";
+import { StatusIcon } from "@/components/scouting/status-icon";
 
 /**
  * Anteprime della landing ("Uno sguardo all'interno"): componenti e colori
@@ -37,7 +38,7 @@ export function DashboardPreview() {
         {KPIS.map(({ icon: Icon, label, value }) => (
           <div key={label} className="rounded-xl border border-border/60 bg-card/60 p-3">
             <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-              <Icon className="h-3.5 w-3.5 text-primary" />
+              <Icon className="h-3.5 w-3.5 text-primary-text" />
               {label}
             </div>
             <p className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">{value}</p>
@@ -45,7 +46,7 @@ export function DashboardPreview() {
         ))}
       </div>
       <div className="flex items-center gap-3 rounded-xl border border-primary/40 bg-primary/10 p-3">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary ring-1 ring-primary/30">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary-text ring-1 ring-primary/30">
           <Eye className="h-4 w-4" />
         </span>
         <div className="min-w-0">
@@ -89,10 +90,11 @@ export function PlayerPreview() {
       </div>
       <span
         className={cn(
-          "inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ring-1",
+          "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1",
           TONE[STATUS_OSSERVAZIONE_TONE.IN_OSSERVAZIONE].badge,
         )}
       >
+        <StatusIcon status="IN_OSSERVAZIONE" />
         {STATUS_OSSERVAZIONE_LABEL.IN_OSSERVAZIONE}
       </span>
       <VoteSparkline points={VOTI} />
@@ -165,7 +167,7 @@ export function SearchPreview() {
           <li key={title}>
             <p className="mb-1 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{section}</p>
             <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-card/60 px-3 py-2">
-              <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
+              <Icon className="h-3.5 w-3.5 shrink-0 text-primary-text" />
               <div className="min-w-0">
                 <p className="truncate text-xs font-medium">
                   <Highlighted text={title} />

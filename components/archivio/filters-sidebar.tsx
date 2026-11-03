@@ -129,10 +129,10 @@ export function FiltersSidebar({ filters, lookups, className }: Props) {
     <aside className={className}>
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
+          <SlidersHorizontal className="h-3.5 w-3.5 text-primary-text" />
           <h2 className="text-sm font-semibold tracking-tight">Filtri</h2>
           {activeCount > 0 && (
-            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary-text">
               {activeCount}
             </span>
           )}

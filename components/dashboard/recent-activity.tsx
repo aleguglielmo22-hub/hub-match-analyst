@@ -41,7 +41,7 @@ function PlayerRow({ p }: { p: RecentPlayer }) {
           className="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-border/50"
         />
       ) : (
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-xs font-bold uppercase text-primary ring-1 ring-primary/30">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-xs font-bold uppercase text-primary-text ring-1 ring-primary/30">
           {initials || <UserIcon className="h-4 w-4" />}
         </span>
       )}
@@ -91,7 +91,7 @@ function SchemeRow({ item }: { item: RecentItem }) {
       href={href}
       className="group flex items-center gap-3 rounded-lg border border-border/40 bg-card/30 px-3 py-2.5 transition-colors hover:border-primary/40 hover:bg-card/60"
     >
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/20">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary-text ring-1 ring-primary/20">
         <Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0 flex-1">

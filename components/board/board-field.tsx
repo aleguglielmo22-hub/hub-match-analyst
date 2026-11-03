@@ -14,7 +14,7 @@ export const LazyBoardEditor = dynamic(() => import("./board-editor"), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 z-[60] grid place-items-center bg-background/90">
-      <Loader2 className="h-6 w-6 animate-spin text-primary" aria-label="Caricamento lavagna" />
+      <Loader2 className="h-6 w-6 animate-spin text-primary-text" aria-label="Caricamento lavagna" />
     </div>
   ),
 });

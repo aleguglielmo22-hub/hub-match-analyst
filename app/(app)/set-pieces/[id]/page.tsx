@@ -387,7 +387,7 @@ export default async function DettaglioSetPiecePage({
             href={sp.pdf_url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+            className="inline-flex items-center gap-2 text-sm text-primary-text hover:underline"
           >
             Apri PDF
             <ExternalLink className="h-3.5 w-3.5" />
@@ -472,7 +472,7 @@ function VideoEmbed({ url }: { url: string }) {
         href={url}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+        className="inline-flex items-center gap-2 text-sm text-primary-text hover:underline"
       >
         Apri clip in una nuova scheda
         <ExternalLink className="h-3.5 w-3.5" />

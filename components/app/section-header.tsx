@@ -26,12 +26,12 @@ export function SectionHeader({
       <div className="space-y-1.5">
         <div className="flex items-center gap-2.5">
           {Icon && (
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/30">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary-text ring-1 ring-primary/30">
               <Icon className="h-5 w-5" />
             </span>
           )}
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-primary-text">
               {eyebrow}
             </p>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">

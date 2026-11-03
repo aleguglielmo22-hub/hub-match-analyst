@@ -47,6 +47,7 @@ import { ArchiveLinksSection } from "@/components/links/archive-links-section";
 import { PlayerSetPiecesList } from "@/components/links/linked-lists";
 import { getPlayerLinks } from "@/app/(app)/collegamenti/actions";
 import { listPlayerObservations } from "@/app/(app)/scouting/osservazioni/actions";
+import { StatusIcon } from "@/components/scouting/status-icon";
 
 export const dynamic = "force-dynamic";
 
@@ -146,7 +147,7 @@ export default async function DettaglioGiocatorePage({
               className="h-20 w-20 rounded-2xl object-cover ring-1 ring-border/50"
             />
           ) : (
-            <span className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-primary/25 to-primary/5 ring-1 ring-primary/30 text-2xl font-bold uppercase text-primary">
+            <span className="grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-primary/25 to-primary/5 ring-1 ring-primary/30 text-2xl font-bold uppercase text-primary-text">
               {(p.nome ?? "").charAt(0)}
               {(p.cognome ?? "").charAt(0)}
             </span>
@@ -205,6 +206,7 @@ export default async function DettaglioGiocatorePage({
                 TONE[STATUS_OSSERVAZIONE_TONE[p.status_osservazione]].badge,
               )}
             >
+              <StatusIcon status={p.status_osservazione} />
               {STATUS_OSSERVAZIONE_LABEL[p.status_osservazione]}
             </Badge>
             {p.voto_potenziale && (
@@ -288,7 +290,7 @@ export default async function DettaglioGiocatorePage({
                   p.team_attuale_id ? (
                     <Link
                       href={`/scouting?squadra=${p.team_attuale_id}`}
-                      className="text-primary hover:underline"
+                      className="text-primary-text hover:underline"
                       title="Altri giocatori di questa squadra"
                     >
                       {squadra}
@@ -484,7 +486,7 @@ export default async function DettaglioGiocatorePage({
                 href={p.scouting_report_url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-primary-text hover:underline"
               >
                 Apri PDF
                 <ExternalLink className="h-3.5 w-3.5" />
@@ -519,7 +521,7 @@ export default async function DettaglioGiocatorePage({
                       href={url}
                       target="_blank"
                       rel="noreferrer"
-                      className="min-w-0 flex-1 truncate text-xs text-foreground/80 hover:text-primary"
+                      className="min-w-0 flex-1 truncate text-xs text-foreground/80 hover:text-primary-text"
                     >
                       {url}
                     </a>

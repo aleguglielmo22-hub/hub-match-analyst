@@ -169,7 +169,7 @@ export function FileDropzone({
                 key={pf.uid}
                 className="flex items-center gap-3 rounded-lg border border-border/60 bg-card/40 p-3"
               >
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary-text">
                   <Icon className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1 space-y-0.5">

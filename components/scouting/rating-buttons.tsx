@@ -42,8 +42,8 @@ export function RatingButtons({
         </span>
         <span
           className={cn(
-            "text-xs font-semibold tabular-nums",
-            value ? TONE[ratingTone(value)].text : "text-muted-foreground/60",
+            "inline-flex min-w-6 justify-center rounded px-1 text-xs font-semibold tabular-nums",
+            value ? cn("ring-1", TONE[ratingTone(value)].badge) : "text-muted-foreground",
           )}
         >
           {value ?? "—"}

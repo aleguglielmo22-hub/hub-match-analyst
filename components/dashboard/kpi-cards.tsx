@@ -45,7 +45,7 @@ function KpiCard({
             "grid h-10 w-10 place-items-center rounded-xl ring-1",
             accent
               ? "bg-tone-voto-10-soft text-tone-voto-10-fg ring-tone-voto-10/40"
-              : "bg-primary/10 text-primary ring-primary/20",
+              : "bg-primary/10 text-primary-text ring-primary/20",
           )}
         >
           <Icon className="h-5 w-5" />

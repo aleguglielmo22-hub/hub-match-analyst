@@ -56,7 +56,7 @@ export function MobileHeader({
         </SheetContent>
       </Sheet>
 
-      <Logo size={28} />
+      <Logo size={20} onDark />
       <MobileSearchButton />
     </header>
   );

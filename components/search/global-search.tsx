@@ -342,7 +342,7 @@ function ResultButton({
         active ? "bg-muted" : "hover:bg-muted/60",
       )}
     >
-      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary-text">
         <Icon className="h-4 w-4" />
       </span>
       <span className="min-w-0 flex-1">

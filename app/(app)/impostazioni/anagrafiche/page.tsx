@@ -24,11 +24,11 @@ export default async function AnagrafichePage() {
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 sm:px-8 sm:py-10">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 ring-1 ring-primary/30 text-primary">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 ring-1 ring-primary/30 text-primary-text">
             <BookUser className="h-4 w-4" />
           </span>
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary font-semibold">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary-text font-semibold">
               Impostazioni
             </p>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">

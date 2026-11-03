@@ -145,10 +145,10 @@ export function SituationalFiltersSidebar({
     <aside className={className}>
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
+          <SlidersHorizontal className="h-3.5 w-3.5 text-primary-text" />
           <h2 className="text-sm font-semibold tracking-tight">Filtri</h2>
           {activeCount > 0 && (
-            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary-text">
               {activeCount}
             </span>
           )}
@@ -205,7 +205,7 @@ export function SituationalFiltersSidebar({
             <span className="flex items-center gap-2">
               Livello 2 · Sotto-fase
               {local.sotto_fase.length > 0 && (
-                <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary-text">
                   {local.sotto_fase.length}
                 </span>
               )}
@@ -250,7 +250,7 @@ export function SituationalFiltersSidebar({
                               className={cn(
                                 "rounded-md border px-2 py-1 text-[11px] transition-colors max-md:min-h-11",
                                 active
-                                  ? "border-primary/60 bg-primary/10 text-primary"
+                                  ? "border-primary/60 bg-primary/10 text-primary-text"
                                   : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground",
                               )}
                             >
@@ -273,7 +273,7 @@ export function SituationalFiltersSidebar({
             <span className="flex items-center gap-2">
               Focus tattico
               {local.focus_tags.length > 0 && (
-                <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary-text">
                   {local.focus_tags.length}
                 </span>
               )}
@@ -292,7 +292,7 @@ export function SituationalFiltersSidebar({
                     className={cn(
                       "rounded-md border px-2 py-1 text-[11px] transition-colors max-md:min-h-11",
                       active
-                        ? "border-primary/60 bg-primary/10 text-primary"
+                        ? "border-primary/60 bg-primary/10 text-primary-text"
                         : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground",
                     )}
                   >

@@ -141,7 +141,7 @@ export function LinkPicker({
                         <span className="block truncate text-[11px] text-muted-foreground">{t.subtitle}</span>
                       )}
                     </span>
-                    <Plus className="h-4 w-4 shrink-0 text-primary" />
+                    <Plus className="h-4 w-4 shrink-0 text-primary-text" />
                   </button>
                 </li>
               ))}
@@ -173,7 +173,7 @@ export function LinkRow({
         href={target.href}
         className="flex min-h-11 min-w-0 flex-1 items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-muted/50"
       >
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-primary/10 text-primary-text">
           <Icon className="h-4 w-4" />
         </span>
         <span className="min-w-0 flex-1">

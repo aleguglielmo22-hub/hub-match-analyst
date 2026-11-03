@@ -77,7 +77,9 @@ function Summary({ observations }: { observations: ObservationItem[] }) {
       label: "Ultimo voto",
       value:
         s.lastVoto != null ? (
-          <span className={TONE[ratingTone(s.lastVoto)].text}>{s.lastVoto}</span>
+          <span className={cn("inline-flex min-w-7 justify-center rounded-md px-1.5 ring-1", TONE[ratingTone(s.lastVoto)].badge)}>
+            {s.lastVoto}
+          </span>
         ) : (
           "—"
         ),

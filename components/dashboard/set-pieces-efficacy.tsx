@@ -23,7 +23,7 @@ export async function SetPiecesEfficacyWidget() {
   return (
     <section className="rounded-2xl border border-border/60 bg-card/40 p-5">
       <header className="mb-4 flex items-center gap-2">
-        <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/30">
+        <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary-text ring-1 ring-primary/30">
           <Activity className="h-4 w-4" />
         </span>
         <h2 className="text-sm font-semibold tracking-tight">

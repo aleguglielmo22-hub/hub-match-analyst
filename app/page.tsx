@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
@@ -14,7 +15,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getSupabaseConfig } from "@/lib/supabase/config";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Logo } from "@/components/brand/logo";
 import {
   DashboardPreview,
   PlayerPreview,
@@ -96,7 +96,24 @@ export default async function LandingPage() {
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-8">
-          <Logo />
+          {/* Lockup del marchio, uno per tema; servito a 2x (1x/2x da next/image). */}
+          <Link href="/" aria-label="AG Workspace" className="shrink-0">
+            <Image
+              src="/brand/lockup-su-chiaro.png"
+              alt="AG · Alessandro Guglielmo, Match Analyst & Scout"
+              width={242}
+              height={36}
+              preload
+              className="h-9 w-auto dark:hidden"
+            />
+            <Image
+              src="/brand/lockup-su-scuro.png"
+              alt="AG · Alessandro Guglielmo, Match Analyst & Scout"
+              width={242}
+              height={36}
+              className="hidden h-9 w-auto dark:block"
+            />
+          </Link>
           <Link href="/login" className={buttonVariants({ size: "default" })}>
             Accedi
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -107,17 +124,17 @@ export default async function LandingPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden">
-          {/* Glow arancio + verde di sfondo */}
+          {/* Aloni di sfondo: arancio del marchio e grigio caldo */}
           <div
             aria-hidden
             className="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/25 blur-[120px]"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-16 right-1/4 h-72 w-72 translate-x-1/2 rounded-full bg-chart-2/30 blur-[120px]"
+            className="pointer-events-none absolute -top-16 right-1/4 h-72 w-72 translate-x-1/2 rounded-full bg-muted-foreground/15 blur-[120px]"
           />
           <div className="relative mx-auto max-w-6xl px-4 py-20 text-center sm:px-8 sm:py-28">
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-primary-text">
               Performance · Scouting
             </p>
             <h1 className="mx-auto max-w-4xl text-4xl font-semibold tracking-tight sm:text-6xl">
@@ -171,7 +188,7 @@ export default async function LandingPage() {
                   key={f.title}
                   className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/40 p-5 transition-colors hover:border-primary/40 hover:bg-card/60"
                 >
-                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/30">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary-text ring-1 ring-primary/30">
                     <Icon className="h-5 w-5" />
                   </span>
                   <h3 className="text-base font-semibold tracking-tight">
@@ -192,7 +209,7 @@ export default async function LandingPage() {
                   key={h.title}
                   className="flex gap-3 rounded-2xl border border-border/60 bg-card/20 p-4"
                 >
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary-text" />
                   <div>
                     <p className="text-sm font-semibold tracking-tight">{h.title}</p>
                     <p className="mt-1 text-xs leading-relaxed text-muted-foreground">

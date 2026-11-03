@@ -10,7 +10,7 @@ export function SidebarBrand() {
       href="/dashboard"
       className="flex items-center px-4 py-4 text-sidebar-foreground transition-opacity hover:opacity-90"
     >
-      <Logo subtitle="Performance · Scouting" />
+      <Logo subtitle="Performance · Scouting" onDark />
     </Link>
   );
 }

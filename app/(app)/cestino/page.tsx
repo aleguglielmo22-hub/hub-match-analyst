@@ -77,7 +77,7 @@ export default async function CestinoPage({
                 className={cn(
                   "inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-medium transition-colors max-md:min-h-11",
                   active
-                    ? "border-primary/60 bg-primary/10 text-primary"
+                    ? "border-primary/60 bg-primary/10 text-primary-text"
                     : "border-border/60 text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >

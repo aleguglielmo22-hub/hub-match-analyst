@@ -87,6 +87,7 @@ import { ArchiveLinksSection } from "@/components/links/archive-links-section";
 import { PlayerSetPiecesList } from "@/components/links/linked-lists";
 import { NationalityPicker } from "@/components/scouting/nationality-picker";
 import { RatingButtons } from "@/components/scouting/rating-buttons";
+import { StatusIcon } from "@/components/scouting/status-icon";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -157,7 +158,7 @@ function CompletionBadge({ completion, className }: { completion: Completion; cl
       className={cn(
         "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tabular-nums ring-1",
         done
-          ? "bg-primary/10 text-primary ring-primary/30"
+          ? "bg-primary/10 text-primary-text ring-primary/30"
           : completion.filled > 0
             ? "bg-muted text-foreground/80 ring-border/60"
             : "bg-transparent text-muted-foreground ring-border/40",
@@ -201,7 +202,7 @@ function FreeChipInput({
       {value.map((t) => (
         <span
           key={t}
-          className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+          className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary-text"
         >
           {t}
           <button
@@ -271,7 +272,7 @@ function RuoliSecondariToggle({
                     disabled
                       ? "border-border/40 bg-muted/30 text-muted-foreground/40 line-through"
                       : active
-                        ? "border-primary/60 bg-primary/10 text-primary"
+                        ? "border-primary/60 bg-primary/10 text-primary-text"
                         : "border-border bg-transparent text-muted-foreground hover:border-border/80 hover:text-foreground",
                   )}
                 >
@@ -335,7 +336,7 @@ function VideoUrlList({
                 href={url}
                 target="_blank"
                 rel="noreferrer"
-                className="min-w-0 flex-1 truncate text-xs text-foreground/80 hover:text-primary"
+                className="min-w-0 flex-1 truncate text-xs text-foreground/80 hover:text-primary-text"
                 title={url}
               >
                 {url}
@@ -642,7 +643,7 @@ export function PlayerForm({
                   className={cn(
                     "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors",
                     view.section === s.id
-                      ? "bg-primary/10 font-medium text-primary"
+                      ? "bg-primary/10 font-medium text-primary-text"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
@@ -672,7 +673,7 @@ export function PlayerForm({
                 </span>
                 <span className="text-muted-foreground"> · {PLAYER_SECTIONS[sectionIndex].label}</span>
               </span>
-              <span className="text-xs text-primary">{sectionsOpen ? "Chiudi" : "Sezioni"}</span>
+              <span className="text-xs text-primary-text">{sectionsOpen ? "Chiudi" : "Sezioni"}</span>
             </button>
             {sectionsOpen && (
               <ol className="mt-2 divide-y divide-border/50 rounded-xl border border-border/60 bg-card/60">
@@ -684,7 +685,7 @@ export function PlayerForm({
                       aria-current={view.section === s.id ? "step" : undefined}
                       className={cn(
                         "flex min-h-11 w-full items-center justify-between gap-2 px-4 text-left text-sm",
-                        view.section === s.id && "font-medium text-primary",
+                        view.section === s.id && "font-medium text-primary-text",
                       )}
                     >
                       <span>
@@ -1153,7 +1154,7 @@ export function PlayerForm({
                   className={cn(
                     "inline-flex min-h-9 items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors max-md:min-h-11",
                     area === a
-                      ? "border-primary/60 bg-primary/10 text-primary"
+                      ? "border-primary/60 bg-primary/10 text-primary-text"
                       : "border-border/60 text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
@@ -1223,6 +1224,7 @@ export function PlayerForm({
                         <SelectContent>
                           {STATUS_OSSERVAZIONE_VALUES.map((v) => (
                             <SelectItem key={v} value={v}>
+                              <StatusIcon status={v} className="h-3.5 w-3.5" />
                               {STATUS_OSSERVAZIONE_LABEL[v]}
                             </SelectItem>
                           ))}

@@ -17,7 +17,7 @@ import {
 /**
  * Card del catalogo Situazionali.
  * Anteprima: lavagna disegnata nell'app > lavagna (link) > video > icona.
- * Badge macro-fase colorato (verde/rosso/blu/giallo come da specs).
+ * Badge macro-fase nel colore della sua fase (lib/tones.ts, MACRO_FASE_TONE).
  */
 export function SituationalCard({ item }: { item: SituationalListItem }) {
   const macro = MACRO_FASE_BADGE[item.macro_fase];
@@ -81,7 +81,7 @@ export function SituationalCard({ item }: { item: SituationalListItem }) {
         <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
           {SOTTO_FASE_LABEL[item.sotto_fase]}
         </p>
-        <h3 className="line-clamp-2 text-sm font-semibold leading-snug group-hover:text-primary">
+        <h3 className="line-clamp-2 text-sm font-semibold leading-snug group-hover:text-primary-text">
           {item.titolo}
         </h3>
 
@@ -108,7 +108,7 @@ export function SituationalCard({ item }: { item: SituationalListItem }) {
             {item.focus_tags.slice(0, 3).map((t) => (
               <span
                 key={t}
-                className="inline-flex items-center rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary"
+                className="inline-flex items-center rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary-text"
               >
                 {t}
               </span>

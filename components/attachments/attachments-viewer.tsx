@@ -45,7 +45,7 @@ export async function AttachmentsViewer({
                 href={f.signed_url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-primary hover:bg-primary/10"
+                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-primary-text hover:bg-primary/10"
               >
                 <Download className="h-3.5 w-3.5" />
                 Apri

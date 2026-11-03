@@ -98,7 +98,7 @@ export function LinksEditor({
               >
                 <div className="flex items-start gap-2">
                   <span
-                    className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary max-md:h-11 max-md:w-11"
+                    className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary-text max-md:h-11 max-md:w-11"
                     title={normalized ? LINK_SOURCE_LABEL[source] : undefined}
                   >
                     <LinkSourceIcon source={source} className="h-4 w-4" />

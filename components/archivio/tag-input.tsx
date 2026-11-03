@@ -94,7 +94,7 @@ export function TagInput({
         {selected.map((tag) => (
           <span
             key={tag.id}
-            className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+            className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary-text"
           >
             #{tag.label}
             <button
@@ -145,7 +145,7 @@ export function TagInput({
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={handleCreate}
                   disabled={isPending}
-                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-primary hover:bg-primary/10 disabled:opacity-60 max-md:min-h-11"
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-primary-text hover:bg-primary/10 disabled:opacity-60 max-md:min-h-11"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Crea tag <strong>“{trimmed}”</strong>

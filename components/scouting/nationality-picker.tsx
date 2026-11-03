@@ -61,7 +61,7 @@ export function NationalityPicker({
             title={known ? undefined : "Testo già salvato, non presente nell'elenco dei paesi"}
             className={cn(
               "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium",
-              known ? "bg-primary/10 text-primary" : "bg-muted text-foreground/80 italic",
+              known ? "bg-primary/10 text-primary-text" : "bg-muted text-foreground/80 italic",
             )}
           >
             {n}

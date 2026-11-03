@@ -186,7 +186,7 @@ export default async function DettaglioSituazionalePage({
                 {s.numero_giocatori.map((n) => (
                   <span
                     key={n}
-                    className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                    className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary-text"
                   >
                     <Users className="h-3 w-3" />
                     {n}
@@ -222,7 +222,7 @@ export default async function DettaglioSituazionalePage({
               {s.focus_tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                  className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary-text"
                 >
                   {tag}
                 </span>
@@ -273,7 +273,7 @@ export default async function DettaglioSituazionalePage({
         <section className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
+              <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary-text">
                 <FileText className="h-5 w-5" />
               </span>
               <div>
@@ -346,7 +346,7 @@ function VideoEmbed({ url }: { url: string }) {
         href={url}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+        className="inline-flex items-center gap-2 text-sm text-primary-text hover:underline"
       >
         Apri clip in una nuova scheda
         <ExternalLink className="h-3.5 w-3.5" />

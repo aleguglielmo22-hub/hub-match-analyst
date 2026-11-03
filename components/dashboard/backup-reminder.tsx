@@ -33,9 +33,9 @@ export function BackupReminder() {
       href="/impostazioni/backup"
       className="flex min-h-11 items-center gap-3 rounded-xl border border-border/60 bg-card/40 px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
     >
-      <DatabaseBackup className="h-4 w-4 shrink-0 text-primary" />
+      <DatabaseBackup className="h-4 w-4 shrink-0 text-primary-text" />
       <span className="flex-1">{message}</span>
-      <span className="shrink-0 font-medium text-primary">Fai un backup →</span>
+      <span className="shrink-0 font-medium text-primary-text">Fai un backup →</span>
     </Link>
   );
 }

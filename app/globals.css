@@ -35,6 +35,9 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
   --color-primary-soft: var(--primary-soft);
+  --color-primary-text: var(--primary-text);
+  --color-voto-ink: var(--voto-ink);
+  --color-brand-orange: var(--brand-orange);
   --color-fase-possesso: var(--fase-possesso);
   --color-fase-transizione-difensiva: var(--fase-transizione-difensiva);
   --color-fase-non-possesso: var(--fase-non-possesso);
@@ -122,22 +125,29 @@
 }
 
 /*
- * Palette AG Workspace.
- * Tema chiaro B "Navy club" (:root) — non ancora attivo: si attiverà nella Modifica 8.
- * Tema scuro C "Notte blu" (.dark) — attivo (classe "dark" forzata in app/layout.tsx).
+ * Palette AG Workspace (marchio AG, Modifica 23).
+ * Tema chiaro "Carta" (:root) e tema scuro "Grafite" (.dark).
  * I valori non indicati nella palette sono ricavati con color-mix dai colori dati.
- * Contrasto WCAG AA verificato sulle coppie testo/sfondo principali.
+ * Contrasto WCAG AA verificato da scripts/check-contrast.mjs (in npm test).
  */
 :root {
-  --background: #f4f6fa;
-  --foreground: #13203a;
+  /* Marchio */
+  --brand-orange: #ff6b00;
+  --brand-ink: #141414; /* lettere del simbolo */
+  --brand-ink-on-dark: #ffffff; /* lettere sulle barre scure */
+
+  --background: #f9f7f4;
+  --foreground: #141414;
   --card: #ffffff;
-  --card-foreground: #13203a;
+  --card-foreground: #141414;
   --popover: #ffffff;
-  --popover-foreground: #13203a;
-  --primary: #0b5fd9;
-  --primary-foreground: #ffffff;
-  --primary-soft: #e3edfc; /* primario tenue */
+  --popover-foreground: #141414;
+  /* Primario: pulsanti principali arancio con testo scuro (uguale nei due temi). */
+  --primary: var(--brand-orange);
+  --primary-foreground: #141414;
+  /* Testo e link nella tinta primaria (l'arancio pieno non è leggibile come testo). */
+  --primary-text: #c2410c;
+  --primary-soft: color-mix(in oklab, var(--brand-orange) 14%, var(--card)); /* chip selezionati */
 
   /* Lavagna tattica (lib/board/colors.ts): campo e simboli uguali in entrambi
      i temi, così l'anteprima PNG non cambia. Nostri = primario; contrasti
@@ -145,81 +155,89 @@
   --board-pitch: #25662e;
   --board-pitch-stripe: #22602b;
   --board-lines: #ffffff;
-  --board-home: #0b5fd9;
-  --board-home-text: #ffffff;
+  --board-home: #ff6b00;
+  --board-home-text: #141414;
   --board-home-stroke: #ffffff;
-  --board-away: #fbbf24;
-  --board-away-text: #111827;
-  --board-away-stroke: #111827;
+  --board-away: #f2f1ec;
+  --board-away-text: #141414;
+  --board-away-stroke: #141414;
   --board-ball: #ffffff;
-  --board-ink: #111827;
-  --board-equipment: #f97316;
-  --board-equipment-stroke: #ffffff;
+  --board-ink: #141414;
+  --board-equipment: #ffd43b;
+  --board-equipment-stroke: #141414;
   --board-arrow: #ffffff;
+
   --secondary: var(--primary-soft);
-  --secondary-foreground: #13203a;
-  --muted: color-mix(in oklab, #dde3ec 40%, #f4f6fa);
-  --muted-foreground: #5e6c84;
+  --secondary-foreground: #141414;
+  --muted: color-mix(in oklab, #e6e3dc 45%, #f9f7f4);
+  --muted-foreground: #66645e;
   --accent: var(--primary-soft);
-  --accent-foreground: #13203a;
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: #dde3ec;
-  --input: #dde3ec;
-  --ring: #0b5fd9;
+  --accent-foreground: #141414;
+  --destructive: #c92a2a;
+  --border: #e6e3dc;
+  --input: #e6e3dc;
+  --ring: var(--primary-text);
   --chart-1: var(--primary);
-  --chart-2: #7fb0ff;
-  --chart-3: #1098ad;
-  --chart-4: #2f9e44;
-  --chart-5: #7048e8;
+  --chart-2: #1971c2;
+  --chart-3: #0b7285;
+  --chart-4: #2b8a3e;
+  --chart-5: #6741d9;
   --radius: 0.625rem;
-  /* Barre di navigazione (sidebar, barra superiore e inferiore) */
-  --sidebar: #0b2149;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #7fb0ff; /* voce attiva */
-  --sidebar-primary-foreground: #0b2149;
-  --sidebar-accent: color-mix(in oklab, #ffffff 10%, #0b2149);
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: color-mix(in oklab, #ffffff 14%, #0b2149);
-  --sidebar-ring: #7fb0ff;
+  /* Barre di navigazione (sidebar, barra superiore e inferiore): scure nei due temi */
+  --sidebar: #141414;
+  --sidebar-foreground: #f9f7f4;
+  --sidebar-primary: var(--brand-orange); /* voce attiva */
+  --sidebar-primary-foreground: #141414;
+  --sidebar-accent: color-mix(in oklab, #ffffff 10%, #141414);
+  --sidebar-accent-foreground: #f9f7f4;
+  --sidebar-border: color-mix(in oklab, #ffffff 14%, #141414);
+  --sidebar-ring: var(--brand-orange);
 
   /* Colori delle fasi di gioco */
-  --fase-possesso: #2f9e44;
-  --fase-transizione-difensiva: #e8590c;
-  --fase-non-possesso: #1098ad;
-  --fase-transizione-offensiva: #7048e8;
-  /* Scala dei voti 1 → 10 */
-  --voto-1: #b54708;
-  --voto-2: #d9631e;
-  --voto-3: #e98a4a;
-  --voto-4: #f2b48a;
-  --voto-5: #a9b1bf;
-  --voto-6: #9db8f0;
-  --voto-7: #6e97ec;
-  --voto-8: #4277e6;
-  --voto-9: #1f5bd8;
-  --voto-10: #123fa8;
+  --fase-possesso: #1971c2;
+  --fase-transizione-offensiva: #0b7285;
+  --fase-non-possesso: #6741d9;
+  --fase-transizione-difensiva: #c2255c;
+  /* Scala dei voti 1 → 10, dal grigio all'arancio: sfondo del numero, testo --voto-ink */
+  --voto-1: #ece9e3;
+  --voto-2: #e2ddd5;
+  --voto-3: #d7d0c5;
+  --voto-4: #ccc3b6;
+  --voto-5: #c9b9a3;
+  --voto-6: #f3c79f;
+  --voto-7: #f8ae6e;
+  --voto-8: #fb954a;
+  --voto-9: #fd7f22;
+  --voto-10: #ff6b00;
+  --voto-ink: #141414;
 
   /* ---- Tinte semantiche (badge, testi, punti, barre) ----
    * Base: colore pieno. -soft: sfondo tenue del badge. -fg: testo della stessa tinta.
-   * Percentuali per tema scelte per il contrasto WCAG AA (min. 4,89:1 su badge, card e sfondo).
+   * Percentuali per tema scelte per il contrasto WCAG AA (scripts/check-contrast.mjs).
    */
   --tone-soft-pct: 14%;
-  --tone-fg-pct: 50%;
-  --overlay: #0b1220; /* veli e fondi dei media, uguale nei due temi */
+  --tone-fg-pct: 62%;
+  /* Testo nella tinta di un voto: i toni chiari della scala richiedono più nero. */
+  --voto-fg-pct: 32%;
+  --overlay: #141414; /* veli e fondi dei media, uguale nei due temi */
   --overlay-foreground: #ffffff;
-  --tone-success: var(--fase-possesso); /* positivo / riuscito */
+  --esito-positivo: #2b8a3e;
+  --esito-negativo: #c92a2a;
+  --neutro: #8c8a83;
+  --attenzione: #e0a800; /* giallo ocra: distinto dall'arancio di marca */
+  --tone-success: var(--esito-positivo); /* positivo / riuscito */
   --tone-success-soft: color-mix(in oklab, var(--tone-success) var(--tone-soft-pct), var(--card));
   --tone-success-fg: color-mix(in oklab, var(--tone-success) var(--tone-fg-pct), var(--foreground));
-  --tone-danger: var(--destructive); /* negativo / errore */
+  --tone-danger: var(--esito-negativo); /* negativo / errore */
   --tone-danger-soft: color-mix(in oklab, var(--tone-danger) var(--tone-soft-pct), var(--card));
   --tone-danger-fg: color-mix(in oklab, var(--tone-danger) var(--tone-fg-pct), var(--foreground));
-  --tone-neutral: var(--voto-5); /* neutro / in attesa */
+  --tone-neutral: var(--neutro); /* neutro / in attesa */
   --tone-neutral-soft: color-mix(in oklab, var(--tone-neutral) var(--tone-soft-pct), var(--card));
   --tone-neutral-fg: color-mix(in oklab, var(--tone-neutral) var(--tone-fg-pct), var(--foreground));
-  --tone-info: var(--primary); /* informazione / in corso */
+  --tone-info: var(--fase-possesso); /* informazione / in corso (blu, mai l'arancio di marca) */
   --tone-info-soft: color-mix(in oklab, var(--tone-info) var(--tone-soft-pct), var(--card));
   --tone-info-fg: color-mix(in oklab, var(--tone-info) var(--tone-fg-pct), var(--foreground));
-  --tone-warning: var(--fase-transizione-difensiva); /* attenzione */
+  --tone-warning: var(--attenzione); /* attenzione */
   --tone-warning-soft: color-mix(in oklab, var(--tone-warning) var(--tone-soft-pct), var(--card));
   --tone-warning-fg: color-mix(in oklab, var(--tone-warning) var(--tone-fg-pct), var(--foreground));
   --tone-possesso: var(--fase-possesso);
@@ -236,74 +254,65 @@
   --tone-transizione-offensiva-fg: color-mix(in oklab, var(--tone-transizione-offensiva) var(--tone-fg-pct), var(--foreground));
   --tone-voto-1: var(--voto-1);
   --tone-voto-1-soft: color-mix(in oklab, var(--tone-voto-1) var(--tone-soft-pct), var(--card));
-  --tone-voto-1-fg: color-mix(in oklab, var(--tone-voto-1) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-1-fg: color-mix(in oklab, var(--tone-voto-1) var(--voto-fg-pct), var(--foreground));
   --tone-voto-2: var(--voto-2);
   --tone-voto-2-soft: color-mix(in oklab, var(--tone-voto-2) var(--tone-soft-pct), var(--card));
-  --tone-voto-2-fg: color-mix(in oklab, var(--tone-voto-2) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-2-fg: color-mix(in oklab, var(--tone-voto-2) var(--voto-fg-pct), var(--foreground));
   --tone-voto-3: var(--voto-3);
   --tone-voto-3-soft: color-mix(in oklab, var(--tone-voto-3) var(--tone-soft-pct), var(--card));
-  --tone-voto-3-fg: color-mix(in oklab, var(--tone-voto-3) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-3-fg: color-mix(in oklab, var(--tone-voto-3) var(--voto-fg-pct), var(--foreground));
   --tone-voto-4: var(--voto-4);
   --tone-voto-4-soft: color-mix(in oklab, var(--tone-voto-4) var(--tone-soft-pct), var(--card));
-  --tone-voto-4-fg: color-mix(in oklab, var(--tone-voto-4) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-4-fg: color-mix(in oklab, var(--tone-voto-4) var(--voto-fg-pct), var(--foreground));
   --tone-voto-5: var(--voto-5);
   --tone-voto-5-soft: color-mix(in oklab, var(--tone-voto-5) var(--tone-soft-pct), var(--card));
-  --tone-voto-5-fg: color-mix(in oklab, var(--tone-voto-5) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-5-fg: color-mix(in oklab, var(--tone-voto-5) var(--voto-fg-pct), var(--foreground));
   --tone-voto-6: var(--voto-6);
   --tone-voto-6-soft: color-mix(in oklab, var(--tone-voto-6) var(--tone-soft-pct), var(--card));
-  --tone-voto-6-fg: color-mix(in oklab, var(--tone-voto-6) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-6-fg: color-mix(in oklab, var(--tone-voto-6) var(--voto-fg-pct), var(--foreground));
   --tone-voto-7: var(--voto-7);
   --tone-voto-7-soft: color-mix(in oklab, var(--tone-voto-7) var(--tone-soft-pct), var(--card));
-  --tone-voto-7-fg: color-mix(in oklab, var(--tone-voto-7) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-7-fg: color-mix(in oklab, var(--tone-voto-7) var(--voto-fg-pct), var(--foreground));
   --tone-voto-8: var(--voto-8);
   --tone-voto-8-soft: color-mix(in oklab, var(--tone-voto-8) var(--tone-soft-pct), var(--card));
-  --tone-voto-8-fg: color-mix(in oklab, var(--tone-voto-8) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-8-fg: color-mix(in oklab, var(--tone-voto-8) var(--voto-fg-pct), var(--foreground));
   --tone-voto-9: var(--voto-9);
   --tone-voto-9-soft: color-mix(in oklab, var(--tone-voto-9) var(--tone-soft-pct), var(--card));
-  --tone-voto-9-fg: color-mix(in oklab, var(--tone-voto-9) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-9-fg: color-mix(in oklab, var(--tone-voto-9) var(--voto-fg-pct), var(--foreground));
   --tone-voto-10: var(--voto-10);
   --tone-voto-10-soft: color-mix(in oklab, var(--tone-voto-10) var(--tone-soft-pct), var(--card));
-  --tone-voto-10-fg: color-mix(in oklab, var(--tone-voto-10) var(--tone-fg-pct), var(--foreground));
+  --tone-voto-10-fg: color-mix(in oklab, var(--tone-voto-10) var(--voto-fg-pct), var(--foreground));
 }
 
 .dark {
-  --background: #0b1220;
-  --foreground: #e8eef8;
-  --card: #121c2e;
-  --card-foreground: #e8eef8;
-  --popover: #121c2e;
-  --popover-foreground: #e8eef8;
-  --primary: #4c8dff;
-  /* Testo scuro sul primario: il bianco su #4C8DFF non raggiunge AA (3,2:1). */
-  --primary-foreground: #0b1220;
-  --primary-soft: #1a2c4d; /* primario tenue */
-  --secondary: var(--primary-soft);
-  --secondary-foreground: #e8eef8;
-  --muted: var(--primary-soft);
-  --muted-foreground: #93a3bc;
-  --accent: var(--primary-soft);
-  --accent-foreground: #e8eef8;
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: #22314a;
-  --input: #22314a;
-  --ring: #4c8dff;
-  --chart-1: var(--primary);
-  --chart-2: #7fb0ff;
-  --chart-3: #1098ad;
-  --chart-4: #2f9e44;
-  --chart-5: #7048e8;
+  --brand-ink: #ffffff;
+  --background: #141414;
+  --foreground: #f2f1ec;
+  --card: #1c1c1c;
+  --card-foreground: #f2f1ec;
+  --popover: #1c1c1c;
+  --popover-foreground: #f2f1ec;
+  --primary-text: #ff8a33;
+  --primary-soft: color-mix(in oklab, var(--brand-orange) 22%, var(--card));
+  --secondary-foreground: #f2f1ec;
+  --muted: color-mix(in oklab, #2c2c2a 70%, #1c1c1c);
+  --muted-foreground: #a3a29c;
+  --accent-foreground: #f2f1ec;
+  --destructive: #ff6b6b;
+  --border: #2c2c2a;
+  --input: #2c2c2a;
   /* Barre di navigazione */
-  --sidebar: #121c2e;
-  --sidebar-foreground: #e8eef8;
-  --sidebar-primary: #4c8dff; /* voce attiva */
-  --sidebar-primary-foreground: #0b1220;
-  --sidebar-accent: var(--primary-soft);
-  --sidebar-accent-foreground: #e8eef8;
-  --sidebar-border: #22314a;
-  --sidebar-ring: #4c8dff;
+  --sidebar: #0e0e0e;
+  --sidebar-foreground: #f2f1ec;
+  --sidebar-accent: color-mix(in oklab, #ffffff 9%, #0e0e0e);
+  --sidebar-accent-foreground: #f2f1ec;
+  --sidebar-border: #2c2c2a;
   /* Tinte semantiche: sfondo più presente e testo più chiaro sul tema scuro */
   --tone-soft-pct: 24%;
-  --tone-fg-pct: 42%;
+  --tone-fg-pct: 45%;
+  --voto-fg-pct: 60%;
+  /* Viola del non possesso schiarito sul fondo grafite (punti e barre ≥ 3:1). */
+  --tone-non-possesso: color-mix(in oklab, var(--fase-non-possesso) 78%, #ffffff);
 }
 
 @layer base {

@@ -635,7 +635,7 @@ function QuickPlayerForm({
       </div>
       <p className="text-[11px] text-muted-foreground">
         Hai già un profilo completo da creare?{" "}
-        <Link href="/scouting/nuovo" className="text-primary hover:underline">
+        <Link href="/scouting/nuovo" className="text-primary-text hover:underline">
           Scheda completa
         </Link>
       </p>

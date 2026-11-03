@@ -87,7 +87,7 @@ export function ExistingFilesList({
                   "grid h-10 w-10 shrink-0 place-items-center rounded-lg",
                   f.removed
                     ? "bg-destructive/15 text-destructive"
-                    : "bg-primary/10 text-primary",
+                    : "bg-primary/10 text-primary-text",
                 )}
               >
                 <Icon className="h-4 w-4" />

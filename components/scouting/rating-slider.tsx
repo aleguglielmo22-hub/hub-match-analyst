@@ -26,7 +26,7 @@ export function RatingSlider({
           className={cn(
             "inline-flex h-5 min-w-[2.25rem] items-center justify-center rounded-md px-1.5 text-[10px] font-semibold tabular-nums ring-1",
             active
-              ? `bg-primary/10 text-primary ring-primary/30`
+              ? `bg-primary/10 text-primary-text ring-primary/30`
               : "bg-muted/40 text-muted-foreground ring-border/40",
           )}
         >

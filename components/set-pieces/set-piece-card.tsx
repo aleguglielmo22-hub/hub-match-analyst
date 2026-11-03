@@ -97,14 +97,14 @@ export function SetPieceCard({ item }: { item: SetPieceListItem }) {
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex items-start gap-2">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary-text">
             <Icon className="h-3.5 w-3.5" />
           </span>
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
               {TIPO_PIAZZATO_LABEL[item.tipo_piazzato]}
             </p>
-            <h3 className="line-clamp-2 text-sm font-semibold leading-snug group-hover:text-primary">
+            <h3 className="line-clamp-2 text-sm font-semibold leading-snug group-hover:text-primary-text">
               {item.titolo}
             </h3>
           </div>

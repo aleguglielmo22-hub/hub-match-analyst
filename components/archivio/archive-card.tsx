@@ -94,7 +94,7 @@ export function ArchiveCard({ item }: { item: ArchiveListItem }) {
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="space-y-1">
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground group-hover:text-primary">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground group-hover:text-primary-text">
             {item.titolo_archivio}
           </h3>
           <p className="text-[11px] uppercase tracking-wider text-muted-foreground">

@@ -2,23 +2,25 @@
  * Colori della lavagna. Il campo è lo stesso in entrambi i temi dell'app,
  * quindi anche i simboli: valori definiti come variabili in app/globals.css
  * (--board-*) e qui ripetuti come riserva e per i test di contrasto.
- * Nostri = primario dell'app (cerchio); avversari = ambra (quadrato).
+ * Nostri = arancio del marchio (cerchio, bordo bianco); avversari = avorio
+ * (quadrato, bordo #141414). Forma e bordo distinguono le squadre, non solo il colore.
  */
 
 export const BOARD_COLORS = {
   pitch: "#25662e",
   pitchStripe: "#22602b",
   lines: "#ffffff",
-  home: "#0b5fd9",
-  homeText: "#ffffff",
+  home: "#ff6b00",
+  homeText: "#141414",
   homeStroke: "#ffffff",
-  away: "#fbbf24",
-  awayText: "#111827",
-  awayStroke: "#111827",
+  away: "#f2f1ec",
+  awayText: "#141414",
+  awayStroke: "#141414",
   ball: "#ffffff",
-  ink: "#111827",
-  equipment: "#f97316",
-  equipmentStroke: "#ffffff",
+  ink: "#141414",
+  // Materiale giallo: non si confonde con l'arancio dei nostri.
+  equipment: "#ffd43b",
+  equipmentStroke: "#141414",
   arrow: "#ffffff",
 } as const;
 

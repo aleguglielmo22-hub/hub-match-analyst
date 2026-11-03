@@ -120,7 +120,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-transizione-offensiva/40",
   },
   "voto-1": {
-    badge: "bg-tone-voto-1-soft text-tone-voto-1-fg ring-tone-voto-1/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-1 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-1-fg",
     solid: "bg-tone-voto-1",
     soft: "bg-tone-voto-1-soft",
@@ -128,7 +129,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-voto-1/40",
   },
   "voto-2": {
-    badge: "bg-tone-voto-2-soft text-tone-voto-2-fg ring-tone-voto-2/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-2 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-2-fg",
     solid: "bg-tone-voto-2",
     soft: "bg-tone-voto-2-soft",
@@ -136,7 +138,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-voto-2/40",
   },
   "voto-3": {
-    badge: "bg-tone-voto-3-soft text-tone-voto-3-fg ring-tone-voto-3/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-3 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-3-fg",
     solid: "bg-tone-voto-3",
     soft: "bg-tone-voto-3-soft",
@@ -144,7 +147,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-voto-3/40",
   },
   "voto-4": {
-    badge: "bg-tone-voto-4-soft text-tone-voto-4-fg ring-tone-voto-4/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-4 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-4-fg",
     solid: "bg-tone-voto-4",
     soft: "bg-tone-voto-4-soft",
@@ -152,7 +156,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-voto-4/40",
   },
   "voto-5": {
-    badge: "bg-tone-voto-5-soft text-tone-voto-5-fg ring-tone-voto-5/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-5 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-5-fg",
     solid: "bg-tone-voto-5",
     soft: "bg-tone-voto-5-soft",
@@ -160,7 +165,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-voto-5/40",
   },
   "voto-6": {
-    badge: "bg-tone-voto-6-soft text-tone-voto-6-fg ring-tone-voto-6/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-6 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-6-fg",
     solid: "bg-tone-voto-6",
     soft: "bg-tone-voto-6-soft",
@@ -168,7 +174,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-voto-6/40",
   },
   "voto-7": {
-    badge: "bg-tone-voto-7-soft text-tone-voto-7-fg ring-tone-voto-7/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-7 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-7-fg",
     solid: "bg-tone-voto-7",
     soft: "bg-tone-voto-7-soft",
@@ -176,7 +183,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-voto-7/40",
   },
   "voto-8": {
-    badge: "bg-tone-voto-8-soft text-tone-voto-8-fg ring-tone-voto-8/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-8 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-8-fg",
     solid: "bg-tone-voto-8",
     soft: "bg-tone-voto-8-soft",
@@ -184,7 +192,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-voto-8/40",
   },
   "voto-9": {
-    badge: "bg-tone-voto-9-soft text-tone-voto-9-fg ring-tone-voto-9/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-9 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-9-fg",
     solid: "bg-tone-voto-9",
     soft: "bg-tone-voto-9-soft",
@@ -192,7 +201,8 @@ export const TONE: Record<Tone, ToneClasses> = {
     ring: "ring-tone-voto-9/40",
   },
   "voto-10": {
-    badge: "bg-tone-voto-10-soft text-tone-voto-10-fg ring-tone-voto-10/40",
+    // Numero del voto sul colore della scala, sempre in --voto-ink (#141414).
+    badge: "bg-tone-voto-10 text-voto-ink ring-voto-ink/15",
     text: "text-tone-voto-10-fg",
     solid: "bg-tone-voto-10",
     soft: "bg-tone-voto-10-soft",

@@ -1,11 +1,11 @@
 /**
- * Tema dell'interfaccia: chiaro B "Navy club" (predefinito) e scuro C "Notte blu"
+ * Tema dell'interfaccia: chiaro "Carta" (predefinito) e scuro "Grafite"
  * (app/globals.css). Colori in esadecimale per manifest e theme-color, che non
  * leggono le variabili CSS: da aggiornare insieme alla palette.
  */
 export const THEME = {
-  light: { background: "#F4F6FA", bar: "#0B2149" },
-  dark: { background: "#0B1220", bar: "#121C2E" },
+  light: { background: "#F9F7F4", bar: "#141414" },
+  dark: { background: "#141414", bar: "#0E0E0E" },
 } as const;
 
 export type ThemePreference = "auto" | "light" | "dark";

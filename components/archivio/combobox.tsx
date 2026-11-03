@@ -156,7 +156,7 @@ export function Combobox({
                   value={`__create__${trimmed}`}
                   onSelect={handleCreate}
                   disabled={isPending}
-                  className="text-primary"
+                  className="text-primary-text"
                 >
                   <Plus className="mr-2 h-3.5 w-3.5" />
                   <span className="truncate">

@@ -152,7 +152,7 @@ function PresetTagToggle({
             className={cn(
               "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors max-md:min-h-11",
               active
-                ? "border-primary/60 bg-primary/10 text-primary"
+                ? "border-primary/60 bg-primary/10 text-primary-text"
                 : "border-border bg-card/30 text-muted-foreground hover:border-border/80 hover:text-foreground",
             )}
           >
@@ -685,7 +685,7 @@ export function SetPieceForm({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label className="inline-flex items-center gap-1.5">
-                <Goal className="h-3.5 w-3.5 text-primary" />
+                <Goal className="h-3.5 w-3.5 text-primary-text" />
                 Piede del battitore
               </Label>
               <Controller
@@ -825,7 +825,7 @@ export function SetPieceForm({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label className="inline-flex items-center gap-1.5">
-                <Shield className="h-3.5 w-3.5 text-primary" />
+                <Shield className="h-3.5 w-3.5 text-primary-text" />
                 Sistema di marcatura
               </Label>
               <Controller

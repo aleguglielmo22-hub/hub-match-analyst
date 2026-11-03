@@ -64,12 +64,12 @@ export function ThemePicker() {
                   : "border-border/60 hover:bg-muted",
               )}
             >
-              <Icon className={cn("mt-0.5 h-4 w-4 shrink-0", selected ? "text-primary" : "text-muted-foreground")} />
+              <Icon className={cn("mt-0.5 h-4 w-4 shrink-0", selected ? "text-primary-text" : "text-muted-foreground")} />
               <span className="flex-1">
                 <span className="block text-sm font-medium">{o.label}</span>
                 <span className="block text-xs text-muted-foreground">{o.description}</span>
               </span>
-              {selected && <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />}
+              {selected && <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary-text" aria-hidden />}
             </button>
           );
         })}
