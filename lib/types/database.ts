@@ -446,6 +446,190 @@ export type Database = {
           },
         ]
       }
+      coding_events: {
+        Row: {
+          anticipo_ms: number
+          coda_ms: number
+          code: string
+          colore: string
+          created_at: string
+          famiglia: string
+          id: string
+          mirror_code: string | null
+          nome: string
+          ordine: number
+          panel_id: string
+          tasto: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          anticipo_ms?: number
+          coda_ms?: number
+          code: string
+          colore: string
+          created_at?: string
+          famiglia: string
+          id?: string
+          mirror_code?: string | null
+          nome: string
+          ordine?: number
+          panel_id: string
+          tasto?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          anticipo_ms?: number
+          coda_ms?: number
+          code?: string
+          colore?: string
+          created_at?: string
+          famiglia?: string
+          id?: string
+          mirror_code?: string | null
+          nome?: string
+          ordine?: number
+          panel_id?: string
+          tasto?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coding_events_panel_id_mirror_code_fkey"
+            columns: ["panel_id", "mirror_code"]
+            isOneToOne: false
+            referencedRelation: "coding_events"
+            referencedColumns: ["panel_id", "code"]
+          },
+          {
+            foreignKeyName: "coding_events_panel_id_workspace_id_fkey"
+            columns: ["panel_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "coding_panels"
+            referencedColumns: ["id", "workspace_id"]
+          },
+        ]
+      }
+      coding_panels: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          nome: string
+          predefinito: boolean
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          nome: string
+          predefinito?: boolean
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          nome?: string
+          predefinito?: boolean
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coding_panels_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coding_panels_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coding_subtag_groups: {
+        Row: {
+          event_id: string
+          id: string
+          lato: string
+          nome: string
+          ordine: number
+          scelta: string
+          workspace_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          lato: string
+          nome: string
+          ordine?: number
+          scelta?: string
+          workspace_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          lato?: string
+          nome?: string
+          ordine?: number
+          scelta?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coding_subtag_groups_event_id_workspace_id_fkey"
+            columns: ["event_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "coding_events"
+            referencedColumns: ["id", "workspace_id"]
+          },
+        ]
+      }
+      coding_subtags: {
+        Row: {
+          group_id: string
+          id: string
+          nome: string
+          ordine: number
+          tasto: string | null
+          workspace_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          nome: string
+          ordine?: number
+          tasto?: string | null
+          workspace_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          nome?: string
+          ordine?: number
+          tasto?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coding_subtags_group_id_workspace_id_fkey"
+            columns: ["group_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "coding_subtag_groups"
+            referencedColumns: ["id", "workspace_id"]
+          },
+        ]
+      }
       competitions: {
         Row: {
           created_at: string
@@ -474,6 +658,376 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "competitions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_action_subtags: {
+        Row: {
+          action_id: string
+          subtag_id: string
+          workspace_id: string
+        }
+        Insert: {
+          action_id: string
+          subtag_id: string
+          workspace_id: string
+        }
+        Update: {
+          action_id?: string
+          subtag_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_action_subtags_action_id_workspace_id_fkey"
+            columns: ["action_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "match_actions"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "match_action_subtags_subtag_id_workspace_id_fkey"
+            columns: ["subtag_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "coding_subtags"
+            referencedColumns: ["id", "workspace_id"]
+          },
+        ]
+      }
+      match_actions: {
+        Row: {
+          anticipo_ms: number
+          coda_ms: number
+          created_at: string
+          created_by: string
+          end_ms: number
+          esito: string | null
+          event_id: string
+          id: string
+          match_id: string
+          minuto: number | null
+          mirror_of: string | null
+          nota: string | null
+          periodo: number | null
+          player_id: string | null
+          pos_x: number | null
+          pos_y: number | null
+          side: string
+          start_ms: number
+          stelle: number
+          to_player_id: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          anticipo_ms?: number
+          coda_ms?: number
+          created_at?: string
+          created_by?: string
+          end_ms: number
+          esito?: string | null
+          event_id: string
+          id?: string
+          match_id: string
+          minuto?: number | null
+          mirror_of?: string | null
+          nota?: string | null
+          periodo?: number | null
+          player_id?: string | null
+          pos_x?: number | null
+          pos_y?: number | null
+          side: string
+          start_ms: number
+          stelle?: number
+          to_player_id?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          anticipo_ms?: number
+          coda_ms?: number
+          created_at?: string
+          created_by?: string
+          end_ms?: number
+          esito?: string | null
+          event_id?: string
+          id?: string
+          match_id?: string
+          minuto?: number | null
+          mirror_of?: string | null
+          nota?: string | null
+          periodo?: number | null
+          player_id?: string | null
+          pos_x?: number | null
+          pos_y?: number | null
+          side?: string
+          start_ms?: number
+          stelle?: number
+          to_player_id?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_actions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_actions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "coding_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_actions_match_id_workspace_id_fkey"
+            columns: ["match_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "match_actions_mirror_of_workspace_id_fkey"
+            columns: ["mirror_of", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "match_actions"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "match_actions_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_actions_to_player_id_fkey"
+            columns: ["to_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_lineups: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string
+          numero: number | null
+          ordine: number
+          player_id: string
+          ruolo: string | null
+          team_id: string
+          titolare: boolean
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id: string
+          numero?: number | null
+          ordine?: number
+          player_id: string
+          ruolo?: string | null
+          team_id: string
+          titolare?: boolean
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string
+          numero?: number | null
+          ordine?: number
+          player_id?: string
+          ruolo?: string | null
+          team_id?: string
+          titolare?: boolean
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_lineups_match_id_workspace_id_fkey"
+            columns: ["match_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "match_lineups_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_lineups_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          audio_codec: string | null
+          away_team_id: string | null
+          competition_id: string | null
+          container: string | null
+          created_at: string
+          created_by: string
+          data_partita: string | null
+          deleted_at: string | null
+          duration_ms: number | null
+          first_half_start_ms: number | null
+          fps: number | null
+          giornata: string | null
+          gol_casa: number | null
+          gol_ospite: number | null
+          height: number | null
+          home_team_id: string | null
+          id: string
+          modulo_casa: string | null
+          modulo_ospite: string | null
+          note: string | null
+          preferred_attacks_right_1t: boolean | null
+          preferred_team_id: string | null
+          season_id: string | null
+          second_half_start_ms: number | null
+          titolo: string | null
+          updated_at: string
+          video_codec: string | null
+          video_file_name: string | null
+          video_fingerprint: string | null
+          video_path: string | null
+          video_size_bytes: number | null
+          width: number | null
+          workspace_id: string
+        }
+        Insert: {
+          audio_codec?: string | null
+          away_team_id?: string | null
+          competition_id?: string | null
+          container?: string | null
+          created_at?: string
+          created_by?: string
+          data_partita?: string | null
+          deleted_at?: string | null
+          duration_ms?: number | null
+          first_half_start_ms?: number | null
+          fps?: number | null
+          giornata?: string | null
+          gol_casa?: number | null
+          gol_ospite?: number | null
+          height?: number | null
+          home_team_id?: string | null
+          id?: string
+          modulo_casa?: string | null
+          modulo_ospite?: string | null
+          note?: string | null
+          preferred_attacks_right_1t?: boolean | null
+          preferred_team_id?: string | null
+          season_id?: string | null
+          second_half_start_ms?: number | null
+          titolo?: string | null
+          updated_at?: string
+          video_codec?: string | null
+          video_file_name?: string | null
+          video_fingerprint?: string | null
+          video_path?: string | null
+          video_size_bytes?: number | null
+          width?: number | null
+          workspace_id: string
+        }
+        Update: {
+          audio_codec?: string | null
+          away_team_id?: string | null
+          competition_id?: string | null
+          container?: string | null
+          created_at?: string
+          created_by?: string
+          data_partita?: string | null
+          deleted_at?: string | null
+          duration_ms?: number | null
+          first_half_start_ms?: number | null
+          fps?: number | null
+          giornata?: string | null
+          gol_casa?: number | null
+          gol_ospite?: number | null
+          height?: number | null
+          home_team_id?: string | null
+          id?: string
+          modulo_casa?: string | null
+          modulo_ospite?: string | null
+          note?: string | null
+          preferred_attacks_right_1t?: boolean | null
+          preferred_team_id?: string | null
+          season_id?: string | null
+          second_half_start_ms?: number | null
+          titolo?: string | null
+          updated_at?: string
+          video_codec?: string | null
+          video_file_name?: string | null
+          video_fingerprint?: string | null
+          video_path?: string | null
+          video_size_bytes?: number | null
+          width?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_away_team_id_fkey"
+            columns: ["away_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_home_team_id_fkey"
+            columns: ["home_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_preferred_team_id_fkey"
+            columns: ["preferred_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
