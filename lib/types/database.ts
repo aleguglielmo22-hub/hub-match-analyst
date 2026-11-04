@@ -816,6 +816,90 @@ export type Database = {
           },
         ]
       }
+      match_key_events: {
+        Row: {
+          created_at: string
+          created_by: string
+          fonte: string | null
+          id: string
+          match_id: string
+          minuto: number | null
+          nota: string | null
+          other_player_id: string | null
+          player_id: string | null
+          recupero: number | null
+          team_id: string
+          tipo: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          fonte?: string | null
+          id?: string
+          match_id: string
+          minuto?: number | null
+          nota?: string | null
+          other_player_id?: string | null
+          player_id?: string | null
+          recupero?: number | null
+          team_id: string
+          tipo: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          fonte?: string | null
+          id?: string
+          match_id?: string
+          minuto?: number | null
+          nota?: string | null
+          other_player_id?: string | null
+          player_id?: string | null
+          recupero?: number | null
+          team_id?: string
+          tipo?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_key_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_key_events_match_id_workspace_id_fkey"
+            columns: ["match_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "match_key_events_other_player_id_fkey"
+            columns: ["other_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_key_events_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_key_events_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_lineups: {
         Row: {
           created_at: string
