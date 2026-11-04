@@ -4,7 +4,10 @@
  * tramite il ponte esposto dal preload (window.agTag).
  */
 import type { ProbeInfo } from "./media.ts";
+import type { Panel } from "./panel.ts";
+import type { EventKeys } from "./panel-shortcuts.ts";
 import type { Shortcuts } from "./shortcuts.ts";
+import type { ImportPreview } from "./videomatch-import.ts";
 
 export type Lookup = { id: string; label: string };
 export type LookupKind = "team" | "competition" | "season";
@@ -14,7 +17,10 @@ export type UserInfo = { email: string; workspaceId: string; isOwner: boolean };
 export type SignInResult = { ok: true; user: UserInfo } | { ok: false; message: string };
 
 export type ThemeChoice = "dark" | "light";
-export type Settings = { cacheDir: string; shortcuts: Shortcuts; theme: ThemeChoice };
+export type Settings = { cacheDir: string; shortcuts: Shortcuts; theme: ThemeChoice; eventKeys: EventKeys };
+
+/** Anteprima di un'importazione del pannello, da confermare con il token. */
+export type PanelImportResult = { ok: true; token: string; preview: ImportPreview } | { ok: false; message: string };
 
 /** File scelto dal disco: il percorso resta nel processo principale, qui solo un riferimento. */
 export type PickedVideo = {
@@ -94,11 +100,20 @@ export type AgTagApi = {
     cancelWorkingCopy(id: string): Promise<void>;
     onProgress(listener: (p: WorkingCopyProgress) => void): () => void;
   };
+  panel: {
+    /** Pannello in uso (per ora solo in memoria fino alla chiusura dell'app). */
+    get(): Promise<Panel | null>;
+    /** Sceglie il file VideoMatch (XML) e, facoltativo, il LiveTag (JSON): restituisce l'anteprima. */
+    pickImport(): Promise<PanelImportResult | null>;
+    confirmImport(token: string): Promise<{ panel: Panel; settings: Settings }>;
+    setTiming(code: string, leadMs: number, lagMs: number): Promise<Panel>;
+  };
   settings: {
     get(): Promise<Settings>;
     chooseCacheDir(): Promise<Settings>;
     setShortcuts(shortcuts: Shortcuts): Promise<Settings>;
     setTheme(theme: ThemeChoice): Promise<Settings>;
+    setEventKeys(keys: EventKeys): Promise<Settings>;
   };
 };
 
@@ -118,8 +133,13 @@ export const IPC = {
   matchesMakeWorkingCopy: "matches:makeWorkingCopy",
   matchesCancelWorkingCopy: "matches:cancelWorkingCopy",
   matchesProgress: "matches:progress",
+  panelGet: "panel:get",
+  panelPickImport: "panel:pickImport",
+  panelConfirmImport: "panel:confirmImport",
+  panelSetTiming: "panel:setTiming",
   settingsGet: "settings:get",
   settingsChooseCacheDir: "settings:chooseCacheDir",
   settingsSetShortcuts: "settings:setShortcuts",
   settingsSetTheme: "settings:setTheme",
+  settingsSetEventKeys: "settings:setEventKeys",
 } as const;

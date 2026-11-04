@@ -8,11 +8,14 @@ import { existsSync } from "node:fs";
 import { basename } from "node:path";
 import { BrowserWindow, dialog, ipcMain, type IpcMainInvokeEvent } from "electron";
 import { z } from "zod";
-import { IPC, type NewMatchInput, type OpenVideoResult, type PickedVideo, type Settings } from "@shared/api";
+import { IPC, type NewMatchInput, type OpenVideoResult, type PanelImportResult, type PickedVideo, type Settings } from "@shared/api";
 import { playability, type ProbeInfo } from "@shared/media";
+import { mergeEventKeys, withDefaults } from "@shared/panel-shortcuts";
 import { mergeShortcuts } from "@shared/shortcuts";
+import { ImportError } from "@shared/videomatch-import";
 import { fingerprintFile } from "./fingerprint";
 import { cancelWorkingCopy, makeWorkingCopy, probe } from "./ffmpeg";
+import * as panel from "./panel-store";
 import { getSettings, updateSettings, workingCopyPath } from "./settings";
 import * as db from "./supabase";
 import { videoUrlFor } from "./video-protocol";
@@ -180,6 +183,33 @@ export function registerIpc(): void {
   });
   handle(IPC.matchesCancelWorkingCopy, (_e, rawId: unknown) => cancelWorkingCopy(uuid.parse(rawId)));
 
+  handle(IPC.panelGet, () => panel.getPanel());
+  handle(IPC.panelPickImport, async (e): Promise<PanelImportResult | null> => {
+    const win = BrowserWindow.fromWebContents(e.sender);
+    const res = await dialog.showOpenDialog(win!, {
+      title: "Pannello VideoMatch (.xml) e, se ce l'hai, LiveTag (.json)",
+      message: "Scegli il file .xml di VideoMatch; con ⌘ puoi aggiungere il .json di LiveTag dello stesso pannello.",
+      properties: ["openFile", "multiSelections"],
+      filters: [{ name: "Pannello VideoMatch o LiveTag", extensions: ["xml", "json"] }],
+    });
+    if (res.canceled || res.filePaths.length === 0) return null;
+    try {
+      return { ok: true, ...(await panel.previewImport(res.filePaths)) };
+    } catch (err) {
+      if (err instanceof ImportError) return { ok: false, message: err.message };
+      throw err;
+    }
+  });
+  handle(IPC.panelConfirmImport, (_e, token: unknown) => {
+    const preview = panel.confirmImport(uuid.parse(token));
+    const settings = updateSettings({ eventKeys: withDefaults(getSettings().eventKeys, preview.keys) });
+    return { panel: preview.panel, settings };
+  });
+  handle(IPC.panelSetTiming, (_e, code: unknown, leadMs: unknown, lagMs: unknown) => {
+    const ms = z.number().int().min(0).max(60_000);
+    return panel.setTiming(z.string().regex(/^[A-Za-z0-9_-]{1,20}$/).parse(code), ms.parse(leadMs), ms.parse(lagMs));
+  });
+
   handle(IPC.settingsGet, (): Settings => getSettings());
   handle(IPC.settingsChooseCacheDir, async (e) => {
     const win = BrowserWindow.fromWebContents(e.sender);
@@ -192,4 +222,5 @@ export function registerIpc(): void {
   });
   handle(IPC.settingsSetShortcuts, (_e, raw: unknown) => updateSettings({ shortcuts: mergeShortcuts(raw) }));
   handle(IPC.settingsSetTheme, (_e, raw: unknown) => updateSettings({ theme: z.enum(["dark", "light"]).parse(raw) }));
+  handle(IPC.settingsSetEventKeys, (_e, raw: unknown) => updateSettings({ eventKeys: mergeEventKeys(raw) }));
 }

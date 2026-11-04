@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { FolderOpen, Keyboard, Moon, RotateCcw, Sun } from "lucide-react";
 import type { Settings } from "@shared/api";
 import { DEFAULT_SHORTCUTS, PLAYER_ACTIONS, comboLabel, comboOf, conflicts, type PlayerAction } from "@shared/shortcuts";
+import { PanelSettings } from "../components/PanelSettings";
 import { Button, Card } from "../components/ui";
 import { api, cn } from "../lib/api";
 
-/** Cartella delle copie di lavoro, tema e scorciatoie del lettore (salvati sul Mac). */
+/** Cartella delle copie di lavoro, tema, scorciatoie del lettore (salvati sul Mac) e pannello di codifica. */
 export function SettingsPage({ settings, onChange }: { settings: Settings; onChange: (s: Settings) => void }) {
   const [recording, setRecording] = useState<PlayerAction | null>(null);
   const clash = new Set(conflicts(settings.shortcuts).flat());
@@ -103,6 +104,8 @@ export function SettingsPage({ settings, onChange }: { settings: Settings; onCha
           </ul>
           {clash.size > 0 && <p className="text-xs text-destructive">Alcune azioni usano la stessa combinazione: cambiane una.</p>}
         </Card>
+
+        <PanelSettings settings={settings} onChange={onChange} />
       </div>
     </div>
   );

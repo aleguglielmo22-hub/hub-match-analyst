@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useImperativeHandle, useRef, useState, type Ref } from "react";
 import {
   ArrowLeft,
   ChevronFirst,
@@ -13,15 +13,16 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import type { MatchListItem, OpenVideoResult } from "@shared/api";
+import type { MatchListItem, OpenVideoResult, Settings } from "@shared/api";
 import { matchTitle } from "@shared/matches";
 import { actionFor, comboLabel, type PlayerAction, type Shortcuts } from "@shared/shortcuts";
 import { PLAYBACK_RATES, formatTimecode, frameAt, jump, nextRate, stepFrames } from "@shared/time";
+import { CodingWorkspace, type PlayerHandle } from "../components/CodingWorkspace";
 import { Button, Card, ErrorBox } from "../components/ui";
 import { api, cn, errorMessage } from "../lib/api";
 
 /** Partita aperta: verifica del file, eventuale copia di lavoro, poi il lettore. */
-export function PlayerPage({ id, shortcuts, onBack }: { id: string; shortcuts: Shortcuts; onBack: () => void }) {
+export function PlayerPage({ id, settings, onBack }: { id: string; settings: Settings; onBack: () => void }) {
   const [match, setMatch] = useState<MatchListItem | null>(null);
   const [state, setState] = useState<OpenVideoResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -144,8 +145,15 @@ export function PlayerPage({ id, shortcuts, onBack }: { id: string; shortcuts: S
         </Card>
       )}
 
-      {state?.status === "ready" && (
-        <VideoPlayer key={state.url} url={state.url} fps={state.fps} shortcuts={shortcuts} />
+      {state?.status === "ready" && match && (
+        <CodingWorkspace
+          match={match}
+          settings={settings}
+          durationMs={state.durationMs}
+          video={(handle) => (
+            <VideoPlayer key={state.url} url={state.url} fps={state.fps} shortcuts={settings.shortcuts} handle={handle} />
+          )}
+        />
       )}
     </div>
   );
@@ -154,7 +162,7 @@ export function PlayerPage({ id, shortcuts, onBack }: { id: string; shortcuts: S
 const MAX_ZOOM = 4;
 
 /** Lettore preciso: fotogramma per fotogramma, salti, velocità, ingrandimento, scorciatoie. */
-function VideoPlayer({ url, fps, shortcuts }: { url: string; fps: number; shortcuts: Shortcuts }) {
+function VideoPlayer({ url, fps, shortcuts, handle }: { url: string; fps: number; shortcuts: Shortcuts; handle?: Ref<PlayerHandle> }) {
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
@@ -163,26 +171,36 @@ function VideoPlayer({ url, fps, shortcuts }: { url: string; fps: number; shortc
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
+  // Istante del fotogramma mostrato, per la registrazione degli eventi.
+  const mediaTime = useRef(0);
 
   // Tempo esatto del fotogramma mostrato (requestVideoFrameCallback), anche in riproduzione.
   useEffect(() => {
     const v = video.current;
     if (!v) return;
-    let handle = 0;
     const onFrame = (_now: number, meta: VideoFrameCallbackMetadata) => {
+      mediaTime.current = meta.mediaTime;
       setTime(meta.mediaTime);
-      handle = v.requestVideoFrameCallback(onFrame);
+      frameCb = v.requestVideoFrameCallback(onFrame);
     };
-    handle = v.requestVideoFrameCallback(onFrame);
-    return () => v.cancelVideoFrameCallback(handle);
+    let frameCb = v.requestVideoFrameCallback(onFrame);
+    return () => v.cancelVideoFrameCallback(frameCb);
   }, []);
 
   const seek = (t: number) => {
     const v = video.current;
     if (!v) return;
     v.currentTime = t;
+    mediaTime.current = t;
     setTime(t);
   };
+
+  useImperativeHandle(handle, () => ({
+    // In pausa vale la posizione impostata; in riproduzione l'ultimo fotogramma mostrato.
+    currentMs: () => Math.round((video.current?.paused ? video.current.currentTime : mediaTime.current) * 1000),
+    durationMs: () => (video.current?.duration ? Math.round(video.current.duration * 1000) : null),
+    seekMs: (ms: number) => seek(ms / 1000),
+  }));
 
   const run = useCallback(
     (action: PlayerAction) => {
@@ -275,7 +293,10 @@ function VideoPlayer({ url, fps, shortcuts }: { url: string; fps: number; shortc
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-          onSeeked={(e) => setTime(e.currentTarget.currentTime)}
+          onSeeked={(e) => {
+            mediaTime.current = e.currentTarget.currentTime;
+            setTime(e.currentTarget.currentTime);
+          }}
         />
         {zoom > 1 && (
           <span className="absolute top-3 right-3 rounded-md bg-black/60 px-2 py-0.5 text-xs text-white tabular-nums">

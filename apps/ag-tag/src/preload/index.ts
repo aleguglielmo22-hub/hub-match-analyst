@@ -34,11 +34,18 @@ const api: AgTagApi = {
       return () => ipcRenderer.removeListener(IPC.matchesProgress, handler);
     },
   },
+  panel: {
+    get: () => invoke(IPC.panelGet),
+    pickImport: () => invoke(IPC.panelPickImport),
+    confirmImport: (token) => invoke(IPC.panelConfirmImport, token),
+    setTiming: (code, leadMs, lagMs) => invoke(IPC.panelSetTiming, code, leadMs, lagMs),
+  },
   settings: {
     get: () => invoke(IPC.settingsGet),
     chooseCacheDir: () => invoke(IPC.settingsChooseCacheDir),
     setShortcuts: (shortcuts) => invoke(IPC.settingsSetShortcuts, shortcuts),
     setTheme: (theme) => invoke(IPC.settingsSetTheme, theme),
+    setEventKeys: (keys) => invoke(IPC.settingsSetEventKeys, keys),
   },
 };
 

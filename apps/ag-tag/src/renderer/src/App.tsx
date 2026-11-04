@@ -105,7 +105,7 @@ export function App() {
           <NewMatchPage onCreated={(id) => setView({ name: "player", id })} onCancel={() => setView({ name: "list" })} />
         )}
         {view.name === "player" && settings && (
-          <PlayerPage id={view.id} shortcuts={settings.shortcuts} onBack={() => setView({ name: "list" })} />
+          <PlayerPage id={view.id} settings={settings} onBack={() => setView({ name: "list" })} />
         )}
         {view.name === "settings" && settings && <SettingsPage settings={settings} onChange={setSettings} />}
       </main>

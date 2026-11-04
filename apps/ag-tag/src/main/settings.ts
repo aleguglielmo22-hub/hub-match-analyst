@@ -1,11 +1,12 @@
 /**
  * Impostazioni salvate sul Mac (non nel database): cartella delle copie di
- * lavoro, scorciatoie del lettore, tema.
+ * lavoro, scorciatoie del lettore, tema, lettere degli eventi del pannello.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { app } from "electron";
 import type { Settings } from "@shared/api";
+import { mergeEventKeys } from "@shared/panel-shortcuts";
 import { mergeShortcuts } from "@shared/shortcuts";
 
 const file = () => join(app.getPath("userData"), "impostazioni.json");
@@ -25,6 +26,7 @@ export function getSettings(): Settings {
     cacheDir: typeof raw.cacheDir === "string" && raw.cacheDir ? raw.cacheDir : defaultCacheDir(),
     shortcuts: mergeShortcuts(raw.shortcuts),
     theme: raw.theme === "light" ? "light" : "dark",
+    eventKeys: mergeEventKeys(raw.eventKeys),
   };
   return cached;
 }
