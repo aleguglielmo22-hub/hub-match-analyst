@@ -178,12 +178,14 @@ CREATE TABLE match_actions (
   end_ms        INTEGER NOT NULL,                                 -- già con la coda
   anticipo_ms   INTEGER NOT NULL DEFAULT 0 CHECK (anticipo_ms BETWEEN 0 AND 60000),
   coda_ms       INTEGER NOT NULL DEFAULT 0 CHECK (coda_ms BETWEEN 0 AND 60000),
+  -- 0 nessuna; 1 utile da ricordare; 2 può determinare la partita; 3 determina la partita.
   stelle        SMALLINT NOT NULL DEFAULT 0 CHECK (stelle BETWEEN 0 AND 3),
   nota          TEXT CHECK (nota IS NULL OR length(nota) <= 2000),
   -- Facoltativi: giocatore, "a giocatore", esito, posizione (0–100 nel verso d'attacco).
   player_id     UUID REFERENCES players(id) ON DELETE SET NULL,
   to_player_id  UUID REFERENCES players(id) ON DELETE SET NULL,
-  esito         TEXT CHECK (esito IS NULL OR esito IN ('positivo', 'negativo', 'neutro')),
+  -- Esito libero e breve (es. riuscita / non riuscita, gol / parato / fuori).
+  esito         TEXT CHECK (esito IS NULL OR (btrim(esito) <> '' AND length(esito) <= 40)),
   pos_x         NUMERIC(5,2) CHECK (pos_x IS NULL OR pos_x BETWEEN 0 AND 100),
   pos_y         NUMERIC(5,2) CHECK (pos_y IS NULL OR pos_y BETWEEN 0 AND 100),
   -- Minuto di gioco (dagli inizi dei tempi della partita).
