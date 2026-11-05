@@ -1972,6 +1972,103 @@ export type Database = {
           },
         ]
       }
+      stat_sets: {
+        Row: {
+          competition_id: string | null
+          created_at: string
+          created_by: string
+          etichetta: string | null
+          fonte: string
+          id: string
+          match_id: string | null
+          riferito_a: string | null
+          scope: string
+          season_id: string | null
+          tabelle: Json | null
+          team_id: string
+          updated_at: string
+          valori: Json
+          workspace_id: string
+        }
+        Insert: {
+          competition_id?: string | null
+          created_at?: string
+          created_by?: string
+          etichetta?: string | null
+          fonte: string
+          id?: string
+          match_id?: string | null
+          riferito_a?: string | null
+          scope: string
+          season_id?: string | null
+          tabelle?: Json | null
+          team_id: string
+          updated_at?: string
+          valori?: Json
+          workspace_id: string
+        }
+        Update: {
+          competition_id?: string | null
+          created_at?: string
+          created_by?: string
+          etichetta?: string | null
+          fonte?: string
+          id?: string
+          match_id?: string | null
+          riferito_a?: string | null
+          scope?: string
+          season_id?: string | null
+          tabelle?: Json | null
+          team_id?: string
+          updated_at?: string
+          valori?: Json
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stat_sets_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stat_sets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stat_sets_match_id_workspace_id_fkey"
+            columns: ["match_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "stat_sets_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stat_sets_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stat_sets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tag_codes: {
         Row: {
           code: string
