@@ -1072,6 +1072,35 @@ export type Database = {
           },
         ]
       }
+      health_sync: {
+        Row: {
+          created_at: string
+          last_sync_at: string | null
+          token_hash: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          last_sync_at?: string | null
+          token_hash: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          last_sync_at?: string | null
+          token_hash?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_sync_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_action_subtags: {
         Row: {
           action_id: string
@@ -4288,6 +4317,10 @@ export type Database = {
     Functions: {
       current_user_owned_workspaces: { Args: never; Returns: string[] }
       current_user_workspaces: { Args: never; Returns: string[] }
+      health_ingest: {
+        Args: { p_rows: Json; p_token: string }
+        Returns: number
+      }
       merge_lookup: {
         Args: { p_kind: string; p_source: string; p_target: string }
         Returns: Json

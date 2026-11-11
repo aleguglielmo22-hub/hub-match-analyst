@@ -466,6 +466,9 @@ function MetricsOverview({ rows }: { rows: Row[] }) {
         </div>
       )}
       <div className="flex flex-wrap gap-2">
+        <Link href="/benessere/sincronizza" className="inline-flex h-8 items-center rounded-lg border border-border px-3 text-sm hover:bg-muted max-md:min-h-11">
+          Sincronizzazione automatica
+        </Link>
         <HealthImport />
         <CsvImport kind="metrics" />
       </div>

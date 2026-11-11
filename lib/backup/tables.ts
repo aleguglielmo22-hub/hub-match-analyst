@@ -61,6 +61,7 @@ export const BACKUP_TABLES = [
   { name: "fin_transactions", orderBy: ["id"] },
   { name: "fin_goals", orderBy: ["id"] },
   // Benessere (0025).
+  { name: "health_sync", orderBy: ["workspace_id"] },
   { name: "health_metrics", orderBy: ["id"] },
   { name: "wk_exercises", orderBy: ["id"] },
   { name: "wk_templates", orderBy: ["id"] },
