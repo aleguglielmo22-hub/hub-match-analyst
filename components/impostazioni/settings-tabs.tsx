@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { BookUser, DatabaseBackup, Palette, SlidersHorizontal, Users } from "lucide-react";
+import { BookUser, DatabaseBackup, Palette, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
-  { key: "collaboratori", href: "/impostazioni/collaboratori", label: "Collaboratori", icon: Users },
   { key: "preferenze", href: "/impostazioni/preferenze", label: "Preferenze", icon: SlidersHorizontal },
   { key: "anagrafiche", href: "/impostazioni/anagrafiche", label: "Anagrafiche", icon: BookUser },
   { key: "backup", href: "/impostazioni/backup", label: "Backup", icon: DatabaseBackup },

@@ -1,5 +1,6 @@
 /**
- * Tabelle dati incluse nel backup, ricavate da supabase/migrations/0001–0018.
+ * Tabelle dati incluse nel backup: tutte quelle create in supabase/migrations/
+ * (tables.test.mjs fallisce se una tabella nuova viene dimenticata).
  * Ordine = ordine di ripristino (prima le tabelle referenziate dalle foreign key).
  * `orderBy` = chiave primaria, per una paginazione stabile a blocchi.
  */
@@ -32,6 +33,18 @@ export const BACKUP_TABLES = [
   { name: "tag_events", orderBy: ["id"] },
   { name: "tag_event_labels", orderBy: ["event_id", "label_code"] },
   { name: "tag_event_players", orderBy: ["event_id", "player_id"] },
+  // AG Studio (0019): partite, formazioni, pannello di codifica e azioni.
+  { name: "matches", orderBy: ["id"] },
+  { name: "match_lineups", orderBy: ["id"] },
+  { name: "coding_panels", orderBy: ["id"] },
+  { name: "coding_events", orderBy: ["id"] },
+  { name: "coding_subtag_groups", orderBy: ["id"] },
+  { name: "coding_subtags", orderBy: ["id"] },
+  { name: "match_actions", orderBy: ["id"] },
+  { name: "match_action_subtags", orderBy: ["action_id", "subtag_id"] },
+  // Eventi importanti della partita (0020) e statistiche importate (0021).
+  { name: "match_key_events", orderBy: ["id"] },
+  { name: "stat_sets", orderBy: ["id"] },
 ] as const;
 
 export type BackupTableName = (typeof BACKUP_TABLES)[number]["name"];

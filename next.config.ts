@@ -5,6 +5,14 @@ const nextConfig: NextConfig = {
   images: {
     localPatterns: [{ pathname: "/brand/**", search: "" }],
   },
+  // App a utente singolo: la vecchia pagina Collaboratori non esiste più.
+  // Reindirizzamento temporaneo (307), così il browser non lo memorizza per sempre.
+  async redirects() {
+    return [
+      { source: "/impostazioni", destination: "/impostazioni/preferenze", permanent: false },
+      { source: "/impostazioni/collaboratori", destination: "/impostazioni/backup", permanent: false },
+    ];
+  },
   // Service worker sempre aggiornato (guida PWA di Next.js, §8).
   async headers() {
     return [

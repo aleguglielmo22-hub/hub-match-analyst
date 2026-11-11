@@ -60,7 +60,7 @@ export default async function CestinoPage({
         <p className="text-xs leading-relaxed">
           Gli elementi nel cestino non compaiono in liste, ricerche e Dashboard
           e restano qui finché non li ripristini. L&apos;eliminazione
-          definitiva (solo il proprietario del workspace) rimuove anche i file
+          definitiva rimuove anche i file
           allegati e non si può annullare.
         </p>
       </div>

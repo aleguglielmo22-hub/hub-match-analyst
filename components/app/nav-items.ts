@@ -42,7 +42,7 @@ export const NAV: NavItem[] = [
   { href: "/archivio", label: "Cloud", shortLabel: "Cloud", icon: Archive, inBottomNav: true },
   { href: "/cestino", label: "Cestino", icon: Trash2 },
   {
-    href: "/impostazioni/collaboratori",
+    href: "/impostazioni/preferenze",
     label: "Impostazioni",
     icon: Settings,
     matchPrefix: "/impostazioni",
