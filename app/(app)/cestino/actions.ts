@@ -7,19 +7,30 @@ import { getCurrentWorkspace } from "@/lib/supabase/queries";
 import { ilikeAnyFilter } from "@/lib/search/ilike-filter";
 import { logLoadError } from "@/lib/load-result";
 import { ATTACHMENTS_BUCKET } from "@/lib/attachments/shared";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   TRASH_SECTION,
   TRASH_SECTIONS,
+  isCoreSection,
+  parseTrashSection,
   type TrashSection,
 } from "@/lib/trash/sections";
 import { FASE_LABEL, TIPO_PIAZZATO_LABEL } from "@/lib/types/set-pieces";
 import { MACRO_FASE_LABEL } from "@/lib/types/situational";
 import { CATEGORIA_LAVORO_LABEL } from "@/lib/types/archivio";
+import { COLLECTIONS, type CollectionKey } from "@/lib/hub/registry";
+import { formatValue } from "@/lib/hub/fields";
+import { logSafeError } from "@/lib/hub/server";
 
-const sectionSchema = z.enum(TRASH_SECTIONS);
+const sectionSchema = z.string().refine((s) => parseTrashSection(s) !== null, "Sezione non valida");
 const idSchema = z.string().uuid();
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
+
+/** Accesso per nome di tabella (scelta solo da TRASH_SECTION, mai dal browser). */
+function byTable(supabase: Supabase): SupabaseClient {
+  return supabase as unknown as SupabaseClient;
+}
 
 function revalidateSection(section: TrashSection, id: string) {
   const cfg = TRASH_SECTION[section];
@@ -49,7 +60,7 @@ async function setDeletedAt(
   const workspace = await requireWorkspace();
   const supabase = await createClient();
 
-  let q = supabase
+  let q = byTable(supabase)
     .from(TRASH_SECTION[section].table)
     .update({ deleted_at: deletedAt })
     .eq("id", id)
@@ -136,7 +147,7 @@ export async function deleteForever(
   const cfg = TRASH_SECTION[section];
 
   // L'elemento deve esistere ed essere nel cestino.
-  const { data: item, error: itemError } = await supabase
+  const { data: item, error: itemError } = await byTable(supabase)
     .from(cfg.table)
     .select("id")
     .eq("id", id)
@@ -157,7 +168,7 @@ export async function deleteForever(
     // Anteprima della lavagna disegnata (0017): un file in più nel bucket "media".
     let boardPreview: string | null = null;
     if (cfg.table === "set_pieces" || cfg.table === "situational_tactics") {
-      const { data: boardRow, error: boardError } = await supabase
+      const { data: boardRow, error: boardError } = await byTable(supabase)
         .from(cfg.table)
         .select("lavagna_anteprima")
         .eq("id", id)
@@ -187,7 +198,7 @@ export async function deleteForever(
     }
   }
 
-  const { error: deleteError } = await supabase
+  const { error: deleteError } = await byTable(supabase)
     .from(cfg.table)
     .delete()
     .eq("id", id)
@@ -233,7 +244,36 @@ export async function loadTrash(opts: {
   const canRestore = (createdBy: string) =>
     workspace.isOwner || createdBy === workspace.userId;
 
-  const loaders: Record<TrashSection, () => Promise<TrashItem[]>> = {
+  // Sezioni personali (Studi, Benessere, Finanze): titolo e sottotitolo dal registro.
+  const hubLoader = async (key: CollectionKey): Promise<TrashItem[]> => {
+    const c = COLLECTIONS[key];
+    const titleField = c.fields.find((f) => f.key === c.titleField);
+    let r = byTable(supabase)
+      .from(c.table)
+      .select("*")
+      .eq("workspace_id", workspace.id)
+      .not("deleted_at", "is", null);
+    if (q && titleField && ["text", "longtext"].includes(titleField.type)) r = r.or(ilikeAnyFilter([c.titleField], q));
+    const { data, error } = await r.order("deleted_at", { ascending: false }).limit(TRASH_LIMIT + 1);
+    if (error) throw error;
+    return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+      section: key,
+      id: String(row.id),
+      title: (titleField ? formatValue(titleField, row[c.titleField]) : "") || "Senza titolo",
+      subtitle:
+        (c.subtitleFields ?? [])
+          .map((k) => {
+            const f = c.fields.find((x) => x.key === k);
+            return f && f.type !== "ref" ? formatValue(f, row[k]) : "";
+          })
+          .filter(Boolean)
+          .join(" · ") || null,
+      deleted_at: String(row.deleted_at),
+      can_restore: workspace.isOwner,
+    }));
+  };
+
+  const loaders: Record<Exclude<TrashSection, CollectionKey>, () => Promise<TrashItem[]>> = {
     scouting: async () => {
       let r = supabase
         .from("players")
@@ -320,9 +360,10 @@ export async function loadTrash(opts: {
   const results = await Promise.all(
     sections.map(async (s) => {
       try {
-        return { section: s, items: await loaders[s]() };
+        return { section: s, items: isCoreSection(s) ? await loaders[s]() : await hubLoader(s as CollectionKey) };
       } catch (err) {
-        logLoadError(`Cestino · ${TRASH_SECTION[s].label}`, err);
+        if (isCoreSection(s)) logLoadError(`Cestino · ${TRASH_SECTION[s].label}`, err);
+        else logSafeError(`Cestino · ${TRASH_SECTION[s].label}`, err);
         return { section: s, items: null };
       }
     }),

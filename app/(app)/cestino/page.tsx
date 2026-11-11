@@ -42,9 +42,14 @@ export default async function CestinoPage({
     loadTrash({ section, query }),
   ]);
 
-  const chips: { key: TrashSection | null; label: string }[] = [
-    { key: null, label: "Tutto" },
-    ...TRASH_SECTIONS.map((s) => ({ key: s, label: TRASH_SECTION[s].label })),
+  // Filtri raggruppati per area: Lavoro, Studi, Benessere, Finanze.
+  const groups = ["Lavoro", "Studi", "Benessere", "Finanze"] as const;
+  const chipGroups: { label: string | null; chips: { key: TrashSection | null; label: string }[] }[] = [
+    { label: null, chips: [{ key: null, label: "Tutto" }] },
+    ...groups.map((g) => ({
+      label: g,
+      chips: TRASH_SECTIONS.filter((s) => TRASH_SECTION[s].group === g).map((s) => ({ key: s, label: TRASH_SECTION[s].label })),
+    })),
   ];
 
   return (
@@ -52,7 +57,7 @@ export default async function CestinoPage({
       <SectionHeader
         icon={Trash2}
         title="Cestino"
-        subtitle="Giocatori, piazzati, esercitazioni e voci del Cloud spostati nel cestino"
+        subtitle="Tutto ciò che hai spostato nel cestino, da tutte le aree"
       />
 
       <div className="flex items-start gap-3 rounded-xl border border-tone-warning/40 bg-tone-warning-soft px-4 py-3 text-tone-warning-fg">
@@ -65,26 +70,31 @@ export default async function CestinoPage({
         </p>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <nav aria-label="Filtra per sezione" className="flex flex-wrap gap-2">
-          {chips.map((c) => {
-            const active = c.key === section;
-            return (
-              <Link
-                key={c.key ?? "all"}
-                href={sectionHref(c.key, query)}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-medium transition-colors max-md:min-h-11",
-                  active
-                    ? "border-primary/60 bg-primary/10 text-primary-text"
-                    : "border-border/60 text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-              >
-                {c.label}
-              </Link>
-            );
-          })}
+      <div className="flex flex-col gap-3">
+        <nav aria-label="Filtra per sezione" className="flex flex-col gap-2">
+          {chipGroups.map((g) => (
+            <div key={g.label ?? "tutto"} className="flex flex-wrap items-center gap-2">
+              {g.label && <span className="w-20 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{g.label}</span>}
+              {g.chips.map((c) => {
+                const active = c.key === section;
+                return (
+                  <Link
+                    key={c.key ?? "all"}
+                    href={sectionHref(c.key, query)}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-medium transition-colors max-md:min-h-11",
+                      active
+                        ? "border-primary/60 bg-primary/10 text-primary-text"
+                        : "border-border/60 text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                  >
+                    {c.label}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
         <div className="sm:w-72">
           <SearchInput

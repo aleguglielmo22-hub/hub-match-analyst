@@ -45,6 +45,32 @@ export const BACKUP_TABLES = [
   // Eventi importanti della partita (0020) e statistiche importate (0021).
   { name: "match_key_events", orderBy: ["id"] },
   { name: "stat_sets", orderBy: ["id"] },
+  // Studi (0023).
+  { name: "study_books", orderBy: ["id"] },
+  { name: "study_book_chapters", orderBy: ["id"] },
+  { name: "study_courses", orderBy: ["id"] },
+  { name: "study_course_modules", orderBy: ["id"] },
+  { name: "study_exam_questions", orderBy: ["id"] },
+  { name: "study_exams", orderBy: ["id"] },
+  { name: "study_readings", orderBy: ["id"] },
+  { name: "study_highlights", orderBy: ["id"] },
+  // Finanze (0024).
+  { name: "fin_accounts", orderBy: ["id"] },
+  { name: "fin_categories", orderBy: ["id"] },
+  { name: "fin_recurring", orderBy: ["id"] },
+  { name: "fin_transactions", orderBy: ["id"] },
+  { name: "fin_goals", orderBy: ["id"] },
+  // Benessere (0025).
+  { name: "health_metrics", orderBy: ["id"] },
+  { name: "wk_exercises", orderBy: ["id"] },
+  { name: "wk_templates", orderBy: ["id"] },
+  { name: "wk_template_items", orderBy: ["id"] },
+  { name: "wk_sessions", orderBy: ["id"] },
+  { name: "wk_sets", orderBy: ["id"] },
+  { name: "nut_foods", orderBy: ["id"] },
+  { name: "nut_log", orderBy: ["id"] },
+  { name: "nut_goals", orderBy: ["id"] },
+  { name: "nut_plans", orderBy: ["id"] },
 ] as const;
 
 export type BackupTableName = (typeof BACKUP_TABLES)[number]["name"];
