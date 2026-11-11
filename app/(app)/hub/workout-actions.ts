@@ -12,8 +12,6 @@ import { groupWorkoutRows, type WorkoutRow } from "@/lib/hub/workout-import";
 const id = z.string().uuid();
 const GENERIC = "Operazione non riuscita. Riprova tra poco.";
 
-export type { SetRow };
-
 function revalidateWorkouts() {
   revalidatePath("/benessere", "layout");
   revalidatePath("/dashboard");
