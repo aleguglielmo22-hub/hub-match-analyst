@@ -11,6 +11,7 @@ import { WorkoutLogger } from "./workout-logger";
 import { TemplateEditor, type EditorItem } from "./template-editor";
 import { WorkoutCsvImport } from "./workout-csv-import";
 import { CsvImport } from "./csv-import";
+import { HealthImport } from "./health-import";
 import { OffSearch } from "./off-search";
 
 /** Pezzi in più sopra il dettaglio di alcune sezioni. */
@@ -464,7 +465,10 @@ function MetricsOverview({ rows }: { rows: Row[] }) {
           })}
         </div>
       )}
-      <CsvImport kind="metrics" />
+      <div className="flex flex-wrap gap-2">
+        <HealthImport />
+        <CsvImport kind="metrics" />
+      </div>
     </div>
   );
 }
