@@ -3954,6 +3954,7 @@ export type Database = {
           created_at: string
           created_by: string
           exercise_id: string
+          fatta: boolean
           id: string
           note: string | null
           ordine: number | null
@@ -3967,6 +3968,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           exercise_id: string
+          fatta?: boolean
           id?: string
           note?: string | null
           ordine?: number | null
@@ -3980,6 +3982,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           exercise_id?: string
+          fatta?: boolean
           id?: string
           note?: string | null
           ordine?: number | null
