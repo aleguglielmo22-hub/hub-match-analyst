@@ -279,3 +279,82 @@ export async function countWhere(table: string, filters: Record<string, string |
   if (error) throw error;
   return count ?? 0;
 }
+
+/* ------------------------------------------------------------------ */
+/* Allenamenti: serie dell'ultima volta e recuperi della scheda        */
+/* ------------------------------------------------------------------ */
+
+export type PreviousSet = { ripetizioni: number | null; carico_kg: number | null };
+
+/**
+ * Per ogni esercizio, le serie fatte nell'allenamento più recente che lo
+ * contiene, escluso quello corrente. Serve al confronto "Precedente".
+ */
+export async function previousSets(
+  sessionId: string,
+  sessionDate: string,
+  exerciseIds: readonly string[],
+): Promise<Record<string, PreviousSet[]>> {
+  if (exerciseIds.length === 0) return {};
+  const workspace = await requireOwner();
+  const supabase = await hubClient();
+  const { data, error } = await supabase
+    .from("wk_sets")
+    .select("exercise_id, session_id, ordine, ripetizioni, carico_kg, wk_sessions!inner(data, created_at, deleted_at)")
+    .eq("workspace_id", workspace.id)
+    .in("exercise_id", [...exerciseIds])
+    .eq("fatta", true)
+    .neq("session_id", sessionId)
+    .is("wk_sessions.deleted_at", null)
+    .lte("wk_sessions.data", sessionDate)
+    .limit(5000);
+  if (error) throw error;
+
+  type Raw = {
+    exercise_id: string;
+    session_id: string;
+    ordine: number | null;
+    ripetizioni: number | null;
+    carico_kg: number | null;
+    wk_sessions: { data: string; created_at: string } | { data: string; created_at: string }[];
+  };
+  const bySession = new Map<string, { rank: string; exercise: string; sets: (PreviousSet & { ordine: number })[] }>();
+  for (const r of (data ?? []) as unknown as Raw[]) {
+    const sess = Array.isArray(r.wk_sessions) ? r.wk_sessions[0] : r.wk_sessions;
+    if (!sess) continue;
+    const key = `${r.session_id}|${r.exercise_id}`;
+    let entry = bySession.get(key);
+    if (!entry) {
+      entry = { rank: `${sess.data}|${sess.created_at}`, exercise: r.exercise_id, sets: [] };
+      bySession.set(key, entry);
+    }
+    entry.sets.push({ ripetizioni: r.ripetizioni, carico_kg: r.carico_kg == null ? null : Number(r.carico_kg), ordine: r.ordine ?? 0 });
+  }
+  const latest = new Map<string, { rank: string; sets: (PreviousSet & { ordine: number })[] }>();
+  for (const e of bySession.values()) {
+    const cur = latest.get(e.exercise);
+    if (!cur || e.rank > cur.rank) latest.set(e.exercise, e);
+  }
+  const out: Record<string, PreviousSet[]> = {};
+  for (const [exercise, e] of latest) {
+    out[exercise] = e.sets.sort((a, b) => a.ordine - b.ordine).map(({ ripetizioni, carico_kg }) => ({ ripetizioni, carico_kg }));
+  }
+  return out;
+}
+
+/** Recupero in secondi previsto dalla scheda per ogni esercizio. */
+export async function templateRestTimes(templateId: string | null): Promise<Record<string, number>> {
+  if (!templateId) return {};
+  const workspace = await requireOwner();
+  const supabase = await hubClient();
+  const { data, error } = await supabase
+    .from("wk_template_items")
+    .select("exercise_id, recupero_s")
+    .eq("workspace_id", workspace.id)
+    .eq("template_id", templateId)
+    .not("recupero_s", "is", null);
+  if (error) throw error;
+  const out: Record<string, number> = {};
+  for (const r of (data ?? []) as { exercise_id: string; recupero_s: number }[]) out[r.exercise_id] = Number(r.recupero_s);
+  return out;
+}

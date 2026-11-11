@@ -11,6 +11,8 @@ export type ViewKind = "table" | "list" | "cards";
 export type ChildDef = {
   /** Chiave di una sezione (controllata da registry.test.mjs). */
   collection: string;
+  /** Non mostrata come elenco generico: la pagina di dettaglio la disegna a modo suo. */
+  hidden?: boolean;
   /** Colonna della tabella figlia che punta al genitore. */
   parentField: string;
   label: string;
@@ -45,6 +47,8 @@ export type CollectionDef = {
   searchFields?: string[];
   /** Badge di stato colorato nelle liste. */
   statusField?: string;
+  /** Le voci hanno un campo "ordine" e si possono spostare su e giù. */
+  reorderable?: boolean;
 };
 
 const opts = (...pairs: [string, string][]): Option[] => pairs.map(([value, label]) => ({ value, label }));
@@ -631,6 +635,7 @@ const DEFS = {
     description: "Esercizi di una scheda.",
     titleField: "exercise_id",
     trash: false,
+    reorderable: true,
     fields: [
       { key: "ordine", label: "N.", type: "integer", min: 0, max: 99, inTable: true },
       { key: "exercise_id", label: "Esercizio", type: "ref", ref: "exercises", required: true, inTable: true },
@@ -664,7 +669,7 @@ const DEFS = {
     sort: [{ field: "data", asc: false }, { field: "created_at", asc: false }],
     filters: ["template_id", "sensazione"],
     searchFields: ["note"],
-    children: [{ collection: "sets", parentField: "session_id", label: "Serie svolte" }],
+    children: [{ collection: "sets", parentField: "session_id", label: "Serie svolte", hidden: true }],
   },
   sets: {
     area: "benessere",
@@ -680,6 +685,7 @@ const DEFS = {
       { key: "exercise_id", label: "Esercizio", type: "ref", ref: "exercises", required: true, inTable: true },
       { key: "ripetizioni", label: "Ripetizioni", type: "integer", min: 0, max: 1000, inTable: true },
       { key: "carico_kg", label: "Carico", type: "number", min: 0, max: 1000, unit: "kg", inTable: true },
+      { key: "fatta", label: "Fatta", type: "boolean", defaultValue: true, inTable: true },
       { key: "note", label: "Note", type: "text", max: 500, wide: true, inTable: true },
     ],
     sort: [{ field: "ordine", asc: true }, { field: "created_at", asc: true }],

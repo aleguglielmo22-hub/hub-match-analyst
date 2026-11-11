@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { daysUntil, formatValue, initialValues, nextReviewDate, type Option } fr
 import { COLLECTIONS, isCollectionKey, newLabel } from "@/lib/hub/registry";
 import { statusBadgeClass } from "@/lib/hub/status";
 import { deleteChildItem, markReviewed } from "@/app/(app)/hub/actions";
+import { moveChild } from "@/app/(app)/hub/workout-actions";
 import { ItemForm } from "./item-form";
 
 type Row = Record<string, unknown> & { id: string };
@@ -59,6 +60,14 @@ export function ChildrenSection({
     });
   }
 
+  function move(row: Row, direction: "up" | "down") {
+    startTransition(async () => {
+      const res = await moveChild(childKey, row.id, direction);
+      if (!res.ok) toast.error("Non è stato possibile spostare la voce.");
+      router.refresh();
+    });
+  }
+
   function remove(row: Row) {
     startTransition(async () => {
       const res = await deleteChildItem(childKey, row.id);
@@ -85,7 +94,7 @@ export function ChildrenSection({
         <p className="rounded-xl border border-dashed border-border p-4 text-center text-sm text-muted-foreground">Nessun elemento.</p>
       ) : (
         <ul className="divide-y divide-border/60 rounded-xl border border-border">
-          {rows.map((r) => {
+          {rows.map((r, idx) => {
             const due = c.reviewable ? nextReviewDate((r.completato_il as string) ?? null, Number(r.ripassi ?? 0)) : null;
             const dueIn = due ? daysUntil(due) : null;
             return (
@@ -120,6 +129,16 @@ export function ChildrenSection({
                   )}
                 </dl>
                 <div className="flex shrink-0 items-center gap-1">
+                  {c.reorderable && (
+                    <>
+                      <Button size="icon-sm" variant="ghost" aria-label="Sposta su" disabled={isPending || idx === 0} onClick={() => move(r, "up")} className="max-md:size-11">
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon-sm" variant="ghost" aria-label="Sposta giù" disabled={isPending || idx === rows.length - 1} onClick={() => move(r, "down")} className="max-md:size-11">
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
                   {due && dueIn! <= 0 && (
                     <Button size="sm" variant="outline" onClick={() => review(r)} disabled={isPending} className="max-md:min-h-11">
                       <Check className="mr-1 h-3.5 w-3.5" /> Ripassato

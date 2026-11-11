@@ -54,9 +54,19 @@ function validYmd(y: number, m: number, d: number): string | null {
   return `${y}-${pad(m)}-${pad(d)}`;
 }
 
+const MONTH_NAMES: Record<string, number> = {
+  jan: 1, gen: 1, feb: 2, mar: 3, apr: 4, may: 5, mag: 5, jun: 6, giu: 6, jul: 7, lug: 7,
+  aug: 8, ago: 8, sep: 9, set: 9, oct: 10, ott: 10, nov: 11, dec: 12, dic: 12,
+};
+
+function monthFromName(name: string): number | null {
+  return MONTH_NAMES[name.toLowerCase().slice(0, 3)] ?? null;
+}
+
 /**
  * Data in formato AAAA-MM-GG da: 2026-11-10, 2026-11-10 08:30, 10/11/2026,
- * 10-11-2026, 10.11.2026, 20261110, secondi o millisecondi dal 1970.
+ * 10-11-2026, 10.11.2026, 20261110, "27 Jul 2025", "Jul 27, 2025",
+ * "27 lug 2025", secondi o millisecondi dal 1970.
  */
 export function parseAnyDate(raw: string): string | null {
   const s = raw.trim();
@@ -67,6 +77,10 @@ export function parseAnyDate(raw: string): string | null {
   if (m) return validYmd(+m[3], +m[2], +m[1]);
   m = s.match(/^(\d{4})(\d{2})(\d{2})$/);
   if (m) return validYmd(+m[1], +m[2], +m[3]);
+  m = s.match(/^(\d{1,2})\s+([A-Za-zÀ-ÿ]{3,9})\.?,?\s+(\d{4})/);
+  if (m && monthFromName(m[2])) return validYmd(+m[3], monthFromName(m[2])!, +m[1]);
+  m = s.match(/^([A-Za-zÀ-ÿ]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})/);
+  if (m && monthFromName(m[1])) return validYmd(+m[3], monthFromName(m[1])!, +m[2]);
   if (/^\d{9,13}$/.test(s)) {
     const n = Number(s);
     const ms = s.length >= 12 ? n : n * 1000;

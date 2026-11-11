@@ -2,10 +2,11 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Play, Receipt } from "lucide-react";
+import { Library, Loader2, Play, Receipt } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { registerRecurring, startSessionFromTemplate } from "@/app/(app)/hub/actions";
+import { seedExercises } from "@/app/(app)/hub/workout-actions";
 
 /** Crea l'allenamento di oggi dalla scheda, con tutte le serie già pronte. */
 export function StartSessionButton({ templateId }: { templateId: string }) {
@@ -51,5 +52,34 @@ export function RegisterRecurringButton({ id }: { id: string }) {
       {isPending ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Receipt className="mr-1.5 h-4 w-4" />}
       Registra il pagamento
     </Button>
+  );
+}
+
+/** Aggiunge al tuo elenco gli esercizi più comuni (quelli che hai già non si duplicano). */
+export function SeedExercisesButton() {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card/40 p-4">
+      <p className="min-w-48 flex-1 text-sm text-muted-foreground">
+        Parti da una libreria di circa 45 esercizi comuni, già divisi per gruppo muscolare. Per ognuno puoi poi aggiungere il link a un video.
+      </p>
+      <Button
+        variant="outline"
+        disabled={isPending}
+        className="max-md:min-h-11"
+        onClick={() =>
+          startTransition(async () => {
+            const res = await seedExercises();
+            if (!res.ok) return void toast.error("Non è stato possibile aggiungere gli esercizi.");
+            toast.success(res.added ? `${res.added} esercizi aggiunti` : "Hai già tutti gli esercizi della libreria");
+            router.refresh();
+          })
+        }
+      >
+        {isPending ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Library className="mr-1.5 h-4 w-4" />}
+        Aggiungi gli esercizi più comuni
+      </Button>
+    </div>
   );
 }

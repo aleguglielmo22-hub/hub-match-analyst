@@ -167,7 +167,7 @@ export async function CollectionDetailPage({ area, slug, id }: { area: AreaKey; 
   try {
     [refs, children] = await Promise.all([
       refOptionsFor([c, ...childCols]),
-      Promise.all(childDefs.map((ch, i) => listRows(childCols[i], { parentField: ch.parentField, parentId: id }))),
+      Promise.all(childDefs.map((ch, i) => (ch.hidden ? Promise.resolve([] as Row[]) : listRows(childCols[i], { parentField: ch.parentField, parentId: id })))),
     ]);
   } catch (err) {
     logSafeError(c.label, err);
@@ -236,7 +236,7 @@ export async function CollectionDetailPage({ area, slug, id }: { area: AreaKey; 
         })}
       </dl>
 
-      {childDefs.map((ch, i) => (
+      {childDefs.map((ch, i) => (ch.hidden ? null : (
         <ChildrenSection
           key={`${ch.collection}-${ch.parentField}`}
           parentCollection={c.key}
@@ -247,7 +247,7 @@ export async function CollectionDetailPage({ area, slug, id }: { area: AreaKey; 
           rows={children[i] ?? []}
           refOptions={refs}
         />
-      ))}
+      )))}
     </div>
   );
 }

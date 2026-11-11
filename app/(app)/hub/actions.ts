@@ -276,6 +276,8 @@ export async function startSessionFromTemplate(templateId: string): Promise<Save
           ordine: ordine++,
           ripetizioni: firstNumber(it.ripetizioni),
           carico_kg: it.carico_kg ?? null,
+          // Previste ma non ancora fatte: si spuntano durante l'allenamento.
+          fatta: false,
         });
       }
     }

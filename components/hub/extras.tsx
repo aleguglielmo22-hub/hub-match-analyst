@@ -2,8 +2,12 @@ import Link from "next/link";
 import { daysUntil, formatDate, formatMoney, todayIso, type Option } from "@/lib/hub/fields";
 import { COLLECTIONS, METRIC_TYPES, METRIC_UNIT, detailHref } from "@/lib/hub/registry";
 import { hubClient, logSafeError, requireOwner, type Row } from "@/lib/hub/server";
+import { previousSets, templateRestTimes } from "@/lib/hub/summary";
+import { estimatedMinutes, personalRecords, totalVolume } from "@/lib/hub/workout";
 import { LineChart, ProgressBar } from "./charts";
-import { RegisterRecurringButton, StartSessionButton } from "./action-buttons";
+import { RegisterRecurringButton, SeedExercisesButton, StartSessionButton } from "./action-buttons";
+import { WorkoutLogger } from "./workout-logger";
+import { WorkoutCsvImport } from "./workout-csv-import";
 import { CsvImport } from "./csv-import";
 import { OffSearch } from "./off-search";
 
@@ -11,6 +15,7 @@ import { OffSearch } from "./off-search";
 export function DetailExtras({
   collectionKey,
   row,
+  refOptions,
 }: {
   collectionKey: string;
   row: Row;
@@ -18,11 +23,9 @@ export function DetailExtras({
 }) {
   switch (collectionKey) {
     case "templatesWk":
-      return (
-        <div>
-          <StartSessionButton templateId={row.id} />
-        </div>
-      );
+      return <TemplateOverview templateId={row.id} />;
+    case "sessions":
+      return <WorkoutSection row={row} exercises={refOptions.exercises ?? []} />;
     case "recurring": {
       const days = typeof row.prossima_data === "string" ? daysUntil(row.prossima_data) : null;
       return (
@@ -145,32 +148,203 @@ async function BookProgress({ bookId }: { bookId: string }) {
 }
 
 async function ExerciseProgress({ exerciseId }: { exerciseId: string }) {
-  const points = await safeLoad("Progressi esercizio", async () => {
+  const data = await safeLoad("Progressi esercizio", async () => {
     const workspace = await requireOwner();
     const supabase = await hubClient();
     const { data, error } = await supabase
       .from("wk_sets")
-      .select("carico_kg, wk_sessions!inner(data, deleted_at)")
+      .select("carico_kg, ripetizioni, fatta, wk_sessions!inner(data, deleted_at)")
       .eq("workspace_id", workspace.id)
       .eq("exercise_id", exerciseId)
       .is("wk_sessions.deleted_at", null)
-      .limit(2000);
+      .limit(5000);
     if (error) throw error;
+    const rows = (data ?? []) as unknown as {
+      carico_kg: number | null;
+      ripetizioni: number | null;
+      fatta: boolean;
+      wk_sessions: { data: string } | { data: string }[];
+    }[];
     const best = new Map<string, number>();
-    for (const s of (data ?? []) as unknown as { carico_kg: number | null; wk_sessions: { data: string } | { data: string }[] }[]) {
+    const days = new Set<string>();
+    for (const s of rows) {
       const sess = Array.isArray(s.wk_sessions) ? s.wk_sessions[0] : s.wk_sessions;
-      if (!sess || s.carico_kg === null) continue;
+      if (!sess || !s.fatta) continue;
+      days.add(sess.data);
+      if (s.carico_kg === null) continue;
       best.set(sess.data, Math.max(best.get(sess.data) ?? 0, Number(s.carico_kg)));
     }
-    return [...best.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([x, y]) => ({ x, y }));
+    return {
+      points: [...best.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([x, y]) => ({ x, y })),
+      records: personalRecords(rows.map((r) => ({ carico_kg: r.carico_kg == null ? null : Number(r.carico_kg), ripetizioni: r.ripetizioni, fatta: r.fatta }))),
+      sessions: days.size,
+    };
   });
-  if (!points) return null;
+  if (!data) return null;
+  const kg = (n: number) => (n > 0 ? `${String(Math.round(n * 10) / 10).replace(".", ",")} kg` : "—");
   return (
-    <div className="rounded-xl border border-border bg-card/40 p-4">
-      <h2 className="mb-2 text-sm font-semibold">Carico massimo per allenamento</h2>
-      <LineChart points={points} unit="kg" label="Carico massimo" />
+    <div className="space-y-3 rounded-xl border border-border bg-card/40 p-4">
+      <div className="grid gap-3 sm:grid-cols-4">
+        <Stat label="Carico massimo" value={kg(data.records.bestWeight)} />
+        <Stat label="Massimale stimato" value={kg(data.records.bestOneRepMax)} />
+        <Stat label="Miglior serie (volume)" value={kg(data.records.bestVolume)} />
+        <Stat label="Allenamenti" value={String(data.sessions)} />
+      </div>
+      <h2 className="text-sm font-semibold">Carico massimo per allenamento</h2>
+      <LineChart points={data.points} unit="kg" label="Carico massimo" />
     </div>
   );
+}
+
+const GROUP_LABEL: Record<string, string> = Object.fromEntries(
+  (COLLECTIONS.exercises.fields.find((f) => f.key === "gruppo")?.options ?? []).map((o) => [o.value, o.label]),
+);
+
+/** Riepilogo di una scheda: quanto dura, cosa allena, quando l'hai fatta l'ultima volta. */
+async function TemplateOverview({ templateId }: { templateId: string }) {
+  const data = await safeLoad("Riepilogo scheda", async () => {
+    const workspace = await requireOwner();
+    const supabase = await hubClient();
+    const [items, last] = await Promise.all([
+      supabase
+        .from("wk_template_items")
+        .select("serie, recupero_s, wk_exercises(gruppo)")
+        .eq("workspace_id", workspace.id)
+        .eq("template_id", templateId),
+      supabase
+        .from("wk_sessions")
+        .select("data")
+        .eq("workspace_id", workspace.id)
+        .eq("template_id", templateId)
+        .is("deleted_at", null)
+        .order("data", { ascending: false })
+        .limit(200),
+    ]);
+    if (items.error) throw items.error;
+    if (last.error) throw last.error;
+    return {
+      items: (items.data ?? []) as unknown as { serie: number | null; recupero_s: number | null; wk_exercises: { gruppo: string | null } | { gruppo: string | null }[] | null }[],
+      sessions: (last.data ?? []) as { data: string }[],
+    };
+  });
+  const items = data?.items ?? [];
+  const groups = new Set<string>();
+  for (const it of items) {
+    const ex = Array.isArray(it.wk_exercises) ? it.wk_exercises[0] : it.wk_exercises;
+    if (ex?.gruppo) groups.add(GROUP_LABEL[ex.gruppo] ?? ex.gruppo);
+  }
+  const sets = items.reduce((n, it) => n + (it.serie ?? 1), 0);
+  const last = data?.sessions[0]?.data;
+  return (
+    <div className="space-y-3 rounded-xl border border-border bg-card/40 p-4">
+      {data && items.length > 0 ? (
+        <p className="text-sm text-muted-foreground">
+          <strong className="text-foreground">{items.length}</strong> esercizi · <strong className="text-foreground">{sets}</strong> serie · circa{" "}
+          <strong className="text-foreground">{estimatedMinutes(items)}</strong> minuti
+          {groups.size > 0 && <> · {[...groups].join(", ")}</>}
+          {last && (
+            <>
+              {" "}
+              · fatta {data.sessions.length} {data.sessions.length === 1 ? "volta" : "volte"}, ultima il {formatDate(last)}
+            </>
+          )}
+        </p>
+      ) : (
+        <p className="text-sm text-muted-foreground">Aggiungi gli esercizi qui sotto: serie, ripetizioni, carico e recupero.</p>
+      )}
+      <StartSessionButton templateId={templateId} />
+    </div>
+  );
+}
+
+/** Allenamento dal vivo: carica le serie, l'ultima volta e i recuperi, e li passa alla schermata. */
+async function WorkoutSection({ row, exercises }: { row: Row; exercises: Option[] }) {
+  const data = await safeLoad("Allenamento", async () => {
+    const workspace = await requireOwner();
+    const supabase = await hubClient();
+    const { data, error } = await supabase
+      .from("wk_sets")
+      .select("id, exercise_id, ordine, ripetizioni, carico_kg, fatta")
+      .eq("workspace_id", workspace.id)
+      .eq("session_id", row.id)
+      .order("ordine", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: true });
+    if (error) throw error;
+    const sets = ((data ?? []) as Record<string, unknown>[]).map((r) => ({
+      id: String(r.id),
+      exercise_id: String(r.exercise_id),
+      ordine: r.ordine == null ? null : Number(r.ordine),
+      ripetizioni: r.ripetizioni == null ? null : Number(r.ripetizioni),
+      carico_kg: r.carico_kg == null ? null : Number(r.carico_kg),
+      fatta: r.fatta !== false,
+    }));
+    const ids = [...new Set(sets.map((s) => s.exercise_id))];
+    const [prev, rest] = await Promise.all([
+      previousSets(row.id, String(row.data), ids),
+      templateRestTimes((row.template_id as string | null) ?? null),
+    ]);
+    return { sets, prev, rest };
+  });
+  if (!data) return <p className="text-sm text-muted-foreground">Non è stato possibile caricare le serie. Ricarica la pagina.</p>;
+  return (
+    <WorkoutLogger
+      sessionId={row.id}
+      startedAt={String(row.created_at)}
+      durationMin={row.durata_min == null ? null : Number(row.durata_min)}
+      hasTemplate={!!row.template_id}
+      initialSets={data.sets}
+      exercises={exercises}
+      previous={data.prev}
+      rest={data.rest}
+    />
+  );
+}
+
+/** Ultimi 30 giorni di allenamenti: quanti, per quanto tempo, quanto volume. */
+async function SessionsOverview({ rows }: { rows: Row[] }) {
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+  const from = todayIsoOf(since);
+  const recent = rows.filter((r) => String(r.data) >= from);
+  const minutes = recent.reduce((n, r) => n + Number(r.durata_min ?? 0), 0);
+  const volume = await safeLoad("Volume allenamenti", async () => {
+    if (recent.length === 0) return 0;
+    const workspace = await requireOwner();
+    const supabase = await hubClient();
+    const { data, error } = await supabase
+      .from("wk_sets")
+      .select("id, exercise_id, ordine, ripetizioni, carico_kg, fatta")
+      .eq("workspace_id", workspace.id)
+      .in("session_id", recent.slice(0, 200).map((r) => r.id))
+      .limit(10000);
+    if (error) throw error;
+    return Math.round(
+      totalVolume(
+        ((data ?? []) as Record<string, unknown>[]).map((r) => ({
+          id: String(r.id),
+          exercise_id: String(r.exercise_id),
+          ordine: null,
+          ripetizioni: r.ripetizioni == null ? null : Number(r.ripetizioni),
+          carico_kg: r.carico_kg == null ? null : Number(r.carico_kg),
+          fatta: r.fatta !== false,
+        })),
+      ),
+    );
+  });
+  return (
+    <div className="space-y-3">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Stat label="Allenamenti negli ultimi 30 giorni" value={String(recent.length)} />
+        <Stat label="Tempo in palestra" value={minutes ? (minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`) : "—"} />
+        <Stat label="Volume sollevato" value={volume ? `${volume.toLocaleString("it-IT")} kg` : "—"} />
+      </div>
+      <WorkoutCsvImport />
+    </div>
+  );
+}
+
+function todayIsoOf(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -223,6 +397,10 @@ export function ListExtras({
     }
     case "foods":
       return <OffSearch />;
+    case "sessions":
+      return <SessionsOverview rows={rows} />;
+    case "exercises":
+      return <SeedExercisesButton />;
     default:
       return null;
   }
