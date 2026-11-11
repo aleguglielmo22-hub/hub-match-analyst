@@ -3833,6 +3833,7 @@ export type Database = {
           gruppo: string | null
           id: string
           link: string | null
+          misura: string
           nome: string
           note: string | null
           updated_at: string
@@ -3846,6 +3847,7 @@ export type Database = {
           gruppo?: string | null
           id?: string
           link?: string | null
+          misura?: string
           nome: string
           note?: string | null
           updated_at?: string
@@ -3859,6 +3861,7 @@ export type Database = {
           gruppo?: string | null
           id?: string
           link?: string | null
+          misura?: string
           nome?: string
           note?: string | null
           updated_at?: string
@@ -3953,13 +3956,20 @@ export type Database = {
           carico_kg: number | null
           created_at: string
           created_by: string
+          durata_s: number | null
           exercise_id: string
           fatta: boolean
           id: string
+          nota_esercizio: string | null
           note: string | null
           ordine: number | null
+          recupero_s: number | null
+          rip_max: number | null
+          rip_min: number | null
           ripetizioni: number | null
           session_id: string
+          superset: number | null
+          tipo: string
           updated_at: string
           workspace_id: string
         }
@@ -3967,13 +3977,20 @@ export type Database = {
           carico_kg?: number | null
           created_at?: string
           created_by?: string
+          durata_s?: number | null
           exercise_id: string
           fatta?: boolean
           id?: string
+          nota_esercizio?: string | null
           note?: string | null
           ordine?: number | null
+          recupero_s?: number | null
+          rip_max?: number | null
+          rip_min?: number | null
           ripetizioni?: number | null
           session_id: string
+          superset?: number | null
+          tipo?: string
           updated_at?: string
           workspace_id: string
         }
@@ -3981,13 +3998,20 @@ export type Database = {
           carico_kg?: number | null
           created_at?: string
           created_by?: string
+          durata_s?: number | null
           exercise_id?: string
           fatta?: boolean
           id?: string
+          nota_esercizio?: string | null
           note?: string | null
           ordine?: number | null
+          recupero_s?: number | null
+          rip_max?: number | null
+          rip_min?: number | null
           ripetizioni?: number | null
           session_id?: string
+          superset?: number | null
+          tipo?: string
           updated_at?: string
           workspace_id?: string
         }
@@ -4027,6 +4051,7 @@ export type Database = {
           carico_kg: number | null
           created_at: string
           created_by: string
+          dettaglio: Json | null
           exercise_id: string
           id: string
           note: string | null
@@ -4034,6 +4059,7 @@ export type Database = {
           recupero_s: number | null
           ripetizioni: string | null
           serie: number | null
+          superset: number | null
           template_id: string
           updated_at: string
           workspace_id: string
@@ -4042,6 +4068,7 @@ export type Database = {
           carico_kg?: number | null
           created_at?: string
           created_by?: string
+          dettaglio?: Json | null
           exercise_id: string
           id?: string
           note?: string | null
@@ -4049,6 +4076,7 @@ export type Database = {
           recupero_s?: number | null
           ripetizioni?: string | null
           serie?: number | null
+          superset?: number | null
           template_id: string
           updated_at?: string
           workspace_id: string
@@ -4057,6 +4085,7 @@ export type Database = {
           carico_kg?: number | null
           created_at?: string
           created_by?: string
+          dettaglio?: Json | null
           exercise_id?: string
           id?: string
           note?: string | null
@@ -4064,6 +4093,7 @@ export type Database = {
           recupero_s?: number | null
           ripetizioni?: string | null
           serie?: number | null
+          superset?: number | null
           template_id?: string
           updated_at?: string
           workspace_id?: string
@@ -4109,6 +4139,7 @@ export type Database = {
           nome: string
           note: string | null
           obiettivo: string | null
+          programma: string | null
           tags: string[]
           updated_at: string
           workspace_id: string
@@ -4122,6 +4153,7 @@ export type Database = {
           nome: string
           note?: string | null
           obiettivo?: string | null
+          programma?: string | null
           tags?: string[]
           updated_at?: string
           workspace_id: string
@@ -4135,6 +4167,7 @@ export type Database = {
           nome?: string
           note?: string | null
           obiettivo?: string | null
+          programma?: string | null
           tags?: string[]
           updated_at?: string
           workspace_id?: string

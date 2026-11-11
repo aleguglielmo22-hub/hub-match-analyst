@@ -98,14 +98,15 @@ export const AREAS: NavArea[] = [
     icon: HeartPulse,
     description: "Parametri vitali, allenamenti e alimentazione.",
     children: [
+      { href: "/benessere/allenati", label: "Allenati", icon: Dumbbell },
       { href: "/benessere/settimana", label: "La settimana", icon: CalendarDays },
       { href: "/benessere/parametri", label: "Parametri vitali", icon: Activity },
       { href: "/benessere/alimentazione", label: "Diario dei pasti", icon: UtensilsCrossed },
       { href: "/benessere/alimenti", label: "Alimenti", icon: Apple },
       { href: "/benessere/piani", label: "Piani alimentari", icon: Salad },
-      { href: "/benessere/allenamenti", label: "Allenamenti svolti", icon: Dumbbell },
-      { href: "/benessere/schede", label: "Schede", icon: ClipboardList },
-      { href: "/benessere/esercizi", label: "Esercizi", icon: ListChecks },
+      { href: "/benessere/allenamenti", label: "Allenamenti svolti", icon: ClipboardList },
+      { href: "/benessere/schede", label: "Schede", icon: ListChecks },
+      { href: "/benessere/esercizi", label: "Esercizi", icon: Activity },
     ],
   },
   {

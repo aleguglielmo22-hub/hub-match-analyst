@@ -2,11 +2,13 @@ import Link from "next/link";
 import { daysUntil, formatDate, formatMoney, todayIso, type Option } from "@/lib/hub/fields";
 import { COLLECTIONS, METRIC_TYPES, METRIC_UNIT, detailHref } from "@/lib/hub/registry";
 import { hubClient, logSafeError, requireOwner, type Row } from "@/lib/hub/server";
-import { previousSets, templateRestTimes } from "@/lib/hub/summary";
-import { estimatedMinutes, personalRecords, totalVolume } from "@/lib/hub/workout";
+import { SET_COLUMNS, toSetRow } from "@/lib/hub/set-row";
+import { previousSets } from "@/lib/hub/summary";
+import { estimatedMinutes, parseTemplateSets, personalRecords, totalVolume } from "@/lib/hub/workout";
 import { LineChart, ProgressBar } from "./charts";
 import { RegisterRecurringButton, SeedExercisesButton, StartSessionButton } from "./action-buttons";
 import { WorkoutLogger } from "./workout-logger";
+import { TemplateEditor, type EditorItem } from "./template-editor";
 import { WorkoutCsvImport } from "./workout-csv-import";
 import { CsvImport } from "./csv-import";
 import { OffSearch } from "./off-search";
@@ -23,7 +25,7 @@ export function DetailExtras({
 }) {
   switch (collectionKey) {
     case "templatesWk":
-      return <TemplateOverview templateId={row.id} />;
+      return <TemplateOverview templateId={row.id} exercises={refOptions.exercises ?? []} />;
     case "sessions":
       return <WorkoutSection row={row} exercises={refOptions.exercises ?? []} />;
     case "recurring": {
@@ -201,16 +203,18 @@ const GROUP_LABEL: Record<string, string> = Object.fromEntries(
 );
 
 /** Riepilogo di una scheda: quanto dura, cosa allena, quando l'hai fatta l'ultima volta. */
-async function TemplateOverview({ templateId }: { templateId: string }) {
+async function TemplateOverview({ templateId, exercises }: { templateId: string; exercises: Option[] }) {
   const data = await safeLoad("Riepilogo scheda", async () => {
     const workspace = await requireOwner();
     const supabase = await hubClient();
-    const [items, last] = await Promise.all([
+    const [items, last, measuresRes] = await Promise.all([
       supabase
         .from("wk_template_items")
-        .select("serie, recupero_s, wk_exercises(gruppo)")
+        .select("id, exercise_id, ordine, serie, recupero_s, superset, note, dettaglio, wk_exercises(gruppo)")
         .eq("workspace_id", workspace.id)
-        .eq("template_id", templateId),
+        .eq("template_id", templateId)
+        .order("ordine", { ascending: true, nullsFirst: false })
+        .order("created_at", { ascending: true }),
       supabase
         .from("wk_sessions")
         .select("data")
@@ -219,12 +223,24 @@ async function TemplateOverview({ templateId }: { templateId: string }) {
         .is("deleted_at", null)
         .order("data", { ascending: false })
         .limit(200),
+      supabase.from("wk_exercises").select("id, misura").eq("workspace_id", workspace.id).is("deleted_at", null).limit(5000),
     ]);
     if (items.error) throw items.error;
     if (last.error) throw last.error;
+    if (measuresRes.error) throw measuresRes.error;
     return {
-      items: (items.data ?? []) as unknown as { serie: number | null; recupero_s: number | null; wk_exercises: { gruppo: string | null } | { gruppo: string | null }[] | null }[],
+      items: (items.data ?? []) as unknown as {
+        id: string;
+        exercise_id: string;
+        serie: number | null;
+        recupero_s: number | null;
+        superset: number | null;
+        note: string | null;
+        dettaglio: unknown;
+        wk_exercises: { gruppo: string | null } | { gruppo: string | null }[] | null;
+      }[],
       sessions: (last.data ?? []) as { data: string }[],
+      measures: Object.fromEntries(((measuresRes.data ?? []) as { id: string; misura: string }[]).map((e) => [e.id, e.misura])),
     };
   });
   const items = data?.items ?? [];
@@ -235,55 +251,65 @@ async function TemplateOverview({ templateId }: { templateId: string }) {
   }
   const sets = items.reduce((n, it) => n + (it.serie ?? 1), 0);
   const last = data?.sessions[0]?.data;
+  const editorItems: EditorItem[] = items.map((it) => {
+    const detail = parseTemplateSets(it.dettaglio);
+    return {
+      id: it.id,
+      exercise_id: it.exercise_id,
+      recupero_s: it.recupero_s,
+      superset: it.superset,
+      note: it.note,
+      // Senza dettaglio (schede create prima) si parte da un elenco semplice di serie uguali.
+      sets: detail.length ? detail : Array.from({ length: Math.max(1, it.serie ?? 1) }, () => ({ t: "normale" as const, rip: null, min: null, max: null, kg: null, dur: null })),
+    };
+  });
   return (
-    <div className="space-y-3 rounded-xl border border-border bg-card/40 p-4">
-      {data && items.length > 0 ? (
-        <p className="text-sm text-muted-foreground">
-          <strong className="text-foreground">{items.length}</strong> esercizi · <strong className="text-foreground">{sets}</strong> serie · circa{" "}
-          <strong className="text-foreground">{estimatedMinutes(items)}</strong> minuti
-          {groups.size > 0 && <> · {[...groups].join(", ")}</>}
-          {last && (
-            <>
-              {" "}
-              · fatta {data.sessions.length} {data.sessions.length === 1 ? "volta" : "volte"}, ultima il {formatDate(last)}
-            </>
-          )}
-        </p>
-      ) : (
-        <p className="text-sm text-muted-foreground">Aggiungi gli esercizi qui sotto: serie, ripetizioni, carico e recupero.</p>
-      )}
-      <StartSessionButton templateId={templateId} />
+    <div className="space-y-4">
+      <div className="space-y-3 rounded-xl border border-border bg-card/40 p-4">
+        {data && items.length > 0 ? (
+          <p className="text-sm text-muted-foreground">
+            <strong className="text-foreground">{items.length}</strong> esercizi · <strong className="text-foreground">{sets}</strong> serie · circa{" "}
+            <strong className="text-foreground">{estimatedMinutes(items)}</strong> minuti
+            {groups.size > 0 && <> · {[...groups].join(", ")}</>}
+            {last && (
+              <>
+                {" "}
+                · fatta {data.sessions.length} {data.sessions.length === 1 ? "volta" : "volte"}, ultima il {formatDate(last)}
+              </>
+            )}
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">Aggiungi gli esercizi qui sotto: serie, ripetizioni, carico e recupero.</p>
+        )}
+        <StartSessionButton templateId={templateId} />
+      </div>
+      {data && <TemplateEditor key={templateId} templateId={templateId} items={editorItems} exercises={exercises} measures={data.measures} />}
     </div>
   );
 }
 
-/** Allenamento dal vivo: carica le serie, l'ultima volta e i recuperi, e li passa alla schermata. */
+/** Allenamento dal vivo: carica le serie, l'ultima volta e come si misura ogni esercizio. */
 async function WorkoutSection({ row, exercises }: { row: Row; exercises: Option[] }) {
   const data = await safeLoad("Allenamento", async () => {
     const workspace = await requireOwner();
     const supabase = await hubClient();
-    const { data, error } = await supabase
-      .from("wk_sets")
-      .select("id, exercise_id, ordine, ripetizioni, carico_kg, fatta")
-      .eq("workspace_id", workspace.id)
-      .eq("session_id", row.id)
-      .order("ordine", { ascending: true, nullsFirst: false })
-      .order("created_at", { ascending: true });
-    if (error) throw error;
-    const sets = ((data ?? []) as Record<string, unknown>[]).map((r) => ({
-      id: String(r.id),
-      exercise_id: String(r.exercise_id),
-      ordine: r.ordine == null ? null : Number(r.ordine),
-      ripetizioni: r.ripetizioni == null ? null : Number(r.ripetizioni),
-      carico_kg: r.carico_kg == null ? null : Number(r.carico_kg),
-      fatta: r.fatta !== false,
-    }));
-    const ids = [...new Set(sets.map((s) => s.exercise_id))];
-    const [prev, rest] = await Promise.all([
-      previousSets(row.id, String(row.data), ids),
-      templateRestTimes((row.template_id as string | null) ?? null),
+    const [setsRes, measuresRes] = await Promise.all([
+      supabase
+        .from("wk_sets")
+        .select(SET_COLUMNS)
+        .eq("workspace_id", workspace.id)
+        .eq("session_id", row.id)
+        .order("ordine", { ascending: true, nullsFirst: false })
+        .order("created_at", { ascending: true }),
+      supabase.from("wk_exercises").select("id, misura").eq("workspace_id", workspace.id).is("deleted_at", null).limit(5000),
     ]);
-    return { sets, prev, rest };
+    if (setsRes.error) throw setsRes.error;
+    if (measuresRes.error) throw measuresRes.error;
+    const sets = ((setsRes.data ?? []) as unknown as Record<string, unknown>[]).map(toSetRow);
+    const measures = Object.fromEntries(((measuresRes.data ?? []) as { id: string; misura: string }[]).map((e) => [e.id, e.misura]));
+    const ids = [...new Set(sets.map((s) => s.exercise_id))];
+    const prev = await previousSets(row.id, String(row.data), ids);
+    return { sets, prev, measures };
   });
   if (!data) return <p className="text-sm text-muted-foreground">Non è stato possibile caricare le serie. Ricarica la pagina.</p>;
   return (
@@ -294,8 +320,8 @@ async function WorkoutSection({ row, exercises }: { row: Row; exercises: Option[
       hasTemplate={!!row.template_id}
       initialSets={data.sets}
       exercises={exercises}
+      measures={data.measures}
       previous={data.prev}
-      rest={data.rest}
     />
   );
 }

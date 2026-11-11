@@ -2,19 +2,20 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Library, Loader2, Play, Receipt } from "lucide-react";
+import { Library, Loader2, Play, Plus, Receipt } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { registerRecurring, startSessionFromTemplate } from "@/app/(app)/hub/actions";
-import { seedExercises } from "@/app/(app)/hub/workout-actions";
+import { seedExercises, startEmptySession } from "@/app/(app)/hub/workout-actions";
 
 /** Crea l'allenamento di oggi dalla scheda, con tutte le serie già pronte. */
-export function StartSessionButton({ templateId }: { templateId: string }) {
+export function StartSessionButton({ templateId, compact = false }: { templateId: string; compact?: boolean }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   return (
     <Button
       disabled={isPending}
+      size={compact ? "sm" : "default"}
       className="max-md:min-h-11"
       onClick={() =>
         startTransition(async () => {
@@ -26,7 +27,30 @@ export function StartSessionButton({ templateId }: { templateId: string }) {
       }
     >
       {isPending ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Play className="mr-1.5 h-4 w-4" />}
-      Inizia allenamento di oggi
+      {compact ? "Inizia" : "Inizia allenamento di oggi"}
+    </Button>
+  );
+}
+
+/** Parte un allenamento senza scheda: gli esercizi si aggiungono man mano. */
+export function StartEmptyButton() {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  return (
+    <Button
+      variant="outline"
+      disabled={isPending}
+      className="max-md:min-h-11"
+      onClick={() =>
+        startTransition(async () => {
+          const res = await startEmptySession();
+          if (!res.ok) return void toast.error(res.message);
+          router.push(res.href);
+        })
+      }
+    >
+      {isPending ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Plus className="mr-1.5 h-4 w-4" />}
+      Allenamento vuoto
     </Button>
   );
 }

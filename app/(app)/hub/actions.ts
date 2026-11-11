@@ -12,6 +12,7 @@ import {
   type CollectionKey,
 } from "@/lib/hub/registry";
 import { hubClient, logSafeError, requireOwner, type Row } from "@/lib/hub/server";
+import { parseTemplateSets } from "@/lib/hub/workout";
 
 export type SaveResult =
   | { ok: true; id: string; href: string | null }
@@ -249,7 +250,7 @@ export async function startSessionFromTemplate(templateId: string): Promise<Save
 
     const { data: items, error: iErr } = await supabase
       .from("wk_template_items")
-      .select("exercise_id, ordine, serie, ripetizioni, carico_kg")
+      .select("exercise_id, ordine, serie, ripetizioni, carico_kg, recupero_s, note, superset, dettaglio")
       .eq("workspace_id", workspace.id)
       .eq("template_id", templateId)
       .order("ordine", { ascending: true, nullsFirst: false })
@@ -267,18 +268,36 @@ export async function startSessionFromTemplate(templateId: string): Promise<Save
     const sets: Record<string, unknown>[] = [];
     let ordine = 1;
     for (const it of (items ?? []) as Record<string, unknown>[]) {
+      // Dati dell'esercizio copiati in ogni serie: l'allenamento resta com'era anche se la scheda cambia.
+      const common = {
+        workspace_id: workspace.id,
+        session_id: sessionId,
+        exercise_id: it.exercise_id,
+        recupero_s: it.recupero_s ?? null,
+        superset: it.superset ?? null,
+        nota_esercizio: typeof it.note === "string" && it.note ? it.note : null,
+        // Previste ma non ancora fatte: si spuntano durante l'allenamento.
+        fatta: false,
+      };
+      const detail = parseTemplateSets(it.dettaglio);
+      if (detail.length) {
+        for (const d of detail) {
+          sets.push({
+            ...common,
+            ordine: ordine++,
+            tipo: d.t,
+            rip_min: d.min,
+            rip_max: d.max,
+            ripetizioni: d.rip ?? (d.min != null && d.min === d.max ? d.min : null),
+            carico_kg: d.kg,
+            durata_s: d.dur,
+          });
+        }
+        continue;
+      }
       const count = Math.min(20, Math.max(1, Number(it.serie ?? 1)));
       for (let i = 0; i < count; i++) {
-        sets.push({
-          workspace_id: workspace.id,
-          session_id: sessionId,
-          exercise_id: it.exercise_id,
-          ordine: ordine++,
-          ripetizioni: firstNumber(it.ripetizioni),
-          carico_kg: it.carico_kg ?? null,
-          // Previste ma non ancora fatte: si spuntano durante l'allenamento.
-          fatta: false,
-        });
+        sets.push({ ...common, ordine: ordine++, ripetizioni: firstNumber(it.ripetizioni), carico_kg: it.carico_kg ?? null });
       }
     }
     if (sets.length) {

@@ -284,7 +284,7 @@ export async function countWhere(table: string, filters: Record<string, string |
 /* Allenamenti: serie dell'ultima volta e recuperi della scheda        */
 /* ------------------------------------------------------------------ */
 
-export type PreviousSet = { ripetizioni: number | null; carico_kg: number | null };
+export type PreviousSet = { ripetizioni: number | null; carico_kg: number | null; durata_s: number | null; tipo: string };
 
 /**
  * Per ogni esercizio, le serie fatte nell'allenamento più recente che lo
@@ -300,7 +300,7 @@ export async function previousSets(
   const supabase = await hubClient();
   const { data, error } = await supabase
     .from("wk_sets")
-    .select("exercise_id, session_id, ordine, ripetizioni, carico_kg, wk_sessions!inner(data, created_at, deleted_at)")
+    .select("exercise_id, session_id, ordine, ripetizioni, carico_kg, durata_s, tipo, fatta, wk_sessions!inner(data, created_at, deleted_at)")
     .eq("workspace_id", workspace.id)
     .in("exercise_id", [...exerciseIds])
     .eq("fatta", true)
@@ -316,6 +316,8 @@ export async function previousSets(
     ordine: number | null;
     ripetizioni: number | null;
     carico_kg: number | null;
+    durata_s: number | null;
+    tipo: string | null;
     wk_sessions: { data: string; created_at: string } | { data: string; created_at: string }[];
   };
   const bySession = new Map<string, { rank: string; exercise: string; sets: (PreviousSet & { ordine: number })[] }>();
@@ -328,7 +330,13 @@ export async function previousSets(
       entry = { rank: `${sess.data}|${sess.created_at}`, exercise: r.exercise_id, sets: [] };
       bySession.set(key, entry);
     }
-    entry.sets.push({ ripetizioni: r.ripetizioni, carico_kg: r.carico_kg == null ? null : Number(r.carico_kg), ordine: r.ordine ?? 0 });
+    entry.sets.push({
+      ripetizioni: r.ripetizioni,
+      carico_kg: r.carico_kg == null ? null : Number(r.carico_kg),
+      durata_s: r.durata_s == null ? null : Number(r.durata_s),
+      tipo: r.tipo ?? "normale",
+      ordine: r.ordine ?? 0,
+    });
   }
   const latest = new Map<string, { rank: string; sets: (PreviousSet & { ordine: number })[] }>();
   for (const e of bySession.values()) {
@@ -337,24 +345,7 @@ export async function previousSets(
   }
   const out: Record<string, PreviousSet[]> = {};
   for (const [exercise, e] of latest) {
-    out[exercise] = e.sets.sort((a, b) => a.ordine - b.ordine).map(({ ripetizioni, carico_kg }) => ({ ripetizioni, carico_kg }));
+    out[exercise] = e.sets.sort((a, b) => a.ordine - b.ordine).map(({ ripetizioni, carico_kg, durata_s, tipo }) => ({ ripetizioni, carico_kg, durata_s, tipo }));
   }
-  return out;
-}
-
-/** Recupero in secondi previsto dalla scheda per ogni esercizio. */
-export async function templateRestTimes(templateId: string | null): Promise<Record<string, number>> {
-  if (!templateId) return {};
-  const workspace = await requireOwner();
-  const supabase = await hubClient();
-  const { data, error } = await supabase
-    .from("wk_template_items")
-    .select("exercise_id, recupero_s")
-    .eq("workspace_id", workspace.id)
-    .eq("template_id", templateId)
-    .not("recupero_s", "is", null);
-  if (error) throw error;
-  const out: Record<string, number> = {};
-  for (const r of (data ?? []) as { exercise_id: string; recupero_s: number }[]) out[r.exercise_id] = Number(r.recupero_s);
   return out;
 }
