@@ -34,11 +34,10 @@ export async function POST(request: NextRequest) {
   }
 
   const rows = normalizeSyncPayload(body);
-  if (rows.length === 0) return NextResponse.json({ ok: true, received: 0, saved: 0 });
-
   const supabase = createClient(config.url, config.anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
   let saved = 0;
-  for (let i = 0; i < rows.length; i += BATCH) {
+  // Anche senza dati si controlla la chiave, così un errore di configurazione si nota subito.
+  for (let i = 0; i < Math.max(1, rows.length); i += BATCH) {
     const { data, error } = await supabase.rpc("health_ingest", { p_token: token, p_rows: rows.slice(i, i + BATCH) });
     if (error) {
       const unauthorized = error.code === "28000";
