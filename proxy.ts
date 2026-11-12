@@ -15,10 +15,6 @@ const PROTECTED_PREFIXES = [
   "/archivio",
   "/cestino",
   "/impostazioni",
-  "/lavoro",
-  "/studi",
-  "/benessere",
-  "/finanze",
 ];
 
 const isProtected = (pathname: string) =>

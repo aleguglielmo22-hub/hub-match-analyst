@@ -7,9 +7,6 @@ import { it } from "date-fns/locale";
 import {
   Archive,
   Brain,
-  GraduationCap,
-  HeartPulse,
-  Wallet,
   Loader2,
   RotateCcw,
   Target,
@@ -37,18 +34,11 @@ import {
 } from "@/app/(app)/cestino/actions";
 import { TRASH_SECTION, type TrashSection } from "@/lib/trash/sections";
 
-const SECTION_ICON: Partial<Record<TrashSection, LucideIcon>> = {
+const SECTION_ICON: Record<TrashSection, LucideIcon> = {
   scouting: Users,
   "set-pieces": Target,
   training: Brain,
   cloud: Archive,
-};
-/** Icona per gruppo, per le sezioni personali (Studi, Benessere, Finanze). */
-const GROUP_ICON: Record<string, LucideIcon> = {
-  Studi: GraduationCap,
-  Benessere: HeartPulse,
-  Finanze: Wallet,
-  Lavoro: Archive,
 };
 
 export function TrashView({
@@ -140,7 +130,7 @@ function TrashRow({
   onAskDelete: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
-  const Icon = SECTION_ICON[item.section] ?? GROUP_ICON[TRASH_SECTION[item.section].group];
+  const Icon = SECTION_ICON[item.section];
   const deletedFmt = format(parseISO(item.deleted_at), "d MMM yyyy, HH:mm", { locale: it });
 
   function handleRestore() {

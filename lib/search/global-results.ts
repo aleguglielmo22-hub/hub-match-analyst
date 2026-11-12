@@ -5,7 +5,7 @@
  * Modulo puro, testato in global-results.test.mjs.
  */
 
-export type SearchSection = "player" | "observation" | "set_piece" | "situational" | "archive" | "related" | "hub";
+export type SearchSection = "player" | "observation" | "set_piece" | "situational" | "archive" | "related";
 export type SearchKind = Exclude<SearchSection, "related">;
 
 export type SearchRow = {
@@ -18,9 +18,6 @@ export type SearchRow = {
   punteggio: number;
   collegato_a: string | null;
   apri_id: string | null;
-  /** Solo sezioni personali ("hub"): indirizzo e nome del gruppo già pronti. */
-  href?: string;
-  gruppo?: string;
 };
 
 export type SearchResult = {
@@ -43,7 +40,6 @@ export const SECTION_LABEL: Record<SearchKind, string> = {
   set_piece: "Piazzati",
   situational: "Esercitazioni",
   archive: "Cloud",
-  hub: "Studi, Benessere e Finanze",
 };
 
 const KINDS = new Set<string>(SECTION_ORDER);
@@ -61,8 +57,6 @@ export function resultHref(kind: SearchKind, id: string, openId?: string | null)
       return `/situational/${id}`;
     case "archive":
       return `/archivio/${id}`;
-    case "hub":
-      return "/dashboard";
   }
 }
 
@@ -106,16 +100,6 @@ export function groupSearchResults(rows: SearchRow[]): SearchGroup[] {
   for (const [name, results] of related) {
     groups.push({ key: `related:${name}`, label: `Collegati a ${name}`, results });
   }
-
-  // Sezioni personali: un gruppo per sezione (Libri, Corsi, Movimenti…).
-  const hub = new Map<string, SearchResult[]>();
-  for (const r of rows) {
-    if (r.sezione !== "hub" || !r.href || !r.gruppo || !r.href.startsWith("/")) continue;
-    const list = hub.get(r.gruppo) ?? [];
-    list.push({ key: `hub:${r.tipo}:${r.id}`, kind: "hub", id: r.id, title: r.titolo, subtitle: r.sottotitolo || null, date: r.data, href: r.href });
-    hub.set(r.gruppo, list);
-  }
-  for (const [label, results] of hub) groups.push({ key: `hub:${label}`, label, results });
   return groups;
 }
 

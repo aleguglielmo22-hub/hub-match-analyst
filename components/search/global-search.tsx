@@ -20,7 +20,6 @@ import {
   Loader2,
   Plus,
   Search,
-  Sparkles,
   Target,
   Users,
   X,
@@ -52,7 +51,6 @@ const KIND_ICON: Record<SearchKind, LucideIcon> = {
   set_piece: Target,
   situational: Brain,
   archive: Archive,
-  hub: Sparkles,
 };
 
 const MIN_CHARS = 2;
@@ -196,9 +194,8 @@ function SearchPanel({ onClose }: { onClose: () => void }) {
     : recentO.map((r) => ({ href: r.href, item: r }));
 
   function openItem(item: RecentItem) {
-    if (searching && item.kind !== "hub") rememberQuery(query);
-    // Studi, Benessere e Finanze non finiscono tra i "recenti" del browser.
-    if (item.kind !== "hub") rememberOpened(item);
+    if (searching) rememberQuery(query);
+    rememberOpened(item);
     onClose();
     router.push(item.href);
   }

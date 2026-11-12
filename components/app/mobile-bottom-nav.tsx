@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { AREAS, HOME, areaForPath, isNavItemActive, type NavItem } from "./nav-items";
+import { NAV, isNavItemActive } from "./nav-items";
 import { LinkPendingIcon } from "@/components/app/link-pending-icon";
 
 /** Pagine con un form: al posto della barra compare la barra "Salva" del form. */
@@ -11,30 +11,26 @@ export function isFormRoute(pathname: string): boolean {
   return /\/(nuovo|nuova|modifica)$/.test(pathname);
 }
 
-const ITEMS: (NavItem & { areaKey?: string })[] = [
-  HOME,
-  ...AREAS.map((a) => ({ href: a.href, label: a.label, shortLabel: a.label, icon: a.icon, areaKey: a.key })),
-];
+const ITEMS = NAV.filter((item) => item.inBottomNav);
 
 /**
- * Barra di navigazione in basso, solo su mobile (< 768 px): Home + le 4 aree.
- * Le sotto-sezioni sono nella pagina dell'area e nel menu ☰ in alto.
+ * Barra di navigazione in basso, solo su mobile (< 768 px).
+ * Impostazioni ed esci restano nel menu ☰ in alto.
  * Rispetta l'area sicura dell'iPhone (safe-area-inset-bottom).
  */
 export function MobileBottomNav() {
   const pathname = usePathname();
   if (isFormRoute(pathname)) return null;
-  const currentArea = areaForPath(pathname)?.key;
 
   return (
     <nav
-      aria-label="Aree"
+      aria-label="Sezioni"
       className="fixed inset-x-0 bottom-0 z-30 border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       <ul className="grid grid-cols-5">
         {ITEMS.map((item) => {
           const Icon = item.icon;
-          const isActive = item.areaKey ? currentArea === item.areaKey : isNavItemActive(item, pathname);
+          const isActive = isNavItemActive(item, pathname);
           return (
             <li key={item.href}>
               <Link
